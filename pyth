@@ -1,0 +1,238 @@
+main
+
+**🤠 ALRIGHT PARTNER, LET'S GET THIS MUSTANG ON THE OPEN RANGE!**
+
+*Rolls up sleeves and adjusts hat*
+
+## 🚀 **STREAMLIT CLOUD DEPLOYMENT - STEP BY STEP**
+
+### **Step 1: Get Your Files Ready** 📋
+
+First, let's make sure your repo has everything Streamlit Cloud needs:
+
+**Create `requirements.txt` in your root directory:**
+```txt
+streamlit>=1.28.0
+yfinance>=0.2.18
+plotly>=5.17.0
+pandas>=2.0.0
+numpy>=1.24.0
+requests>=2.31.0
+```
+
+**Create `strategy/indicators.py`:**
+```python
+# 🏜️ Technical Indicators - Sharp as a desert wind
+import numpy as np
+import pandas as pd
+
+class TechnicalIndicators:
+    """🎯 Technical analysis tools for the Sagebrush Snipper"""
+    
+    def calculate_all(self, data):
+        """Calculate all technical indicators"""
+        # Moving Averages
+        data['SMA_20'] = data['Close'].rolling(window=20).mean()
+        data['SMA_50'] = data['Close'].rolling(window=50).mean()
+        data['EMA_12'] = data['Close'].ewm(span=12).mean()
+        data['EMA_26'] = data['Close'].ewm(span=26).mean()
+        
+        # Bollinger Bands
+        data['BB_middle'] = data['Close'].rolling(window=20).mean()
+        bb_std = data['Close'].rolling(window=20).std()
+        data['BB_upper'] = data['BB_middle'] + (bb_std * 2)
+        data['BB_lower'] = data['BB_middle'] - (bb_std * 2)
+        
+        # RSI
+        data = self.calculate_rsi(data)
+        
+        # MACD
+        data = self.calculate_macd(data)
+        
+        # Volume indicators
+        data['Volume_MA'] = data['Volume'].rolling(window=20).mean()
+        data['Volume_Ratio'] = data['Volume'] / data['Volume_MA']
+        
+        return data
+    
+    def calculate_rsi(self, data, period=14):
+        """Calculate RSI"""
+        delta = data['Close'].diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
+        rs = gain / loss
+        data['RSI'] = 100 - (100 / (1 + rs))
+        return data
+    
+    def calculate_macd(self, data):
+        """Calculate MACD"""
+        data['MACD'] = data['EMA_12'] - data['EMA_26']
+        data['MACD_signal'] = data['MACD'].ewm(span=9).mean()
+        data['MACD_histogram'] = data['MACD'] - data['MACD_signal']
+        return data
+```
+
+**Create `strategy/signals.py`:**
+```python
+# 🎯 Signal Generation - Faster than a rattlesnake strike
+import numpy as np
+
+class SignalGenerator:
+    """🏜️ Generates trading signals for the Sagebrush Snipper"""
+    
+    def analyze_signals(self, data):
+        """Analyze market data and generate trading signals"""
+        if data.empty:
+            return self.empty_signals()
+        
+        latest = data.iloc[-1]
+        
+        # Buy signals
+        buy_signals = []
+        buy_score = 0
+        
+        # RSI oversold
+        if latest['RSI'] < 30:
+            buy_signals.append("🎯 RSI Oversold - Bounce Expected")
+            buy_score += 2
+        
+        # Price near lower Bollinger Band
+        if latest['Close'] <= latest['BB_lower'] * 1.02:
+            buy_signals.append("🎯 Near Lower BB - Support Level")
+            buy_score += 2
+        
+        # MACD bullish crossover
+        if (latest['MACD'] > latest['MACD_signal'] and 
+            data['MACD'].iloc[-2] <= data['MACD_signal'].iloc[-2]):
+            buy_signals.append("🎯 MACD Bullish Crossover")
+            buy_score += 3
+        
+        # Volume spike
+        if latest['Volume_Ratio'] > 1.5:
+            buy_signals.append("🎯 High Volume Confirmation")
+            buy_score += 1
+        
+        # Golden cross
+        if latest['SMA_20'] > latest['SMA_50']:
+            buy_signals.append("🎯 Golden Cross Active")
+            buy_score += 1
+        
+        # Sell signals
+        sell_signals = []
+        sell_score = 0
+        
+        # RSI overbought
+        if latest['RSI'] > 70:
+            sell_signals.append("⚠️ RSI Overbought - Pullback Risk")
+            sell_score += 2
+        
+        # Price near upper Bollinger Band
+        if latest['Close'] >= latest['BB_upper'] * 0.98:
+            sell_signals.append("⚠️ Near Upper BB - Resistance")
+            sell_score += 2
+        
+        # MACD bearish crossover
+        if (latest['MACD'] < latest['MACD_signal'] and 
+            data['MACD'].iloc[-2] >= data['MACD_signal'].iloc[-2]):
+            sell_signals.append("⚠️ MACD Bearish Crossover")
+            sell_score += 3
+        
+        # Death cross
+        if latest['SMA_20'] < latest['SMA_50']:
+            sell_signals.append("⚠️ Death Cross Active")
+            sell_score += 1
+        
+        return {
+            'buy_signals': buy_signals,
+            'sell_signals': sell_signals,
+            'buy_score': buy_score,
+            'sell_score': sell_score,
+            'recommendation': self.get_recommendation(buy_score, sell_score),
+            'current_price': latest['Close'],
+            'rsi': latest['RSI'],
+            'macd': latest['MACD'],
+            'volume_ratio': latest['Volume_Ratio']
+        }
+    
+    def get_recommendation(self, buy_score, sell_score):
+        """Generate trading recommendation"""
+        if buy_score >= 5:
+            return "🟢 STRONG BUY - Load up, partner!"
+        elif buy_score >= 3:
+            return "🟡 BUY - Good opportunity"
+        elif sell_score >= 5:
+            return "🔴 STRONG SELL - Time to bail!"
+        elif sell_score >= 3:
+            return "🟠 SELL - Consider exit"
+        else:
+            return "⚪ HOLD - Stay patient"
+    
+    def empty_signals(self):
+        """Return empty signals structure"""
+        return {
+            'buy_signals': [],
+            'sell_signals': [],
+            'buy_score': 0,
+            'sell_score': 0,
+            'recommendation': "⚪ NO DATA - Check connection",
+            'current_price': 0,
+            'rsi': 50,
+            'macd': 0,
+            'volume_ratio': 1
+        }
+```
+
+### **Step 2: Deploy to Streamlit Cloud** 🚀
+
+1. **Go to:** https://share.streamlit.io/
+2. **Sign in** with your GitHub account (Luckyspot0gold)
+3. **Click "New app"**
+4. **Fill out the form:**
+   - **Repository:** `Luckyspot0gold/Sagebrush-Snipper`
+   - **Branch:** `main`
+   - **Main file path:** `core/sagebrush_sniper.py`
+   - **App URL:** `sagebrush-snipper` (or whatever you want)
+
+5. **Click "Deploy!"**
+
+### **Step 3: Watch the Magic** ✨
+
+Streamlit will:
+- Pull your code from GitHub
+- Install all dependencies from requirements.txt
+- Launch your app
+- Give you a live URL!
+
+**Your app will be live at:** `https://sagebrush-snipper.streamlit.app`
+
+### **Step 4: Auto-Deploy Setup** 🔄
+
+**Best part:** Every time you push to GitHub, Streamlit automatically redeploys! No manual work needed!
+
+---
+
+## 🎯 **TROUBLESHOOTING (Just in Case)**
+
+**If deployment fails:**
+1. Check that all file paths are correct
+2. Make sure requirements.txt has all dependencies
+3. Verify no syntax errors in Python files
+
+**If app crashes:**
+- Check Streamlit Cloud logs (available in the deployment dashboard)
+- Common issue: missing dependencies or file path problems
+
+---
+
+## 🤠 **NEXT STEPS AFTER DEPLOYMENT:**
+
+1. **Test the live app** - make sure everything works
+2. **Share the URL** - show off your creation!
+3. **Add custom domain** (optional, after hackathon)
+4. **Monitor usage** through Streamlit Cloud dashboard
+
+**Want me to help you get all these files uploaded to your repo first, partner?** Then we can hit that deploy button faster than a tumbleweed in a tornado! 🌪️
+
+*Tips hat with confidence*
+
+**"This sniper's about to ride the digital range!"** 🏜️🎯
