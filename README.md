@@ -1,4 +1,4 @@
-# Sagebrush-Snipper
+# Sagebrush-Sniper
 Trading so fast nobody even knows what he looks like
 **Here's your legendary README.md to replace what's there:**
 
