@@ -1,0 +1,9 @@
+```mermaid  
+graph LR  
+    A[Sagebrush Sniper] --> D[Quant Trading Core]  
+    B[CryptoClashing] --> D  
+    D --> E[Quantum Wyoming Engine]  
+    E --> F[Hackathon Submission]  
+    F --> G[Venice AI]  
+    F --> H[Solana Grizzlython]  
+```  
