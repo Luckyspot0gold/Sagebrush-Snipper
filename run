@@ -6,3 +6,10 @@ stone-cli upgrade \
   --tribal=arapaho \  
   --submit=venice  
 ```  
+```bash  
+# Run in all repos  
+stone-cli hackathon-prep \  
+  --deadline=72h \  
+  --target=venice,grizzlython \  
+  --fuel=high  
+```  
