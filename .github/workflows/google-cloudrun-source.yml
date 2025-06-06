@@ -1,3 +1,5 @@
+gcloud iam service-accounts keys create gsa-key.json \
+  --iam-account=github-actions@$PROJECT_ID.iam.gserviceaccount.com
 name: Deploy to Cloud Run
 
 on: [push]
@@ -27,6 +29,9 @@ jobs:
       run: |
         echo "Service deployed to: ${{ steps.deploy.outputs.url }}"
         gcloud services enable \
+ gcloud services enable \
   run.googleapis.com \
+  artifactregistry.googleapis.com \
+  cloudbuild.googleapis.com run.googleapis.com \
   artifactregistry.googleapis.com \
   cloudbuild.googleapis.com
