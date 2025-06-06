@@ -13,3 +13,4 @@ stone-cli hackathon-prep \
   --target=venice,grizzlython \  
   --fuel=high  
 ```  
+stone-cli audit --full --repair
