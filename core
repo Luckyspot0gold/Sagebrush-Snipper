@@ -44,10 +44,11 @@ class WyomingCryptoSniper:
             data['BB_lower'] = data['BB_middle'] - (bb_std * 2)
             
             # RSI (Relative Strength Index - tough as Wyoming winters)
-            delta = data['Close'].diff()
+            - data = ticker.history(period=period, interval="1h")  
+            + data = ticker.history(period=period, interval="60m")  # yfinance fix  ` 
             gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
             loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
-            rs = gain / loss
+            rs = gain/loss
             data['RSI'] = 100 - (100 / (1 + rs))
             
             # MACD (smoother than a cowboy's drawl)
