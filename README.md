@@ -1,4 +1,15 @@
-# Sagebrush-Sniper
+## 👻 AI Ghost Editor  
+
+This repo uses an AI assistant to automatically:  
+- 🛠️ Fix syntax errors  
+- 🧹 Improve code style  
+- 🔍 Catch potential bugs  
+- ✅ Validate changes  
+
+Workflows:  
+1. `ai-review.yml` - AI reviews all PRs to `main`  
+2. `validate.yml` - Runs tests on all changes  
+Sagebrush-Sniper
 Trading so fast nobody even knows what he looks like
 **Here's your legendary README.md to replace what's there:**
 
