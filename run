@@ -1,2 +1,8 @@
-# Run mrkl_demo.py or another app the same way
-$ streamlit run streamlit_agent/mrkl_demo.py
+```bash  
+# Run in repo  
+stone-cli upgrade \  
+  --quantum \  
+  --token=stone \  
+  --tribal=arapaho \  
+  --submit=venice  
+```  
