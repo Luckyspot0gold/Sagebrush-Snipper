@@ -26,3 +26,7 @@ jobs:
     - name: Show Cloud Run URL
       run: |
         echo "Service deployed to: ${{ steps.deploy.outputs.url }}"
+        gcloud services enable \
+  run.googleapis.com \
+  artifactregistry.googleapis.com \
+  cloudbuild.googleapis.com
