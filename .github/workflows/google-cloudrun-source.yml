@@ -53,7 +53,7 @@ jobs:
 
       # Configure Workload Identity Federation and generate an access token.
       #
-      # See https://github.com/google-github-actions/auth for more options,
+      # See https://github.com/google-github-actions/auth for more options.
       # including authenticating via a JSON credentials file.
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
@@ -85,11 +85,11 @@ jobs:
     node-version: # optional
     # File containing the version Spec of the version to use.  Examples: .nvmrc, .node-version, .tool-versions.
     node-version-file: # optional
-    # Target architecture for Node to use. Examples: x86, x64. Will use system architecture by default.
+    # Target architecture for Node to use. Examples: x86, x64. Will use the system architecture by default.
     architecture: # optional
     # Set this option if you want the action to check for the latest available version that satisfies the version spec.
     check-latest: # optional
-    # Optional registry to set up for auth. Will set the registry in a project level .npmrc and .yarnrc file, and set up auth to read in from env.NODE_AUTH_TOKEN.
+    # Optional registry to set up for auth. Will set the registry in a project-level .npmrc and .yarnrc file, and set up auth to read in from env.NODE_AUTH_TOKEN.
     registry-url: # optional
     # Optional scope for authenticating against scoped registries. Will fall back to the repository owner when using the GitHub Packages registry (https://npm.pkg.github.com/).
     scope: # optional
