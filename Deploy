@@ -1,0 +1,15 @@
+app: frontier-trader
+engine: streamlit
+phases:
+  - name: Build
+    commands:
+      - pip install -r requirements.txt
+      - stone-cli build --quantum
+  - name: Deploy
+    targets:
+      - cloudflare
+      - vercel
+      - modal
+    secrets:
+      - STONE_TOKEN
+      - TRADER_KEY
