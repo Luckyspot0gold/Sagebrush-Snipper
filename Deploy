@@ -14,3 +14,5 @@ phases:
       - STONE_TOKEN
       - TRADER_KEY
 stone-cli deploy --watch
+# Execute full deployment
+stone-cli deploy --all --confirm
