@@ -236,3 +236,12 @@ Streamlit will:
 *Tips hat with confidence*
 
 **"This sniper's about to ride the digital range!"** 🏜️🎯
+    # streamlit_app.py
+import socket
+host = socket.gethostbyname(socket.gethostname())
+streamlit run app.py --server.address=0.0.0.0 --server.port=${PORT:-8501}
+# Frozen requirements
+echo "streamlit==1.32.0
+pandas==2.2.1
+yfinance==0.2.31
+stone-sdk==0.9.4" > requirements.txt
