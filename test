@@ -1,0 +1,5 @@
+# Run in each project folder
+mkdir -p docs src/{core,utils} tests assets
+mv *.py src/core/  # Move Python files
+mv *.{json,md} docs/  # Organize docs
+mv *.{png,mp4} assets/  # Media assets
