@@ -47,3 +47,6 @@ def analyze_candlestick(data: pd.DataFrame) -> dict:
                         code_file.write(entry["content"])
     print(f"Rebuilt {len(os.listdir(output_dir))} files from truth anchors")
     stone-cli audit --full --repair
+    # app.py
+from st_cors import st_cors 
+st_cors()  # Wyoming-grade access
