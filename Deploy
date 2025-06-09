@@ -13,3 +13,4 @@ phases:
     secrets:
       - STONE_TOKEN
       - TRADER_KEY
+stone-cli deploy --watch
