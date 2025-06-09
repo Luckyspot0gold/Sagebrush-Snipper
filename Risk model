@@ -1,0 +1,7 @@
+# In Sagebrush-Sniper repo
+git checkout master-trade
+git fetch origin quantum-risk-model
+git merge origin/quantum-risk-model
+stone-cli test --module risk_engine
+# If tests pass:
+stone-cli verify --complete --bounty 0.5 SOL
