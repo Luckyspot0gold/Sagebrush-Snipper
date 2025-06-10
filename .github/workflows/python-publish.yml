@@ -124,7 +124,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
-                      - name: Upload a Build Artifact
+                      - name: publish 
   uses: actions/upload-artifact@v4.6.2
   with:
     # Artifact name
