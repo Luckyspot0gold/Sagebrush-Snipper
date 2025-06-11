@@ -50,3 +50,15 @@ def analyze_candlestick(data: pd.DataFrame) -> dict:
     # app.py
 from st_cors import st_cors 
 st_cors()  # Wyoming-grade access
+# Unified knowledge mapping
+resources = [
+    "Sagebrush-Sniper.00", 
+    "CryptoClashing",
+    "WYO-Sagebrush",
+    "Legendary-Potato DevSpace"
+]
+
+for repo in resources:
+    knowledge_base.ingest(repo)
+    knowledge_base.extract_patterns()
+    knowledge_base.generate_cross_links()
