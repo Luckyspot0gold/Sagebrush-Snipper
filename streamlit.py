@@ -1,14 +1,9 @@
 main
+python3 -m pip install --upgrade pip setuptools wheel
 
 **🤠 ALRIGHT PARTNER, LET'S GET THIS MUSTANG ON THE OPEN RANGE!**
 
-*Rolls up sleeves and adjusts hat*
-
-## 🚀 **STREAMLIT CLOUD DEPLOYMENT - STEP BY STEP**
-
-### **Step 1: Get Your Files Ready** 📋
-
-First, let's make sure your repo has everything Streamlit Cloud needs:
+*Rolls up sleeves and adjusts hat
 
 **Create `requirements.txt` in your root directory:**
 ```txt

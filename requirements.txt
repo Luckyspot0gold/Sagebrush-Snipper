@@ -1,0 +1,5 @@
+openai>=1.0.0
+rich>=10.0.0
+diff-match-patch>=20200713
+pytest>=7.0.0
+pytest-cov>=4.0.0

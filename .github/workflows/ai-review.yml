@@ -1,0 +1,109 @@
+name: AI Code Review
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Get full commit history
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: 
+        pip install openai rich diff-match-patch
+        echo "Installed AI review tools"
+
+    - name: Run AI Code Assistant
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        python <<'EOF'
+        import os
+        import openai
+        import subprocess
+        from rich import print
+        from diff_match_patch import diff_match_patch
+
+        # Configure AI
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+        
+        def get_diff():
+            """Get code changes since last push"""
+            result = subprocess.run(
+                ["git", "diff", "HEAD~1", "--unified=0"],
+                capture_output=True,
+                text=True
+            )
+            return result.stdout
+
+        def ai_review(code_diff):
+            """Get AI suggestions for code improvements"""
+            response = openai.ChatCompletion.create(
+                model="gpt-4-turbo",
+                messages=[
+                    {"role": "system", "content": "You are an expert code reviewer. Suggest corrections for these code changes. Return only corrected code blocks with file paths."},
+                    {"role": "user", "content": f"Review and correct this code:\n\n{code_diff}\n\nReturn corrected code in format:\nFILE: path/to/file.js\n```js\ncorrected code\n```"}
+                ],
+                temperature=0.2
+            )
+            return response.choices[0].message.content
+
+        def apply_corrections(suggestions):
+            """Apply AI-suggested changes"""
+            dmp = diff_match_patch()
+            current_file = None
+            code_block = []
+            
+            for line in suggestions.split('\n'):
+                if line.startswith("FILE: "):
+                    if current_file and code_block:
+                        apply_to_file(current_file, '\n'.join(code_block[1:-1]))
+                    current_file = line.split("FILE: ")[1].strip()
+                    code_block = []
+                elif line.startswith("```"):
+                    if code_block and current_file:
+                        apply_to_file(current_file, '\n'.join(code_block[1:]))
+                        code_block = []
+                else:
+                    code_block.append(line)
+        
+        def apply_to_file(file_path, new_content):
+            """Update file with corrected content"""
+            if os.path.exists(file_path):
+                with open(file_path, 'w') as f:
+                    f.write(new_content)
+                print(f"[bold green]✅ Updated {file_path}[/bold green]")
+        
+        if __name__ == "__main__":
+            diff = get_diff()
+            if not diff:
+                print("[yellow]No code changes detected[/yellow]")
+                exit(0)
+                
+            print("[cyan]🧠 Analyzing code with AI...[/cyan]")
+            suggestions = ai_review(diff)
+            print(f"[magenta]\nAI Suggestions:\n{suggestions}[/magenta]")
+            apply_corrections(suggestions)
+        EOF
+
+    - name: Commit AI improvements
+      if: success()
+      run: |
+        git config user.name "Ghost Editor"
+        git config user.email "ghost-editor@users.noreply.github.com"
+        git add .
+        git diff --quiet && git diff --staged --quiet || git commit -m "👻 AI Auto-Corrections"
+        git push
