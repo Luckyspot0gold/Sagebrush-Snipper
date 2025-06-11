@@ -1,6 +1,6 @@
 gcloud iam service-accounts keys create gsa-key.json \
   --iam-account=github-actions@$PROJECT_ID.iam.gserviceaccount.com
-name: Deploy to Cloud Run
+ Deploy to Cloud Run
 
 on: [push]
 
