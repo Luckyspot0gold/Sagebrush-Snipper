@@ -11,7 +11,7 @@ class Chipy:
 
     def greet(self):
         greetings = [
-            "Howdy partner! Ready to conquer the frontier?",
+            "Howdy, partner! Ready to conquer the frontier?",
             "Well, well, look who's here! Ready to trade?",
             "This town ain't big enough for the both of us... just kidding! I'm here to help."
         ]
@@ -204,9 +204,11 @@ jobs:
 1. **Add Secrets**:
    ```bash
    https://github.com/<user>/<repo>/settings/secrets/actions
-   ```
+   ```env:(
    - Add `OPENAI_API_KEY` with your OpenAI API key
-
+    - Add 'coinmarketcap api
+#cloud_architecture:   crypto:     region: sg-sin 
+#Cenv:(e60c2ee7-dac0-40d4-87b6-38d0a1ecb156')
 2. **Required Files**:
    - `requirements.txt` (Python dependencies)
    - `package.json` (Node.js dependencies with test scripts)
