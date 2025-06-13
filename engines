@@ -10,6 +10,19 @@ phases:
       - cloudflare
       - vercel
       - modal
+      - venice
+      - dune
+      - crew ai
+      - based on chain
+      - meta mask
+      - web3
+      - layer 2
+      - claude
+      - deepseek
+      - blender
+      - roblox
+      - pixel
+
     secrets:
       - STONE_TOKEN
       - TRADER_KEY
