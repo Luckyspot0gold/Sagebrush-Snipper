@@ -4,7 +4,7 @@ phases:
   - name: Build
     commands:
       - pip install -r requirements.txt
-      - stone-cli build --quantum
+      - stone-cli build -quantum
   - name: Deploy
     targets:
       - cloudflare
@@ -22,10 +22,22 @@ phases:
       - blender
       - roblox
       - pixel
-
+      - unreal
+      - virtual studio  
+      - replit
+      - Google Cloud
+      - microsoft 
+      - avalanche
+      - aleo
+      - chain link
+      - pi network
+      - DESO
+      - coinbase
+      - stellar
+      - solana
+      - and more
     secrets:
       - STONE_TOKEN
       - TRADER_KEY
-stone-cli deploy --watch
-# Execute full deployment
-stone-cli deploy --all --confirm
+stone-cli deploy --automate, recurrence, recursive, quantom, adaptation, 
+stone-cli deploy --all  --confirm
