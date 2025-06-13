@@ -1,4 +1,4 @@
-## 👻 AI Ghost Editor  
+## 👻 StoneYard AI Ghost Editor  
 
 This repo uses an AI assistant to automatically:  
 - 🛠️ Fix syntax errors  
@@ -9,14 +9,14 @@ This repo uses an AI assistant to automatically:
 Workflows:  
 1. `ai-review.yml` - AI reviews all PRs to `main`  
 2. `validate.yml` - Runs tests on all changes  
-Sagebrush-Sniper
-Trading so fast nobody even knows what he looks like
+   Pioneer_Sniper
+Sniping trades at an Executive level
 **Here's your legendary README.md to replace what's there:**
 
 ```markdown
-# 🏜️ SAGEBRUSH SNIPPER 🎯
+# 🏜️ Pioneer SNIPPER 🎯
 
-> *"Trading so fast, nobody even knows what he looks like"*
+> *"Trading at an Executive Level*
 
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
