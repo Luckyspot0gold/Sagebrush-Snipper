@@ -10,3 +10,8 @@ echo '    Add Quantum :active, des1, 2025-06-05, 72h' >> HACKATHON_PLAN.md
 echo '```' >> HACKATHON_PLAN.md
 # Run in project root
 stone-cli tunnel --app=frontier-trader --port=8501 --protocol=https
+# Run these commands in your project root:
+git rm -cached -r.  # Reset tracking
+git reset HEAD --hard  # Wipe local changes
+git pull origin main   # Sync with GitHub
+rm -rf git/index.lock # Remove lockfiles
