@@ -1,2 +1,0 @@
-# Single command to launch everything
-curl -sSL https://stonefortress.sov/install.sh | bash -s -- --guardio

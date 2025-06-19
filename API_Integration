@@ -1,3 +1,0 @@
-modal secret create wyotrading \
-  BINANCE_API_KEY=your_key \
-  TRUTH_ARCHIVER_KEY=your_archiver_key
