@@ -1,0 +1,9 @@
+graph TD
+    A[Paper App] --> B[Wyoverse Hub]
+    B --> C[Crypto Clashers]
+    B --> D[Stockcar Racing]
+    B --> E[Frontier Trader]
+    B --> F[Quantum Vault]
+    C <--> G((Avalanche NFTs))
+    D <--> G
+    E <--> G
