@@ -1,4 +1,4 @@
-main
+#!/usr/bin/.env python3main
 
 **🤠 ALRIGHT PARTNER, LET'S GET THIS MUSTANG ON THE OPEN RANGE!**
 
@@ -27,10 +27,10 @@ import numpy as np
 import pandas as pd
 
 class TechnicalIndicators:
-    """🎯 Technical analysis tools for the Sagebrush Snipper"""
+    """🎯 Technical analysis tools for the Frontier Trader"""
     
     def calculate_all(self, data):
-        """Calculate all technical indicators"""
+        " Calculate all technical indicators"
         # Moving Averages
         data['SMA_20'] = data['Close'].rolling(window=20).mean()
         data['SMA_50'] = data['Close'].rolling(window=50).mean()
@@ -56,7 +56,7 @@ class TechnicalIndicators:
         return data
     
     def calculate_rsi(self, data, period=14):
-        """Calculate RSI"""
+        """ Calculate RSI"
         delta = data['Close'].diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
@@ -65,7 +65,7 @@ class TechnicalIndicators:
         return data
     
     def calculate_macd(self, data):
-        """Calculate MACD"""
+        "Calculate MACD"
         data['MACD'] = data['EMA_12'] - data['EMA_26']
         data['MACD_signal'] = data['MACD'].ewm(span=9).mean()
         data['MACD_histogram'] = data['MACD'] - data['MACD_signal']
@@ -78,10 +78,10 @@ class TechnicalIndicators:
 import numpy as np
 
 class SignalGenerator:
-    """🏜️ Generates trading signals for the Sagebrush Snipper"""
+    """🏜️ Generates trading signals for the FrontierTrader"""
     
     def analyze_signals(self, data):
-        """Analyze market data and generate trading signals"""
+        "Analyze market data and generate trading signals"
         if data.empty:
             return self.empty_signals()
         
@@ -96,7 +96,7 @@ class SignalGenerator:
             buy_signals.append("🎯 RSI Oversold - Bounce Expected")
             buy_score += 2
         
-        # Price near lower Bollinger Band
+        # Price near the lower Bollinger Band
         if latest['Close'] <= latest['BB_lower'] * 1.02:
             buy_signals.append("🎯 Near Lower BB - Support Level")
             buy_score += 2
@@ -126,7 +126,7 @@ class SignalGenerator:
             sell_signals.append("⚠️ RSI Overbought - Pullback Risk")
             sell_score += 2
         
-        # Price near upper Bollinger Band
+        # Price near the upper Bollinger Band
         if latest['Close'] >= latest['BB_upper'] * 0.98:
             sell_signals.append("⚠️ Near Upper BB - Resistance")
             sell_score += 2
@@ -155,7 +155,7 @@ class SignalGenerator:
         }
     
     def get_recommendation(self, buy_score, sell_score):
-        """Generate trading recommendation"""
+        "Generate trading recommendation"
         if buy_score >= 5:
             return "🟢 STRONG BUY - Load up, partner!"
         elif buy_score >= 3:
@@ -168,7 +168,7 @@ class SignalGenerator:
             return "⚪ HOLD - Stay patient"
     
     def empty_signals(self):
-        """Return empty signals structure"""
+        "Return empty signals structure"
         return {
             'buy_signals': [],
             'sell_signals': [],
@@ -191,7 +191,7 @@ class SignalGenerator:
    - **Repository:** `Luckyspot0gold/Sagebrush-Snipper`
    - **Branch:** `main`
    - **Main file path:** `core/sagebrush_sniper.py`
-   - **App URL:** `sagebrush-snipper` (or whatever you want)
+   - **App URL:** `stoneyard.cash`
 
 5. **Click "Deploy!"**
 
