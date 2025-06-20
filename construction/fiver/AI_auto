@@ -1,0 +1,5 @@
+# START GENERATING $ NOW:
+node revenue/fiverrAutoPilot.js \
+  --service "Wyoverse NFT Porting" \
+  --price 200 \
+  --keywords "web3,avalanche,gaming"
