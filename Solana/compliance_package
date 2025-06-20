@@ -1,0 +1,2 @@
+# GENERATE PROOF DOCS:
+npm run generate-compliance-package
