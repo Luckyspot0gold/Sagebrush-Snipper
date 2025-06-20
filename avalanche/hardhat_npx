@@ -1,0 +1,5 @@
+npx hardhat verify --network avalanche \
+  0xYourContractAddress \
+  --constructor-args arguments.js \ 
+  --force-solc 0.8.19 \
+  --show-stack-traces
