@@ -1,0 +1,8 @@
+// PREVENTS REGRESSION
+import { StabilityAnchor } from '@stoneverse/core';
+
+const anchor = new StabilityAnchor({
+  features: ['revenue', 'compliance', 'nft_porting'],
+  killSwitches: false // KEEPS SYSTEMS RUNNING
+});
+anchor.engage();
