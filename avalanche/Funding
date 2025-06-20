@@ -1,0 +1,6 @@
+document.dispatchEvent(new CustomEvent('enableRevenueGenerators', {
+  detail: {
+    streams: ['nft_sales', 'battle_commissions', 'fiverr_porting'],
+    minYield: '$500/day'
+  }
+}));
