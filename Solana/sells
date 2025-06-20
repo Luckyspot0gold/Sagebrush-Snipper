@@ -1,0 +1,6 @@
+// RUN IN BROWSER CONSOLE:
+document.querySelector('#emergency-sale-btn').click();
+SALE TERMS:
+- 50 Limited Edition "Legal Warrior" NFTs
+- Price: 1 AVAX each
+- Utility: 2x revenue share in betting pools
