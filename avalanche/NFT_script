@@ -1,0 +1,15 @@
+// Unity Fix (Assets/Scripts/NFTLoader.cs)
+IEnumerator LoadNFT(string uri) {
+  // ADD TIMEOUT AND RETRY
+  using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(uri)) {
+    uwr.timeout = 5; // 5-second timeout
+    yield return uwr.SendWebRequest();
+    
+    if (uwr.result != UnityWebRequest.Result.Success) {
+      // Load fallback asset
+      LoadDefaultCharacter(); 
+    } else {
+      // Apply texture
+    }
+  }
+}
