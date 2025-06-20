@@ -1,0 +1,10 @@
+npm run generate-legal-shield --output=./court_evidence
+// In your deploy script
+async function main() {
++  const quantumDeploy = await import('@stoneverse/quantum-deploy');
+-  const contract = await ethers.deployContract("CryptoClashers");
++  const contract = await quantumDeploy.autoFix(
++    "CryptoClashers", 
++    { gasOptimization: "turbo", legalCompliance: "WP7" }
++  );
+}
