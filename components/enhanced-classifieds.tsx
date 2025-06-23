@@ -13,6 +13,7 @@ import { ShoppingCart, MessageSquare, Plus, Search, Link, FolderSyncIcon as Sync
 import { marketplaceAPI, type MarketplaceListing } from "@/lib/marketplace-api"
 import { useUserProfileStore } from "@/lib/stores/user-profile-store"
 import Image from "next/image"
+import { OfferManagement } from "@/components/offer-management"
 
 export function EnhancedClassifieds() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -473,15 +474,20 @@ function MarketplaceListingCard({ listing }: { listing: MarketplaceListing }) {
           )}
         </div>
 
-        <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={handleContact} className="flex-1">
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Contact
-          </Button>
-          <Button size="sm" onClick={handlePurchase} className="flex-1">
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            {listing.url ? "View" : "Buy"}
-          </Button>
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={handleContact} className="flex-1">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Contact
+            </Button>
+            <Button size="sm" onClick={handlePurchase} className="flex-1">
+              <ShoppingCart className="h-4 w-4 mr-2" />
+              {listing.url ? "View" : "Buy"}
+            </Button>
+          </div>
+
+          {/* Add Offer Management */}
+          <OfferManagement listing={listing} isOwner={false} />
         </div>
       </div>
     </div>
