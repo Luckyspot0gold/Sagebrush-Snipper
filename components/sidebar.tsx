@@ -26,11 +26,14 @@ import {
   Gamepad2,
   Coins,
   Landmark,
+  TrendingUp,
 } from "lucide-react"
 
 const sidebarItems = [
   { name: "WyoVerse Pioneer", href: "/", icon: Home },
   { name: "Market", href: "/market", icon: BarChart3 },
+  { name: "Finance Hub", href: "/finance", icon: LineChart },
+  { name: "Trading Desk", href: "/trading", icon: TrendingUp },
   { name: "Land Deeds", href: "/land-deeds", icon: LandPlot },
   { name: "Mining", href: "/mining", icon: Pickaxe },
   { name: "Digital Rodeo", href: "/digital-rodeo", icon: Coins },
