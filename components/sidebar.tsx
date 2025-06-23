@@ -34,6 +34,7 @@ const sidebarItems = [
   { name: "Land Deeds", href: "/land-deeds", icon: LandPlot },
   { name: "Mining", href: "/mining", icon: Pickaxe },
   { name: "Digital Rodeo", href: "/digital-rodeo", icon: Coins },
+  { name: "Games", href: "/games", icon: Gamepad2 },
   { name: "Explore", href: "/explore", icon: Compass },
   { name: "Saloon", href: "/saloon", icon: MessageSquare },
   { name: "Patents", href: "/patents", icon: Scroll },
@@ -52,7 +53,6 @@ const sidebarItems = [
   { name: "Native History", href: "/native-history", icon: Scroll },
   { name: "Parks & Recreation", href: "/parks", icon: Mountain },
   { name: "Crypto & Stocks", href: "/finance", icon: LineChart },
-  { name: "Games", href: "/games", icon: Gamepad2 },
 ]
 
 export function Sidebar() {

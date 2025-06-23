@@ -136,35 +136,38 @@ export function NewspaperFrontPage() {
                 <h3 className="text-2xl font-bold font-serif uppercase">FEATURED GAMES</h3>
                 <p className="text-sm font-serif">From the creators at LuckyspotOgold</p>
               </div>
-              <div className="flex justify-center mb-4">
-                <Image
-                  src="/images/crypto-classic.png"
-                  alt="Crypto Classic"
-                  width={150}
-                  height={150}
-                  className="border border-black"
-                />
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="flex justify-center">
+                  <Image
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/cryptoclasherboxingposter.jpg-ohRGClzi9a58dAT0C2eBn8w5aDOR7g.jpeg"
+                    alt="Crypto Clashers Boxing"
+                    width={150}
+                    height={150}
+                    className="border border-black"
+                  />
+                </div>
+                <div className="flex justify-center">
+                  <Image
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/cryptoclasherwcarsposter.jpg-0nnGL4RaNIFloUUC1cdsn0GDa31YE2.jpeg"
+                    alt="Crypto Classic Racing"
+                    width={150}
+                    height={150}
+                    className="border border-black"
+                  />
+                </div>
               </div>
               <ul className="space-y-2 font-serif">
                 <li className="border-b border-black pb-2">
                   <p className="font-medium">Crypto Clashers "KryptO Boxing"</p>
-                  <div className="flex justify-end">
-                    <Image src="/images/bull-vs-bear.webp" alt="Bull vs Bear" width={80} height={80} />
-                  </div>
                   <p className="text-sm">Battle in the digital ring with market-driven fighters</p>
                 </li>
                 <li className="border-b border-black pb-2">
                   <p className="font-medium">Crypto Classic "8 in the Gate"</p>
-                  <div className="flex justify-end">
-                    <Image src="/images/race-winner.png" alt="Horse Racing" width={80} height={80} />
-                  </div>
                   <p className="text-sm">Horse racing powered by blockchain technology</p>
                 </li>
                 <li>
-                  <p className="font-medium">Cryptopia</p>
-                  <p className="text-sm">
-                    Join Cutch, Irelynn, Bully and the whales in this educational storyboard game
-                  </p>
+                  <p className="font-medium">Frontier Trader</p>
+                  <p className="text-sm">Navigate the digital frontier as a crypto trader in the old west</p>
                 </li>
               </ul>
               <Link href="/games">
