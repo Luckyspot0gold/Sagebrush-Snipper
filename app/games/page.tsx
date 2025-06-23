@@ -1,15 +1,25 @@
+import { EnhancedGamesPortal } from "@/components/enhanced-games-portal"
+import { CharacterProgression } from "@/components/character-progression"
 import { NewspaperLayout } from "@/components/newspaper-layout"
-import { GamesPortal } from "@/components/games-portal"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function GamesPage() {
   return (
-    <NewspaperLayout title="STONEYARD GAMING GAZETTE" subtitle="The Premier Gaming Destination of the Digital Frontier">
-      <div className="newspaper-paragraph">
-        Welcome to the most comprehensive gaming experience in the WyoVerse! From the creators at LuckyspotOgold comes a
-        revolutionary collection of blockchain-powered games that merge traditional gaming with cutting-edge
-        cryptocurrency mechanics.
-      </div>
-      <GamesPortal />
+    <NewspaperLayout>
+      <Tabs defaultValue="games" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="games">Games Portal</TabsTrigger>
+          <TabsTrigger value="character">Character</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="games">
+          <EnhancedGamesPortal />
+        </TabsContent>
+
+        <TabsContent value="character">
+          <CharacterProgression />
+        </TabsContent>
+      </Tabs>
     </NewspaperLayout>
   )
 }
