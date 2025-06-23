@@ -1,8 +1,0 @@
-steps:
-  - name: Checkout code
-    uses: actions/checkout@v3
-
-  - name: Set up .NET Core
-   The failure occurred because the workflow is trying to run MSBuild commands, but the required project or solution uses: actions/setup-dotnet@v2
-    with:
-      dot file is not in the specified working directory. Specifically, the error indicates:

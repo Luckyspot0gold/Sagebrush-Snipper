@@ -1,3 +1,0 @@
-git checkout master-trade
-git merge origin/quantum-risk-model
-stone-cli verify --module risk_engine

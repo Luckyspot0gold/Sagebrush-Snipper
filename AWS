@@ -1,7 +1,0 @@
-env:
-  AWS_REGION: us-west-2                   # Example: Replace with your preferred AWS region
-  ECR_REPOSITORY: MY_ECR_REPOSITORY       # Update this if necessary
-  ECS_SERVICE: MY_ECS_SERVICE             # Update this if necessary
-  ECS_CLUSTER: MY_ECS_CLUSTER             # Update this if necessary
-  ECS_TASK_DEFINITION: MY_ECS_TASK_DEFINITION # Update this if necessary
-  CONTAINER_NAME: MY_CONTAINER_NAME       # Update this if necessary
