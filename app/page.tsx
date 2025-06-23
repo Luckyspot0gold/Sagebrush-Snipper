@@ -14,7 +14,9 @@ import { WyomingCryptoSniper } from "@/components/wyoming-crypto-sniper"
 
 export default function WyoVerse() {
   const [ageVerified, setAgeVerified] = useState(false)
-  const [activeModule, setActiveModule] = useState("trading")
+  const [activeModule, setActiveModule] = useState<"trading" | "sniper" | "boxing" | "casino" | "land" | "education">(
+    "trading",
+  )
 
   if (!ageVerified) {
     return (
@@ -86,7 +88,13 @@ export default function WyoVerse() {
 
         {/* Main Content */}
         <main className="max-w-7xl mx-auto px-4 py-8">
-          <Tabs value={activeModule} onValueChange={setActiveModule} className="w-full">
+          <Tabs
+            value={activeModule}
+            onValueChange={(val) => {
+              if (val) setActiveModule(val as string)
+            }}
+            className="w-full"
+          >
             <TabsList className="grid w-full grid-cols-6 mb-8">
               <TabsTrigger value="trading" className="flex items-center gap-2">
                 📈 Trading
