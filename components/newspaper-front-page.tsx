@@ -1,6 +1,6 @@
 import { WyoVerseCalendar } from "@/components/wyoverse-calendar"
 
-export default function NewspaperFrontPage() {
+function NewspaperFrontPage() {
   return (
     <div className="grid grid-cols-3 gap-4">
       {/* Headline Section */}
@@ -49,3 +49,6 @@ export default function NewspaperFrontPage() {
     </div>
   )
 }
+
+export default NewspaperFrontPage
+export { NewspaperFrontPage }
