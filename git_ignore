@@ -185,7 +185,7 @@ pip install cryptography
 **Let's implement this with precision. Here's your full-stack integration:**
 
 
-```python
+\`\`\`python
 # 1. First, install required packages
 !pip install pyth-client langchain==0.0.346 huggingface_hub
 
@@ -291,7 +291,7 @@ def deploy_wyoverse():
 # Run deployment
 if __name__ == "__main__":
     print(deploy_wyoverse())
-```
+\`\`\`
 
 
 **Key features:**

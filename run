@@ -1,16 +1,16 @@
-```bash  
+\`\`\`bash  
 # Run in repo  
 stone-cli upgrade \  
   --quantum \  
   --token=stone \  
   --tribal=arapaho \  
   --submit=venice  
-```  
-```bash  
+\`\`\`  
+\`\`\`bash  
 # Run in all repos  
 stone-cli hackathon-prep \  
   --deadline=72h \  
   --target=venice,grizzlython \  
   --fuel=high  
-```  
+\`\`\`  
 stone-cli audit --full --repair

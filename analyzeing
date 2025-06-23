@@ -20,11 +20,11 @@ MIT License - Free as the Wyoming wind!
 <p><strong>🤠 "In Wyoming, we don't just mine crypto - we snipe it!" 🎯</strong></p>
 <p><em>Built with ⚡ by frontier coders</em></p>
 </div>
-```
+\`\`\`
 
 **Now for the core/sagebrush_sniper.py file:**
 
-```python
+\`\`\`python
 # 🏜️ SAGEBRUSH SNIPPER - MAIN APPLICATION
 # "Trading so fast, nobody even knows what he looks like"
 
@@ -305,7 +305,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-```
+\`\`\`
 
 **Want me to continue with the strategy files next, partner?** 🤠
 

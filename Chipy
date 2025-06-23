@@ -1,5 +1,5 @@
 1. AI Code Review Workflow (`.github/workflows/ai-review.yml`)
-```yaml
+\`\`\`yaml
 name: AI Ghost Editor
 import time
 import random
@@ -137,10 +137,10 @@ jobs:
         git add .
         git diff --quiet && git diff --staged --quiet || git commit -m "👻 AI Auto-Corrections"
         git push
-```
+\`\`\`
 
 ### 2. Validation Workflow (`.github/workflows/validate.yml`)
-```yaml
+\`\`\`yaml
 name: Code Validation
 
 on: [push, pull_request]
@@ -175,7 +175,7 @@ jobs:
       run: |
         npm test
         pytest --cov=.
-```
+\`\`\`
 
 ### Key Features:
 
@@ -202,9 +202,9 @@ jobs:
 ### Setup Instructions:
 
 1. **Add Secrets**:
-   ```bash
+   \`\`\`bash
    https://github.com/<user>/<repo>/settings/secrets/actions
-   ```
+   \`\`\`
    - Add `OPENAI_API_KEY` with your OpenAI API key
 
 2. **Required Files**:

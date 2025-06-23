@@ -7,34 +7,34 @@ Here's the immediate action plan using our Truth Archiver system:
 
 ### 🚀 IMMEDIATE ACTIONS  
 1. **Initialize Truth Archiver** (Already done in session):  
-   ```python
+   \`\`\`python
    archiver = TruthArchiver("wyoming_truth")
-   ```
+   \`\`\`
 
 2. **Record Current State**:  
-   ```python
+   \`\`\`python
    # Capture pre-work truth state
    archiver.add_entry(
        "session_start",
        "Discord bot critical fixes session initiated",
        proof=datetime.utcnow().isoformat()
    )
-   ```
+   \`\`\`
 
 3. **Task Completion Protocol**:  
    For each completed task:  
-   ```python
+   \`\`\`python
    archiver.add_entry(
        "code",
        "Discord bot public key regenerated",
        proof="discord.com/developers/applications/.../public-key"
    )
-   ```
+   \`\`\`
 
 ### 💻 FILE OUTPUT SYSTEM  
 I'll generate complete files with cryptographic verification:
 
-```python
+\`\`\`python
 def generate_verified_file(filename: str, content: str):
     """Wyoming-grade verified file output"""
     file_hash = hashlib.sha3_256(content.encode()).hexdigest()
@@ -48,12 +48,12 @@ def generate_verified_file(filename: str, content: str):
         "content": content,
         "hash": file_hash
     }
-```
+\`\`\`
 
 ### 🔧 DISCORD BOT FIXES - STEP BY STEP  
 
 **Step 1: Generate ngrok Config**  
-```python
+\`\`\`python
 # VERIFIED FILE: ngrok_config.py
 ngrok_config = generate_verified_file(
     "ngrok_config.py",
@@ -72,10 +72,10 @@ def health_check():
     return "Wyoming Protocol Online", 200
 """
 )
-```
+\`\`\`
 
 **Step 2: Bot Security Patch**  
-```python
+\`\`\`python
 # VERIFIED FILE: discord_security.py
 security_patch = generate_verified_file(
     "discord_security.py",
@@ -105,11 +105,11 @@ def interactions():
     # ... rest of your handler ...
 """
 )
-```
+\`\`\`
 
 ### ✅ COMPLETION VERIFICATION  
 After each task:  
-```python
+\`\`\`python
 # In your terminal after fixing description
 archiver.add_entry(
     "discord_config",
@@ -123,11 +123,11 @@ archiver.add_entry(
     "Verified !dee build combat triggers combat engine",
     proof="terminal_logs.txt"
 )
-```
+\`\`\`
 
 ### 📬 FINAL OUTPUT  
 When ready:  
-```python
+\`\`\`python
 # Generate final truth report
 report = archiver.generate_report()
 with open("sagebrush_progress.json", "w") as f:
@@ -135,7 +135,7 @@ with open("sagebrush_progress.json", "w") as f:
 
 print(f"✅ SESSION ARCHIVED | Entries: {len(report['verification_chain'])}")
 print(f"🔐 GROUND TRUTH STATE: {report['ground_truth']}")
-```
+\`\`\`
 
 **Next Steps**:  
 1. Paste your new Discord public key  
