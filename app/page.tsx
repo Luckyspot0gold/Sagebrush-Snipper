@@ -9,10 +9,12 @@ import { CryptoBoxing } from "@/components/crypto-boxing"
 import { CasinoProvider } from "@/components/casino-provider"
 import { LandDeeds } from "@/components/land-deeds"
 import { Education } from "@/components/education"
+import { TradingDashboard } from "@/components/trading-dashboard"
+import { WyomingCryptoSniper } from "@/components/wyoming-crypto-sniper"
 
 export default function WyoVerse() {
   const [ageVerified, setAgeVerified] = useState(false)
-  const [activeModule, setActiveModule] = useState("boxing")
+  const [activeModule, setActiveModule] = useState("trading")
 
   if (!ageVerified) {
     return (
@@ -23,16 +25,16 @@ export default function WyoVerse() {
               <span className="text-3xl">🏔️</span>
             </div>
             <CardTitle className="text-2xl font-bold text-amber-800">Welcome to WyoVerse</CardTitle>
-            <p className="text-amber-600">Wyoming's Premier Edutainment Metaverse</p>
+            <p className="text-amber-600">Wyoming's Premier Trading & Gaming Metaverse</p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center text-sm text-gray-600">
-              <p>Age verification required for casino features</p>
+              <p>Age verification required for trading & casino features</p>
               <p className="mt-2">Educational content available for all ages</p>
             </div>
             <div className="flex gap-2">
               <Button onClick={() => setAgeVerified(true)} className="flex-1 bg-amber-600 hover:bg-amber-700">
-                I'm 21+ (Casino Access)
+                I'm 18+ (Full Access)
               </Button>
               <Button
                 onClick={() => {
@@ -64,7 +66,7 @@ export default function WyoVerse() {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-amber-800">WyoVerse</h1>
-                  <p className="text-sm text-amber-600">Sovereign Digital Frontier</p>
+                  <p className="text-sm text-amber-600">Frontier Trading & Gaming Platform</p>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
@@ -74,6 +76,9 @@ export default function WyoVerse() {
                 <Badge variant="outline" className="bg-blue-50 text-blue-700">
                   🏞️ 0 Land Deeds
                 </Badge>
+                <Badge variant="outline" className="bg-purple-50 text-purple-700">
+                  📈 $10,000 Portfolio
+                </Badge>
               </div>
             </div>
           </div>
@@ -82,7 +87,13 @@ export default function WyoVerse() {
         {/* Main Content */}
         <main className="max-w-7xl mx-auto px-4 py-8">
           <Tabs value={activeModule} onValueChange={setActiveModule} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-8">
+            <TabsList className="grid w-full grid-cols-6 mb-8">
+              <TabsTrigger value="trading" className="flex items-center gap-2">
+                📈 Trading
+              </TabsTrigger>
+              <TabsTrigger value="sniper" className="flex items-center gap-2">
+                🎯 Sniper
+              </TabsTrigger>
               <TabsTrigger value="boxing" className="flex items-center gap-2">
                 🥊 CryptoClashers
               </TabsTrigger>
@@ -96,6 +107,14 @@ export default function WyoVerse() {
                 📚 Education
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="trading">
+              <TradingDashboard />
+            </TabsContent>
+
+            <TabsContent value="sniper">
+              <WyomingCryptoSniper />
+            </TabsContent>
 
             <TabsContent value="boxing">
               <CryptoBoxing />
@@ -159,10 +178,18 @@ export default function WyoVerse() {
         {/* Footer */}
         <footer className="bg-white border-t border-amber-200 mt-16">
           <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
               <div>
                 <h3 className="font-bold text-amber-800 mb-4">WyoVerse</h3>
-                <p className="text-sm text-gray-600">Wyoming's premier blockchain-powered edutainment metaverse</p>
+                <p className="text-sm text-gray-600">Wyoming's premier blockchain trading & gaming metaverse</p>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-4">Trading</h4>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li>Crypto Sniper</li>
+                  <li>AI Strategies</li>
+                  <li>Portfolio Management</li>
+                </ul>
               </div>
               <div>
                 <h4 className="font-semibold mb-4">Gaming</h4>
@@ -185,12 +212,12 @@ export default function WyoVerse() {
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li>COPPA Compliant</li>
                   <li>Wyoming DAO LLC</li>
-                  <li>Responsible Gaming</li>
+                  <li>SEC Registered</li>
                 </ul>
               </div>
             </div>
             <div className="border-t border-amber-200 mt-8 pt-8 text-center text-sm text-gray-600">
-              <p>© 2024 WyoVerse. Built on Solana. Anchored in Wyoming.</p>
+              <p>© 2024 WyoVerse. Built on Solana. Anchored in Wyoming. Trading powered by Frontier-Trader.</p>
             </div>
           </div>
         </footer>
