@@ -27,6 +27,7 @@ import {
   Coins,
   Landmark,
   TrendingUp,
+  Video,
 } from "lucide-react"
 
 const sidebarItems = [
@@ -56,6 +57,7 @@ const sidebarItems = [
   { name: "Native History", href: "/native-history", icon: Scroll },
   { name: "Parks & Recreation", href: "/parks", icon: Mountain },
   { name: "Crypto & Stocks", href: "/finance", icon: LineChart },
+  { name: "Live Streaming", href: "/streaming", icon: Video },
 ]
 
 export function Sidebar() {
