@@ -32,6 +32,7 @@ export function WyomingCryptoSniper() {
   const [activeMode, setActiveMode] = useState("wyoming")
   const [scanning, setScanning] = useState(false)
   const [tradeHistory, setTradeHistory] = useState([])
+  const [tab, setTab] = useState<"targets" | "execution" | "history">("targets")
 
   const executeSnipe = (target) => {
     const trade = {
@@ -72,7 +73,13 @@ export function WyomingCryptoSniper() {
         ))}
       </div>
 
-      <Tabs defaultValue="targets" className="w-full">
+      <Tabs
+        value={tab}
+        onValueChange={(val) => {
+          if (val) setTab(val as typeof tab)
+        }}
+        className="w-full"
+      >
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="targets">Target Scanner</TabsTrigger>
           <TabsTrigger value="execution">Execution Center</TabsTrigger>

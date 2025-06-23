@@ -48,6 +48,7 @@ export function TradingDashboard() {
   const [totalValue, setTotalValue] = useState(58840)
   const [dailyPnL, setDailyPnL] = useState(1247)
   const [activeStrategy, setActiveStrategy] = useState("wyoming-hammer")
+  const [tab, setTab] = useState<"portfolio" | "strategies" | "trading" | "analytics">("portfolio")
 
   return (
     <div className="space-y-8">
@@ -107,7 +108,13 @@ export function TradingDashboard() {
         </Card>
       </div>
 
-      <Tabs defaultValue="portfolio" className="w-full">
+      <Tabs
+        value={tab}
+        onValueChange={(val) => {
+          if (val) setTab(val as typeof tab)
+        }}
+        className="w-full"
+      >
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
           <TabsTrigger value="strategies">AI Strategies</TabsTrigger>

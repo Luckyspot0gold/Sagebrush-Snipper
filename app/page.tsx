@@ -91,7 +91,9 @@ export default function WyoVerse() {
           <Tabs
             value={activeModule}
             onValueChange={(val) => {
-              if (val) setActiveModule(val as string)
+              if (val !== null && val !== undefined) {
+                setActiveModule(val as typeof activeModule)
+              }
             }}
             className="w-full"
           >
