@@ -1,22 +1,19 @@
-import { DashboardLayout } from "@/components/dashboard-layout"
-import { PatentsList } from "@/components/patents-list"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { UnderConstruction } from "@/components/under-construction"
 
 export default function PatentsPage() {
   return (
-    <DashboardLayout>
-      <div className="flex flex-col gap-6 p-6">
-        <h1 className="text-3xl font-bold">Patents</h1>
-        <Card>
-          <CardHeader>
-            <CardTitle>WyoVerse Patents</CardTitle>
-            <CardDescription>Intellectual property and patents in the WyoVerse ecosystem</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <PatentsList />
-          </CardContent>
-        </Card>
-      </div>
-    </DashboardLayout>
+    <UnderConstruction
+      title="Digital Patent Office"
+      description="Revolutionary intellectual property system for the digital age! Register, trade, and monetize your innovations in the WyoVerse. Clutch is building the future of digital IP protection."
+      expectedCompletion="Q3 2024"
+      features={[
+        "Digital patent registration system",
+        "IP trading marketplace",
+        "Smart contract protection",
+        "Royalty distribution system",
+        "Patent portfolio management",
+      ]}
+      progress={45}
+    />
   )
 }

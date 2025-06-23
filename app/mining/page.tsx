@@ -1,22 +1,19 @@
-import { DashboardLayout } from "@/components/dashboard-layout"
-import { MiningDashboard } from "@/components/mining-dashboard"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { UnderConstruction } from "@/components/under-construction"
 
 export default function MiningPage() {
   return (
-    <DashboardLayout>
-      <div className="flex flex-col gap-6 p-6">
-        <h1 className="text-3xl font-bold">Mining</h1>
-        <Card>
-          <CardHeader>
-            <CardTitle>Mining Operations</CardTitle>
-            <CardDescription>Manage your WyoVerse mining operations and resources</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <MiningDashboard />
-          </CardContent>
-        </Card>
-      </div>
-    </DashboardLayout>
+    <UnderConstruction
+      title="Mining Operations"
+      description="Clutch is building an advanced cryptocurrency mining simulation with real-time market integration. Mine STONES, Tatonka, and Artifacts while learning about blockchain technology!"
+      expectedCompletion="Q2 2024"
+      features={[
+        "Real-time cryptocurrency mining simulation",
+        "Multiple mining pools for different tokens",
+        "Educational blockchain tutorials",
+        "Mining equipment upgrades and customization",
+        "Leaderboards and mining competitions",
+      ]}
+      progress={75}
+    />
   )
 }

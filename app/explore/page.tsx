@@ -1,22 +1,19 @@
-import { DashboardLayout } from "@/components/dashboard-layout"
-import { ExploreMap } from "@/components/explore-map"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { UnderConstruction } from "@/components/under-construction"
 
 export default function ExplorePage() {
   return (
-    <DashboardLayout>
-      <div className="flex flex-col gap-6 p-6">
-        <h1 className="text-3xl font-bold">Explore WyoVerse</h1>
-        <Card>
-          <CardHeader>
-            <CardTitle>Interactive Map</CardTitle>
-            <CardDescription>Explore the WyoVerse territory and discover new opportunities</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ExploreMap />
-          </CardContent>
-        </Card>
-      </div>
-    </DashboardLayout>
+    <UnderConstruction
+      title="Territory Explorer"
+      description="Get ready for an immersive 3D exploration experience across the Wyoming digital frontier! Discover hidden treasures, claim land, and uncover the mysteries of the WyoVerse."
+      expectedCompletion="Q2 2024"
+      features={[
+        "Interactive 3D world exploration",
+        "Hidden treasure hunting",
+        "Land claiming and territory expansion",
+        "Wildlife encounters and photography",
+        "Weather system and day/night cycles",
+      ]}
+      progress={60}
+    />
   )
 }
