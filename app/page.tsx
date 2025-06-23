@@ -89,11 +89,9 @@ export default function WyoVerse() {
         {/* Main Content */}
         <main className="max-w-7xl mx-auto px-4 py-8">
           <Tabs
-            value={activeModule}
+            defaultValue="trading"
             onValueChange={(val) => {
-              if (val !== null && val !== undefined) {
-                setActiveModule(val as typeof activeModule)
-              }
+              if (val) setActiveModule(val as typeof activeModule)
             }}
             className="w-full"
           >

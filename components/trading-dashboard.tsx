@@ -109,7 +109,7 @@ export function TradingDashboard() {
       </div>
 
       <Tabs
-        value={tab}
+        defaultValue="portfolio"
         onValueChange={(val) => {
           if (val) setTab(val as typeof tab)
         }}

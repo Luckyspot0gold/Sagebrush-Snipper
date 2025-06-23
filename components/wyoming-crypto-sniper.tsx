@@ -74,7 +74,7 @@ export function WyomingCryptoSniper() {
       </div>
 
       <Tabs
-        value={tab}
+        defaultValue="targets"
         onValueChange={(val) => {
           if (val) setTab(val as typeof tab)
         }}
