@@ -1,6 +1,8 @@
 import { NewspaperLayout } from "@/components/newspaper-layout"
 import { EnhancedBarKeepBill } from "@/components/enhanced-bar-keep-bill"
-import { BillPremiumSystem } from "@/components/bill-premium-system"
+import { PremiumDashboard } from "@/components/premium-ui-templates"
+import { SubscriptionManagement } from "@/components/subscription-management"
+import { DataLicensingSystem } from "@/components/data-licensing-system"
 import { BillRevenueDashboard } from "@/components/bill-revenue-dashboard"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -15,12 +17,18 @@ export default function SaloonPage() {
         </div>
 
         <Tabs defaultValue="chat" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
             <TabsTrigger value="chat" className="font-serif">
               Chat with Bill
             </TabsTrigger>
             <TabsTrigger value="premium" className="font-serif">
-              Premium Services
+              Premium Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="subscriptions" className="font-serif">
+              Subscriptions
+            </TabsTrigger>
+            <TabsTrigger value="licensing" className="font-serif">
+              Data Licensing
             </TabsTrigger>
             <TabsTrigger value="analytics" className="font-serif">
               Revenue Analytics
@@ -32,7 +40,15 @@ export default function SaloonPage() {
           </TabsContent>
 
           <TabsContent value="premium">
-            <BillPremiumSystem />
+            <PremiumDashboard />
+          </TabsContent>
+
+          <TabsContent value="subscriptions">
+            <SubscriptionManagement />
+          </TabsContent>
+
+          <TabsContent value="licensing">
+            <DataLicensingSystem />
           </TabsContent>
 
           <TabsContent value="analytics">
