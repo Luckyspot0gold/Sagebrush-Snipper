@@ -100,8 +100,11 @@ export function BarKeepBillAvatar() {
     }
 
     // Add asset-specific advice
-    const topAsset = assets.reduce((prev, current) => (prev.priceChange > current.priceChange ? prev : current))
-    if (topAsset.priceChange > 5) {
+    const topAsset =
+      assets.length > 0
+        ? assets.reduce((prev, current) => (prev.priceChange > current.priceChange ? prev : current))
+        : { name: "STONES", priceChange: 0 }
+    if (assets.length > 0 && topAsset.priceChange > 5) {
       advice.push(`That ${topAsset.name} is risin' like smoke from a campfire!`)
     }
 
