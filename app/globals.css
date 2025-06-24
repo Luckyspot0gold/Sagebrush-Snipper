@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import enhanced typography */
-@import url("https://fonts.googleapis.com/css2?family=IM+Fell+English:ital,wght@0,400;0,700;1,400&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap");
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -76,26 +71,26 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: "Crimson Text", serif;
+    font-family: "Crimson Text", Georgia, "Times New Roman", Times, serif;
   }
 }
 
-/* Enhanced Typography System */
+/* Enhanced Typography System with Fallbacks */
 .headline-primary {
-  font-family: "IM Fell English", serif;
+  font-family: "IM Fell English", Georgia, "Times New Roman", Times, serif;
   font-weight: 700;
   text-shadow: 2px 2px 4px rgba(139, 69, 19, 0.3);
   letter-spacing: 0.05em;
 }
 
 .headline-secondary {
-  font-family: "Playfair Display", serif;
+  font-family: "Playfair Display", Georgia, "Times New Roman", Times, serif;
   font-weight: 600;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .body-text {
-  font-family: "Crimson Text", serif;
+  font-family: "Crimson Text", Georgia, "Times New Roman", Times, serif;
   line-height: 1.7;
   text-align: justify;
 }
@@ -219,7 +214,7 @@
 }
 
 .metric-value {
-  font-family: "IM Fell English", serif;
+  font-family: "IM Fell English", Georgia, "Times New Roman", Times, serif;
   font-size: 2.5rem;
   font-weight: bold;
   color: #8b4513;
@@ -331,15 +326,15 @@
   background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d1c7a3' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
 }
 
-/* Enhanced newspaper components */
+/* Enhanced newspaper components with fallback fonts */
 .newspaper-headline {
   @apply text-4xl font-bold uppercase mb-2 letterpress;
-  font-family: "IM Fell English", serif;
+  font-family: "IM Fell English", Georgia, "Times New Roman", Times, serif;
 }
 
 .newspaper-subheadline {
   @apply text-xl italic mb-4;
-  font-family: "Playfair Display", serif;
+  font-family: "Playfair Display", Georgia, "Times New Roman", Times, serif;
 }
 
 .newspaper-paragraph {
@@ -352,12 +347,12 @@
 
 .newspaper-image-caption {
   @apply text-xs text-center mt-1 italic;
-  font-family: "Crimson Text", serif;
+  font-family: "Crimson Text", Georgia, "Times New Roman", Times, serif;
 }
 
 .newspaper-section-title {
   @apply text-2xl font-bold uppercase border-b-2 border-black pb-2 mb-4 letterpress;
-  font-family: "IM Fell English", serif;
+  font-family: "IM Fell English", Georgia, "Times New Roman", Times, serif;
 }
 
 .newspaper-article {
@@ -370,24 +365,24 @@
 
 .newspaper-byline {
   @apply text-sm italic mb-4;
-  font-family: "Crimson Text", serif;
+  font-family: "Crimson Text", Georgia, "Times New Roman", Times, serif;
   color: #8b4513;
 }
 
 .newspaper-dateline {
   @apply text-sm font-bold mb-4;
-  font-family: "Crimson Text", serif;
+  font-family: "Crimson Text", Georgia, "Times New Roman", Times, serif;
   color: #8b4513;
 }
 
 .newspaper-ad {
   @apply border-2 border-black p-4 text-center;
-  font-family: "Crimson Text", serif;
+  font-family: "Crimson Text", Georgia, "Times New Roman", Times, serif;
 }
 
 .newspaper-button {
   @apply bg-black text-white hover:bg-gray-800 px-4 py-2 inline-block transition-all duration-300;
-  font-family: "IM Fell English", serif;
+  font-family: "IM Fell English", Georgia, "Times New Roman", Times, serif;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -425,7 +420,7 @@
   color: #f4f1e8;
   padding: 8px 16px;
   border-radius: 20px;
-  font-family: "IM Fell English", serif;
+  font-family: "IM Fell English", Georgia, "Times New Roman", Times, serif;
   font-size: 0.9rem;
   z-index: 1000;
   opacity: 0;
@@ -472,7 +467,7 @@
   background: linear-gradient(145deg, #8b4513, #a0522d);
   border: 2px solid #daa520;
   color: #f4f1e8;
-  font-family: "IM Fell English", serif;
+  font-family: "IM Fell English", Georgia, "Times New Roman", Times, serif;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
 }
