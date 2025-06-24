@@ -1,0 +1,32 @@
+{
+  "routes": [
+    { "src": "/bill/(.*)", "dest": "/api/bill?section=$1" },
+    { "src": "/games", "dest": "/api/game-hub" },
+    { "src": "/revenue", "dest": "/api/revenue-dashboard" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=3600" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=60" }]
+    }
+  ],
+  "functions": {
+    "app/api/bill/advice.ts": {
+      "runtime": "edge"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/hackathon",
+      "destination": "/?tab=hackathon"
+    }
+  ]
+}

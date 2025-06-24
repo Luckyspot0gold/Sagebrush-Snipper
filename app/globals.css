@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import enhanced typography */
+@import url("https://fonts.googleapis.com/css2?family=IM+Fell+English:ital,wght@0,400;0,700;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap");
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -71,95 +76,109 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "Crimson Text", serif;
   }
 }
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
+/* Enhanced Typography System */
+.headline-primary {
+  font-family: "IM Fell English", serif;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(139, 69, 19, 0.3);
+  letter-spacing: 0.05em;
 }
 
-/* Import vintage fonts */
-@import url("https://fonts.googleapis.com/css2?family=IM+Fell+English:ital,wght@0,400;0,700;1,400&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&display=swap");
+.headline-secondary {
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+.body-text {
+  font-family: "Crimson Text", serif;
+  line-height: 1.7;
+  text-align: justify;
+}
+
+/* Enhanced Interactive Elements */
+.article {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.article:hover {
+  transform: scale(1.02) translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+  z-index: 10;
+}
+
+.article:active {
+  transform: scale(0.98);
+}
+
+/* Ink Splash Animation */
+@keyframes ink-splash {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
   }
 }
 
-/* Steampunk-Western Parchment Background */
-.parchment-bg {
-  background-color: #f4f1e8;
-  background-image: radial-gradient(circle at 20% 80%, rgba(120, 119, 108, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(120, 119, 108, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(194, 178, 128, 0.2) 0%, transparent 50%),
-    linear-gradient(135deg, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
-    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c2b280' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3Ccircle cx='15' cy='15' r='0.5'/%3E%3Ccircle cx='45' cy='45' r='0.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+.ink-splash {
   position: relative;
+  overflow: hidden;
 }
 
-.parchment-bg::before {
+.ink-splash::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-      45deg,
-      transparent 48%,
-      rgba(139, 69, 19, 0.1) 49%,
-      rgba(139, 69, 19, 0.1) 51%,
-      transparent 52%
-    ), linear-gradient(-45deg, transparent 48%, rgba(139, 69, 19, 0.1) 49%, rgba(139, 69, 19, 0.1) 51%, transparent 52%);
-  background-size: 20px 20px;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(139, 69, 19, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
   pointer-events: none;
-  opacity: 0.3;
 }
 
-/* Brass and Leather UI Elements */
-.brass-border {
-  border: 3px solid #b8860b;
-  box-shadow: inset 0 0 10px rgba(184, 134, 11, 0.3), 0 0 15px rgba(184, 134, 11, 0.2);
-  background: linear-gradient(145deg, #daa520, #b8860b);
+.ink-splash:hover::after {
+  animation: ink-splash 0.6s ease-out;
 }
 
-.leather-texture {
-  background: linear-gradient(45deg, #8b4513 25%, transparent 25%),
-    linear-gradient(-45deg, #8b4513 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #8b4513 75%),
-    linear-gradient(-45deg, transparent 75%, #8b4513 75%);
-  background-size: 4px 4px;
-  background-position: 0 0, 0 2px, 2px -2px, -2px 0px;
-  background-color: #a0522d;
+/* Newspaper Fold Effects */
+.newspaper-folds {
+  display: flex;
+  gap: 1rem;
+  margin: 2rem 0;
+  justify-content: center;
 }
 
-/* Vintage Typography */
-.font-vintage {
-  font-family: "IM Fell English", serif;
-}
-
-.font-serif {
-  font-family: "Playfair Display", serif;
-}
-
-.font-steampunk {
-  font-family: "Cinzel", serif;
-}
-
-/* Newspaper Page Fold Effect */
-.page-fold {
+.fold-section {
   position: relative;
+  padding: 1rem;
+  background: linear-gradient(145deg, #f8f3e3, #e8e5d8);
+  border: 2px solid #8b4513;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
   transform-style: preserve-3d;
-  transition: transform 0.6s ease-in-out;
 }
 
-.page-fold.folding {
-  transform: rotateY(-15deg) rotateX(5deg);
+.fold-section:hover {
+  transform: rotateY(-5deg) rotateX(2deg);
+  box-shadow: 5px 5px 15px rgba(139, 69, 19, 0.4);
 }
 
-.page-fold::after {
+.fold-section::before {
   content: "";
   position: absolute;
   top: 0;
@@ -167,279 +186,143 @@ body {
   width: 0;
   height: 0;
   border-style: solid;
-  border-width: 0 20px 20px 0;
+  border-width: 0 15px 15px 0;
   border-color: transparent #d4af37 transparent transparent;
   transition: all 0.3s ease;
 }
 
-.page-fold:hover::after {
-  border-width: 0 40px 40px 0;
+.fold-section:hover::before {
+  border-width: 0 25px 25px 0;
 }
 
-/* Ink Bleed Animation */
-@keyframes ink-bleed {
-  0% {
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.1);
-  }
-  50% {
-    box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.2);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.1);
-  }
+/* Revenue Dashboard Styling */
+.revenue-dashboard {
+  background: linear-gradient(135deg, #f8f3e3 0%, #e8e5d8 100%);
+  border: 3px double #8b4513;
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
 }
 
-.ink-bleed:hover {
-  animation: ink-bleed 0.8s ease-in-out;
-}
-
-/* Wax Seal Animation */
-.wax-seal {
-  position: relative;
-  background: radial-gradient(circle, #8b0000, #660000);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: inline-block;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.wax-seal:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 20px rgba(139, 0, 0, 0.5);
-}
-
-.wax-seal::before {
-  content: "🏛️";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 20px;
-}
-
-/* Typewriter Effect */
-@keyframes typewriter {
-  from {
-    width: 0;
-  }
-  to {
-    width: 100%;
-  }
-}
-
-.typewriter {
-  overflow: hidden;
-  border-right: 2px solid #8b4513;
-  white-space: nowrap;
-  animation: typewriter 2s steps(40, end), blink-caret 0.75s step-end infinite;
-}
-
-@keyframes blink-caret {
-  from,
-  to {
-    border-color: transparent;
-  }
-  50% {
-    border-color: #8b4513;
-  }
-}
-
-/* Vintage Marketplace Cards */
-.vintage-card {
-  background: linear-gradient(145deg, #f4f1e8, #e8e5d8);
+.metric-card {
+  background: rgba(255, 255, 255, 0.8);
   border: 2px solid #8b4513;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
-}
-
-.vintage-card::before {
-  content: "";
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(45deg, #daa520, #b8860b, #daa520);
-  z-index: -1;
-  border-radius: inherit;
-}
-
-/* Steampunk Gears Animation */
-@keyframes rotate-gear {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.gear {
-  animation: rotate-gear 10s linear infinite;
-}
-
-.gear-reverse {
-  animation: rotate-gear 8s linear infinite reverse;
-}
-
-/* Newspaper Column Layout */
-.newspaper-columns {
-  column-count: 3;
-  column-gap: 2rem;
-  column-rule: 2px solid #8b4513;
-}
-
-@media (max-width: 768px) {
-  .newspaper-columns {
-    column-count: 1;
-  }
-}
-
-/* Enhanced Newspaper Components */
-.newspaper-headline {
-  @apply text-4xl font-bold font-serif uppercase mb-2;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.newspaper-subheadline {
-  @apply text-xl font-serif italic mb-4;
-}
-
-.newspaper-paragraph {
-  @apply font-serif leading-relaxed mb-4;
-  text-align: justify;
-}
-
-.newspaper-quote {
-  @apply font-serif italic border-l-4 border-black pl-4 my-4;
-  position: relative;
-}
-
-.newspaper-quote::before {
-  content: '"';
-  font-size: 4rem;
-  position: absolute;
-  left: -10px;
-  top: -20px;
-  color: #8b4513;
-  opacity: 0.3;
-}
-
-.newspaper-image-caption {
-  @apply text-xs font-serif text-center mt-1 italic;
-  border-top: 1px solid #8b4513;
-  padding-top: 4px;
-}
-
-.newspaper-section-title {
-  @apply text-2xl font-bold font-serif uppercase border-b-2 border-black pb-2 mb-4;
-  background: linear-gradient(90deg, #8b4513, #daa520);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.newspaper-article {
-  @apply border-4 border-black p-1 mb-6;
-}
-
-.newspaper-article-inner {
-  @apply border-2 border-black p-4;
-}
-
-.newspaper-byline {
-  @apply text-sm font-serif italic mb-4;
-  color: #8b4513;
-}
-
-.newspaper-dateline {
-  @apply text-sm font-serif font-bold mb-4;
-  color: #8b4513;
-}
-
-.newspaper-ad {
-  @apply border-2 border-black p-4 text-center font-serif;
-  background: radial-gradient(circle, #f4f1e8, #e8e5d8);
-}
-
-.newspaper-button {
-  @apply bg-black text-white hover:bg-gray-800 font-serif px-4 py-2 inline-block;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.newspaper-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.3);
 }
 
-/* Sound Effect Indicators */
-.sound-indicator {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: rgba(139, 69, 19, 0.9);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
+.metric-value {
   font-family: "IM Fell English", serif;
-  z-index: 1000;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #8b4513;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.sound-indicator.show {
+.metric-trend {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.metric-trend.up {
+  color: #22c55e;
+}
+
+.metric-trend.down {
+  color: #ef4444;
+}
+
+/* Game Preview Styling */
+.game-preview-container {
+  position: relative;
+  border: 4px solid #8b4513;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+}
+
+.game-preview {
+  width: 100%;
+  height: 300px;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.game-preview:hover {
+  transform: scale(1.05);
+}
+
+.play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.game-preview-container:hover .play-overlay {
   opacity: 1;
 }
 
-/* Music Player Styling */
-.music-player {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: linear-gradient(145deg, #8b4513, #a0522d);
-  border: 2px solid #daa520;
-  border-radius: 10px;
-  padding: 10px;
+.play-button {
+  background: #d4af37;
+  border: 3px solid #8b4513;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #8b4513;
+  transition: all 0.3s ease;
+}
+
+.play-button:hover {
+  transform: scale(1.1);
+  background: #f4d03f;
+}
+
+/* Ad Space Styling */
+.classified-ad {
+  background: linear-gradient(45deg, #fff9e6, #f5f0d8);
+  border: 2px dashed #8b4513;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.classified-ad::before {
+  content: "SPONSORED";
+  position: absolute;
+  top: -8px;
+  right: 10px;
+  background: #8b4513;
   color: white;
-  font-family: "IM Fell English", serif;
-  z-index: 1000;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-radius: 4px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .newspaper-headline {
-    @apply text-2xl;
-  }
-
-  .newspaper-columns {
-    column-count: 1;
-  }
-
-  .music-player {
-    bottom: 10px;
-    right: 10px;
-    padding: 8px;
-  }
-}
-
-/* Utility Classes */
-.text-balance {
-  text-wrap: balance;
-}
-
-.vintage-shadow {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-.brass-text {
-  background: linear-gradient(90deg, #daa520, #b8860b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Letterpress Effect */
+.letterpress {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 -1px 0 rgba(0, 0, 0, 0.3);
 }
 
 /* Vintage newspaper styles - ORIGINAL 1880s LOOK */
@@ -448,101 +331,87 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d1c7a3' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
 }
 
-/* Add vintage font styles */
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap");
-
-.font-serif {
-  font-family: "Playfair Display", serif;
-}
-
-/* Newspaper components */
+/* Enhanced newspaper components */
 .newspaper-headline {
-  @apply text-4xl font-bold font-serif uppercase mb-2;
+  @apply text-4xl font-bold uppercase mb-2 letterpress;
+  font-family: "IM Fell English", serif;
 }
 
 .newspaper-subheadline {
-  @apply text-xl font-serif italic mb-4;
+  @apply text-xl italic mb-4;
+  font-family: "Playfair Display", serif;
 }
 
 .newspaper-paragraph {
-  @apply font-serif leading-relaxed mb-4;
+  @apply leading-relaxed mb-4 body-text;
 }
 
 .newspaper-quote {
-  @apply font-serif italic border-l-4 border-black pl-4 my-4;
+  @apply italic border-l-4 border-black pl-4 my-4 body-text;
 }
 
 .newspaper-image-caption {
-  @apply text-xs font-serif text-center mt-1 italic;
+  @apply text-xs text-center mt-1 italic;
+  font-family: "Crimson Text", serif;
 }
 
 .newspaper-section-title {
-  @apply text-2xl font-bold font-serif uppercase border-b-2 border-black pb-2 mb-4;
+  @apply text-2xl font-bold uppercase border-b-2 border-black pb-2 mb-4 letterpress;
+  font-family: "IM Fell English", serif;
 }
 
 .newspaper-article {
-  @apply border-4 border-black p-1 mb-6;
+  @apply border-4 border-black p-1 mb-6 article;
 }
 
 .newspaper-article-inner {
   @apply border-2 border-black p-4;
 }
 
-.newspaper-column {
-  @apply font-serif leading-relaxed;
-}
-
 .newspaper-byline {
-  @apply text-sm font-serif italic mb-4;
+  @apply text-sm italic mb-4;
+  font-family: "Crimson Text", serif;
+  color: #8b4513;
 }
 
 .newspaper-dateline {
-  @apply text-sm font-serif font-bold mb-4;
+  @apply text-sm font-bold mb-4;
+  font-family: "Crimson Text", serif;
+  color: #8b4513;
 }
 
 .newspaper-ad {
-  @apply border-2 border-black p-4 text-center font-serif;
+  @apply border-2 border-black p-4 text-center;
+  font-family: "Crimson Text", serif;
 }
 
 .newspaper-button {
-  @apply bg-black text-white hover:bg-gray-800 font-serif px-4 py-2 inline-block;
+  @apply bg-black text-white hover:bg-gray-800 px-4 py-2 inline-block transition-all duration-300;
+  font-family: "IM Fell English", serif;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Decorative elements */
-.decorative-border {
-  position: relative;
+.newspaper-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
-.decorative-border::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border: 2px solid black;
-  pointer-events: none;
+/* Utility classes */
+.text-balance {
+  text-wrap: balance;
 }
 
-.decorative-corner::before,
-.decorative-corner::after {
-  content: "";
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border: 2px solid black;
-}
+/* Responsive design */
+@media (max-width: 768px) {
+  .newspaper-headline {
+    @apply text-2xl;
+  }
 
-.decorative-corner::before {
-  top: -2px;
-  left: -2px;
-  border-right: none;
-  border-bottom: none;
-}
+  .fold-section {
+    padding: 0.5rem;
+  }
 
-.decorative-corner::after {
-  bottom: -2px;
-  right: -2px;
-  border-left: none;
-  border-top: none;
+  .metric-value {
+    font-size: 1.8rem;
+  }
 }
