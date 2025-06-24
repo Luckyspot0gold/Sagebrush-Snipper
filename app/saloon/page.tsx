@@ -1,5 +1,8 @@
 import { NewspaperLayout } from "@/components/newspaper-layout"
 import { EnhancedBarKeepBill } from "@/components/enhanced-bar-keep-bill"
+import { BillPremiumSystem } from "@/components/bill-premium-system"
+import { BillRevenueDashboard } from "@/components/bill-revenue-dashboard"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function SaloonPage() {
   return (
@@ -11,7 +14,31 @@ export default function SaloonPage() {
           <p className="text-sm font-serif mt-2">Established 1852 • Finest Establishment in the Digital Territory</p>
         </div>
 
-        <EnhancedBarKeepBill />
+        <Tabs defaultValue="chat" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger value="chat" className="font-serif">
+              Chat with Bill
+            </TabsTrigger>
+            <TabsTrigger value="premium" className="font-serif">
+              Premium Services
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="font-serif">
+              Revenue Analytics
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="chat">
+            <EnhancedBarKeepBill />
+          </TabsContent>
+
+          <TabsContent value="premium">
+            <BillPremiumSystem />
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <BillRevenueDashboard />
+          </TabsContent>
+        </Tabs>
 
         <div className="text-center mt-8 p-4 border-2 border-black bg-amber-50">
           <p className="font-serif italic">
