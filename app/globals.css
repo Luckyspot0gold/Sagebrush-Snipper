@@ -415,3 +415,90 @@
     font-size: 1.8rem;
   }
 }
+
+/* Frontier Sound Effect Indicators */
+.frontier-sound-indicator {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(145deg, #8b4513, #a0522d);
+  color: #f4f1e8;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-family: "IM Fell English", serif;
+  font-size: 0.9rem;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border: 2px solid #daa520;
+  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.4);
+}
+
+.frontier-sound-indicator.show {
+  opacity: 1;
+}
+
+/* Bill's Speech Bubble Enhancements */
+.speech-bubble-tail {
+  position: relative;
+}
+
+.speech-bubble-tail::before {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 20px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #8b4513;
+}
+
+.speech-bubble-tail::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 21px;
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid white;
+}
+
+/* Frontier Button Styling */
+.frontier-button {
+  background: linear-gradient(145deg, #8b4513, #a0522d);
+  border: 2px solid #daa520;
+  color: #f4f1e8;
+  font-family: "IM Fell English", serif;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
+}
+
+.frontier-button:hover {
+  background: linear-gradient(145deg, #a0522d, #8b4513);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.4);
+}
+
+.frontier-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(139, 69, 19, 0.3);
+}
+
+/* Bill's Bonus Effect */
+.bonus-glow {
+  animation: bonus-pulse 2s ease-in-out infinite;
+}
+
+@keyframes bonus-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+  }
+}
