@@ -15,14 +15,35 @@ interface FrontierDialogue {
   analysis: string[]
   recommendation: string
   closing: string
-  mood: "bullish" | "bearish" | "cautious" | "excited"
+  mood: "bullish" | "bearish" | "cautious" | "excited" | "cheerful" | "wise"
 }
 
 const FRONTIER_EXPRESSIONS = {
-  surprise: ["Well I'll be hornswoggled!", "Thunderation!", "Great jumpin' Jehosaphat!"],
-  approval: ["Well butter my biscuits!", "Finer than frog's hair!", "Sweeter than Georgia peach pie!"],
-  concern: ["Dagnabbit!", "That's a real pickle!", "Trouble's brewin' like a summer storm!"],
-  wisdom: ["As my pappy used to say...", "In my years tendin' bar...", "Seen this before in '49..."],
+  surprise: ["Well I'll be hornswoggled!", "Thunderation!", "Great jumpin' Jehosaphat!", "Well I'll be jiggered!"],
+  approval: [
+    "Well butter my biscuits!",
+    "Finer than frog's hair!",
+    "Sweeter than Georgia peach pie!",
+    "Hotter than a pistol in July!",
+  ],
+  concern: [
+    "Dagnabbit!",
+    "That's a real pickle!",
+    "Trouble's brewin' like a summer storm!",
+    "Colder than a Wyoming winter!",
+  ],
+  wisdom: [
+    "As my pappy used to say...",
+    "In my years tendin' bar...",
+    "Seen this before in '49...",
+    "Back in the Gold Rush days...",
+  ],
+  excitement: [
+    "Well butter my biscuits!",
+    "Hotter than a pistol!",
+    "Sweeter than sorghum molasses!",
+    "Finer than frog's hair split four ways!",
+  ],
 }
 
 const MARKET_METAPHORS = {
@@ -30,16 +51,19 @@ const MARKET_METAPHORS = {
     "wilder than a mustang stampede",
     "jumpier than a long-tailed cat in a room full of rockers",
     "more unpredictable than prairie weather",
+    "shakier than a leaf in a tornado",
   ],
   bullish: [
     "risin' like smoke from a campfire",
     "climbin' faster than a cat up a tree",
     "hotter than a pistol in July",
+    "stronger than a team of oxen",
   ],
   bearish: [
     "droppin' faster than a coyote down a mineshaft",
     "colder than a Wyoming winter",
     "fallin' like leaves in autumn",
+    "weaker than watered-down whiskey",
   ],
 }
 
@@ -134,10 +158,47 @@ export function useFrontierSpeech() {
     }
   }, [])
 
+  const generateContextualDialogue = useCallback(
+    (context: string, marketData: MarketData): FrontierDialogue => {
+      const { volatility, sentiment, mood, topGainer, topLoser } = marketData
+
+      switch (context) {
+        case "welcome":
+          return {
+            opening: "Howdy, partner! Bill's the name. Seen more market booms than a Missouri riverboat gambler.",
+            analysis: [
+              "Been tendin' this establishment since the Gold Rush of '49.",
+              "Helped many a pioneer navigate these financial waters.",
+            ],
+            recommendation: "What brings ya to the frontier today?",
+            closing: "Pull up a stool and let's talk business!",
+            mood: "cheerful",
+          }
+
+        case "tutorial":
+          return {
+            opening: "New to these parts? No worries, partner!",
+            analysis: [
+              "Every greenhorn needs a good guide.",
+              "The frontier's full of opportunity for them that know where to look.",
+            ],
+            recommendation: "Start with small trades and work yer way up.",
+            closing: "Remember, fortune favors the prepared mind!",
+            mood: "wise",
+          }
+
+        default:
+          return generateDialogue(marketData)
+      }
+    },
+    [generateDialogue],
+  )
+
   return {
     generateDialogue,
     getRandomGreeting,
     getMarketQuip,
     lastAdvice,
+    generateContextualDialogue,
   }
 }

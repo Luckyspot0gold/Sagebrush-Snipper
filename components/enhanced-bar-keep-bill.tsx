@@ -23,7 +23,7 @@ interface MarketInsight {
 
 interface BillResponse {
   message: string
-  mood: "bullish" | "bearish" | "neutral" | "excited"
+  mood: "bullish" | "bearish" | "neutral" | "excited" | "concerned" | "cheerful"
   confidence: number
   recommendations?: string[]
 }
@@ -44,6 +44,34 @@ const WHISKEY_WISDOM = [
   "Trust your gut, but verify with data, partner.",
 ]
 
+const FRONTIER_DIALOGUE_LIBRARY = {
+  launch: [
+    "Howdy, partner! Bill's the name. Seen more market booms than a Missouri riverboat gambler. Need help navigating these choppy waters?",
+    "Welcome to my establishment! Been tendin' bar since the Gold Rush of '49. What brings ya to the frontier today?",
+    "Pull up a stool, friend! This old bartender's got wisdom older than the hills and fresher than morning dew.",
+  ],
+  marketCrash: [
+    "Dagnabbit! Prices are dropping faster than a coyote down a mineshaft. Reckon you should batten down the hatches!",
+    "Thunderation! Market's colder than a Wyoming winter. Time to hunker down and wait for spring.",
+    "Well I'll be jiggered! Haven't seen a crash this bad since the Panic of '73. Hold onto your hat, partner!",
+  ],
+  successfulTrade: [
+    "Well butter my biscuits! That trade's sweeter than Georgia peach pie. Celebrate with a sarsaparilla?",
+    "Finer than frog's hair! You just struck gold, partner. How 'bout a drink to celebrate?",
+    "Hotter than a pistol in July! That was some mighty fine trading. Care for some liquid celebration?",
+  ],
+  newFeature: [
+    "Say... back in '49 we used claim jumpers to stake territory. This new option's mighty similar...",
+    "Reminds me of the old mining claims. Same principle, different century, partner.",
+    "In my day, we called this 'staking a claim.' Looks like you got the same opportunity here!",
+  ],
+  volatileMarket: [
+    "Thunderation! This market's wilder than a mustang stampede! Best to rein in them leveraged positions.",
+    "Jumpier than a long-tailed cat in a room full of rockers! Consider hedging with gold or land deeds.",
+    "More unpredictable than prairie weather! Time to play it safe, partner.",
+  ],
+}
+
 export function EnhancedBarKeepBill() {
   const [query, setQuery] = useState("")
   const [conversation, setConversation] = useState<
@@ -59,6 +87,8 @@ export function EnhancedBarKeepBill() {
   const [isTyping, setIsTyping] = useState(false)
   const [marketInsights, setMarketInsights] = useState<MarketInsight[]>([])
   const [billMood, setBillMood] = useState<"bullish" | "bearish" | "neutral">("neutral")
+  const [sarsaparillaOffered, setSarsaparillaOffered] = useState(false)
+  const [marketInsightBoost, setMarketInsightBoost] = useState(1.0)
 
   const { assets, marketMood, marketSentiment } = useMarketStore()
 
@@ -106,48 +136,73 @@ export function EnhancedBarKeepBill() {
 
   const generateBillResponse = (userQuery: string): BillResponse => {
     const lowerQuery = userQuery.toLowerCase()
-    let response = `${SALOON_GREETINGS[Math.floor(Math.random() * SALOON_GREETINGS.length)]} `
+    let response = ""
     let mood: BillResponse["mood"] = "neutral"
     const confidence = 0.8
     const recommendations: string[] = []
 
-    if (lowerQuery.includes("price") || lowerQuery.includes("cost")) {
-      const asset = assets.find((a) => lowerQuery.includes(a.name.toLowerCase()))
-      if (asset) {
-        response += `Now that ${asset.name}... last I heard it was trading at $${asset.price.toFixed(2)} `
-        response += `with a ${asset.priceChange > 0 ? "mighty fine" : "rough"} ${Math.abs(asset.priceChange).toFixed(1)}% change. `
-        mood = asset.priceChange > 0 ? "bullish" : "bearish"
-        recommendations.push(
-          `Keep an eye on ${asset.name} - it's showing ${asset.priceChange > 0 ? "strength" : "weakness"}`,
-        )
-      } else {
-        response += "Prices are dancing like tumbleweeds in the wind today. "
-      }
-    } else if (lowerQuery.includes("land") || lowerQuery.includes("deed")) {
-      response +=
-        "The land rush continues, partner! Prime parcels near the digital mountains are going for 150 STONES. "
-      response += "Heard tell of a new settlement opening up near the crypto mines. "
-      mood = "excited"
-      recommendations.push("Consider diversifying into virtual real estate", "Check out the new mining territories")
-    } else if (lowerQuery.includes("market") || lowerQuery.includes("trend")) {
-      response += `The market's feeling ${marketMood.toLowerCase()} today. `
-      response += `Sentiment's running at ${(marketSentiment * 100).toFixed(0)}% - `
-      response += marketSentiment > 0 ? "folks are optimistic!" : "people are being cautious."
-      mood = marketSentiment > 0 ? "bullish" : "bearish"
-    } else if (lowerQuery.includes("game") || lowerQuery.includes("boxing") || lowerQuery.includes("racing")) {
-      response +=
-        "The arena's been packed lately! Crypto Clashers Boxing is drawing crowds from all over the territory. "
-      response += "Racing circuit's heating up too - saw some mighty fine times on the track yesterday. "
-      mood = "excited"
-      recommendations.push("Try your luck in the boxing arena", "Check out the racing leaderboards")
+    // Use dialogue library based on market conditions
+    if (marketSentiment < -0.5) {
+      response =
+        FRONTIER_DIALOGUE_LIBRARY.marketCrash[Math.floor(Math.random() * FRONTIER_DIALOGUE_LIBRARY.marketCrash.length)]
+      mood = "bearish"
+    } else if (marketSentiment > 0.5) {
+      response =
+        FRONTIER_DIALOGUE_LIBRARY.successfulTrade[
+          Math.floor(Math.random() * FRONTIER_DIALOGUE_LIBRARY.successfulTrade.length)
+        ]
+      mood = "bullish"
+    } else if (marketMood === "Volatile") {
+      response =
+        FRONTIER_DIALOGUE_LIBRARY.volatileMarket[
+          Math.floor(Math.random() * FRONTIER_DIALOGUE_LIBRARY.volatileMarket.length)
+        ]
+      mood = "concerned"
     } else {
-      response += "That's an interesting question, partner. "
-      response += "The frontier's full of opportunities for those brave enough to seize them. "
+      response = FRONTIER_DIALOGUE_LIBRARY.launch[Math.floor(Math.random() * FRONTIER_DIALOGUE_LIBRARY.launch.length)]
+      mood = "cheerful"
     }
 
-    response += ` ${WHISKEY_WISDOM[Math.floor(Math.random() * WHISKEY_WISDOM.length)]}`
+    // Add context-specific advice
+    if (lowerQuery.includes("help") || lowerQuery.includes("guide")) {
+      recommendations.push(
+        "Check the market sentiment indicator",
+        "Review your portfolio balance",
+        "Consider diversifying your holdings",
+      )
+    }
 
     return { message: response, mood, confidence, recommendations }
+  }
+
+  const offerSarsaparilla = () => {
+    if (!sarsaparillaOffered && marketSentiment > 0.3) {
+      return {
+        text: "Buy ya a celebratory sarsaparilla?",
+        reward: "10% market insight boost for 5 minutes!",
+        action: () => {
+          setSarsaparillaOffered(true)
+          setMarketInsightBoost(1.1)
+          // playSound("whiskey-pour")
+
+          // Remove boost after 5 minutes
+          setTimeout(() => {
+            setMarketInsightBoost(1.0)
+          }, 300000)
+
+          // setCurrentDialogue({
+          //   greeting: "Much obliged, partner!",
+          //   advice: [
+          //     "That sarsaparilla's got some special ingredients from the old country...",
+          //     "Yer market instincts should be sharper now!",
+          //     "Use this wisdom well, and may fortune smile upon ya!"
+          //   ],
+          //   mood: "excited"
+          // })
+        },
+      }
+    }
+    return null
   }
 
   const handleSendMessage = async () => {
