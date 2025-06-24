@@ -1,115 +1,124 @@
-"use client"
+import Image from "next/image"
+import styles from "./newspaper-layout.module.css"
 
-import type React from "react"
-
-import { useEffect, useState } from "react"
-import { usePathname } from "next/navigation"
-import { DashboardLayout } from "@/components/dashboard-layout"
-import { MarketMoodIndicator } from "@/components/market-mood-indicator"
-import { useMarketStore } from "@/lib/stores/market-store"
-import Link from "next/link"
-import { ArrowRight, Newspaper } from "lucide-react"
-
-interface NewspaperLayoutProps {
-  children: React.ReactNode
-  title: string
-  subtitle?: string
-}
-
-export function NewspaperLayout({ children, title, subtitle }: NewspaperLayoutProps) {
-  const pathname = usePathname()
-  const { marketMood } = useMarketStore()
-  const [currentDate, setCurrentDate] = useState("")
-
-  useEffect(() => {
-    setCurrentDate(
-      new Date().toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }),
-    )
-  }, [])
-
-  // Generate a unique "volume" and "issue" number based on the pathname
-  const getVolumeAndIssue = () => {
-    const pathHash = pathname.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
-
-    const volume = Math.max(1, (pathHash % 10) + 1)
-    const issue = Math.max(1, ((pathHash * 13) % 100) + 1)
-
-    return { volume, issue }
-  }
-
-  const { volume, issue } = getVolumeAndIssue()
-
+export default function NewspaperLayout() {
   return (
-    <DashboardLayout>
-      <div className="flex flex-col gap-6 p-6 newspaper-bg">
-        <div className="max-w-6xl mx-auto bg-[#f8f3e3] text-black">
-          {/* Newspaper Header */}
-          <div className="border-b-4 border-black pb-4 mb-6">
-            <div className="text-center relative py-4">
-              <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-                <div className="w-1/2 h-[1px] bg-black"></div>
-              </div>
-              <div className="absolute top-4 left-4 right-4 bottom-4 border-2 border-black"></div>
-              <div className="relative">
-                <p className="text-sm font-serif mb-2">ESTABLISHED 1868 • TERRITORY OF WYOMING</p>
-                <h1 className="text-5xl md:text-7xl font-bold font-serif tracking-tight uppercase">
-                  THE WYOVERSE PIONEER
-                </h1>
-                <div className="flex justify-between items-center mt-2 px-8">
-                  <p className="text-sm font-serif">
-                    Vol. {volume}, No. {issue}
-                  </p>
-                  <p className="text-sm font-serif">{currentDate}</p>
-                  <p className="text-sm font-serif">PRICE: 5¢</p>
-                </div>
-              </div>
-            </div>
+    <div className={styles.newspaper}>
+      <header>
+        <h1>The Daily Chronicle</h1>
+        <p>Your source for news, opinions, and more.</p>
+      </header>
+
+      <nav>
+        <ul>
+          <li>
+            <a href="#">Home</a>
+          </li>
+          <li>
+            <a href="#">World</a>
+          </li>
+          <li>
+            <a href="#">Politics</a>
+          </li>
+          <li>
+            <a href="#">Business</a>
+          </li>
+          <li>
+            <a href="#">Technology</a>
+          </li>
+          <li>
+            <a href="#">Sports</a>
+          </li>
+          <li>
+            <a href="#">Entertainment</a>
+          </li>
+        </ul>
+      </nav>
+
+      <main>
+        <article>
+          <h2>Breaking News: Local Bakery Wins National Award</h2>
+          <div className={styles.imageContainer}>
+            <Image src="/images/bakery.jpg" alt="Award-winning bakery" width={600} height={400} fetchPriority="high" />
           </div>
+          <p>
+            The Sweet Surrender bakery has been awarded the prestigious Golden Whisk award for their innovative pastries
+            and commitment to quality ingredients.
+          </p>
+          <p>
+            The bakery, located in the heart of downtown, has been a local favorite for over 20 years. Their signature
+            croissant and decadent chocolate cake are known throughout the region.
+          </p>
+          <p>
+            "We are incredibly honored to receive this award," said owner Emily Carter. "It's a testament to the hard
+            work and dedication of our amazing team."
+          </p>
+        </article>
 
-          {/* Page Title */}
-          <div className="border-4 border-black p-1 mb-6">
-            <div className="border-2 border-black p-4">
-              <div className="text-center mb-4">
-                <h2 className="text-4xl font-bold font-serif uppercase mb-1">{title}</h2>
-                {subtitle && <h3 className="text-xl font-serif italic">{subtitle}</h3>}
-              </div>
-
-              {/* Market Mood Indicator */}
-              <div className="flex justify-end mb-4">
-                <div className="border-2 border-black p-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-serif">Market Mood:</span>
-                    <MarketMoodIndicator mood={marketMood} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Main Content */}
-              <div className="border-t-2 border-black pt-4">{children}</div>
-            </div>
+        <article>
+          <h2>City Council Approves New Park Development</h2>
+          <div className={styles.imageContainer}>
+            <Image src="/images/park.jpg" alt="Proposed park design" width={600} height={400} fetchPriority="high" />
           </div>
+          <p>The City Council has unanimously approved the development of a new public park on the city's west side.</p>
+          <p>
+            The park, which will be named Harmony Park, will feature walking trails, a playground, a community garden,
+            and a performance stage.
+          </p>
+          <p>
+            "This park will be a valuable asset to our community," said Mayor David Miller. "It will provide a space for
+            residents to relax, exercise, and connect with nature."
+          </p>
+        </article>
 
-          {/* Footer */}
-          <div className="border-t-4 border-black pt-4 text-center">
-            <div className="flex justify-between items-center px-4 mb-2">
-              <Link href="/" className="font-serif text-sm hover:underline flex items-center gap-1">
-                <Newspaper className="h-4 w-4" />
-                Front Page
-              </Link>
-              <p className="font-serif text-sm">WYOVERSE PIONEER PRESS • TERRITORY OF WYOMING</p>
-              <Link href="/classifieds" className="font-serif text-sm hover:underline flex items-center gap-1">
-                Classifieds
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+        <article>
+          <h2>Local Artist Unveils Stunning New Mural</h2>
+          <div className={styles.imageContainer}>
+            <Image src="/images/mural.jpg" alt="Newly unveiled mural" width={600} height={400} fetchPriority="high" />
           </div>
-        </div>
-      </div>
-    </DashboardLayout>
+          <p>Local artist Sarah Johnson has unveiled a stunning new mural on the side of the historic Grand Theater.</p>
+          <p>
+            The mural, which depicts scenes from the city's history, is a vibrant and colorful addition to the downtown
+            landscape.
+          </p>
+          <p>
+            "I wanted to create a piece of art that would celebrate our city's rich heritage," said Johnson. "I hope it
+            will inspire people to learn more about our history and appreciate the beauty of our community."
+          </p>
+        </article>
+      </main>
+
+      <aside>
+        <section>
+          <h3>Top Stories</h3>
+          <ul>
+            <li>
+              <a href="#">Stock Market Reaches Record High</a>
+            </li>
+            <li>
+              <a href="#">New Study Links Exercise to Improved Mental Health</a>
+            </li>
+            <li>
+              <a href="#">Local School District Announces New Superintendent</a>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Weather</h3>
+          <p>Today: Sunny with a high of 75°F.</p>
+          <p>Tomorrow: Partly cloudy with a chance of rain.</p>
+        </section>
+
+        <section>
+          <h3>Advertisement</h3>
+          <p>Visit our sponsor: Acme Corp.</p>
+        </section>
+      </aside>
+
+      <footer>
+        <p>&copy; 2023 The Daily Chronicle</p>
+      </footer>
+    </div>
   )
 }
