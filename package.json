@@ -43,6 +43,7 @@
     "@react-spring/web": "latest",
     "@react-three/drei": "latest",
     "@react-three/fiber": "latest",
+    "@supabase/supabase-js": "latest",
     "@web3-react/coinbase-wallet": "latest",
     "autoprefixer": "^10.4.20",
     "canvas-confetti": "latest",

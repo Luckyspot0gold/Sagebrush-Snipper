@@ -2,7 +2,8 @@
   "routes": [
     { "src": "/bill/(.*)", "dest": "/api/bill?section=$1" },
     { "src": "/games", "dest": "/api/game-hub" },
-    { "src": "/revenue", "dest": "/api/revenue-dashboard" }
+    { "src": "/revenue", "dest": "/api/revenue-dashboard" },
+    { "src": "/api/avalanche", "dest": "/api/avalanche/route" }
   ],
   "headers": [
     {
@@ -11,7 +12,9 @@
         { "key": "Cache-Control", "value": "public, max-age=3600" },
         { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Access-Control-Allow-Origin", "value": "*" }
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, X-Requested-With" }
       ]
     },
     {
@@ -20,6 +23,14 @@
         { "key": "Cache-Control", "value": "public, max-age=60" },
         { "key": "Access-Control-Allow-Origin", "value": "*" },
         { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, X-Requested-With" }
+      ]
+    },
+    {
+      "source": "/api/avalanche",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
       ]
     }
@@ -27,6 +38,9 @@
   "functions": {
     "app/api/bill/advice.ts": {
       "runtime": "edge"
+    },
+    "app/api/avalanche/route.ts": {
+      "runtime": "nodejs18.x"
     }
   },
   "rewrites": [
