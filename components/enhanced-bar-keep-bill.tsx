@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useMarketStore } from "@/lib/stores/market-store"
 import { TrendingUp, TrendingDown, MessageSquare, Coins, MapPin, BarChart3, Zap, Star } from "lucide-react"
+import { RevenueDashboard } from "@/components/revenue-dashboard"
 
 interface MarketInsight {
   id: string
@@ -236,7 +237,7 @@ export function EnhancedBarKeepBill() {
 
         <CardContent className="p-6">
           <Tabs defaultValue="chat" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-6">
+            <TabsList className="grid w-full grid-cols-5 mb-6">
               <TabsTrigger value="chat" className="font-serif">
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Chat with Bill
@@ -244,6 +245,10 @@ export function EnhancedBarKeepBill() {
               <TabsTrigger value="insights" className="font-serif">
                 <Zap className="h-4 w-4 mr-2" />
                 Market Intel
+              </TabsTrigger>
+              <TabsTrigger value="revenue" className="font-serif">
+                <Coins className="h-4 w-4 mr-2" />
+                Revenue Saloon
               </TabsTrigger>
               <TabsTrigger value="assets" className="font-serif">
                 <Coins className="h-4 w-4 mr-2" />
@@ -335,6 +340,18 @@ export function EnhancedBarKeepBill() {
                       ))}
                     </div>
                   </ScrollArea>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="revenue" className="space-y-4">
+              <Card className="border-2 border-gray-300">
+                <CardHeader>
+                  <CardTitle className="font-serif">Bill's Revenue Dashboard</CardTitle>
+                  <CardDescription>Live earnings from the digital frontier</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <RevenueDashboard />
                 </CardContent>
               </Card>
             </TabsContent>

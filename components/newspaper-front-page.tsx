@@ -21,9 +21,10 @@ import {
   Gem,
   Scroll,
   MessageSquare,
-  ExternalLink,
 } from "lucide-react"
 import Image from "next/image"
+import { RevenueDashboard } from "@/components/revenue-dashboard"
+import { GamePreviewSystem } from "@/components/game-preview-system"
 
 export function NewspaperFrontPage() {
   const { initializeMarket, updateMarketConditions, marketMood, assets } = useMarketStore()
@@ -175,103 +176,16 @@ export function NewspaperFrontPage() {
         </div>
       </div>
 
-      {/* Featured Games Section */}
+      {/* Enhanced Game Preview Section */}
       <div className="grid grid-cols-12 gap-6 mb-6">
-        <div className="col-span-4">
+        <div className="col-span-12">
           <div className="border-4 border-black p-1">
             <div className="border-2 border-black p-4">
               <div className="text-center mb-4">
-                <h3 className="text-xl font-bold font-serif uppercase">CRYPTO CLASHERS BOXING</h3>
-                <p className="text-sm font-serif">KryptO Boxing Championship</p>
+                <h3 className="text-3xl font-bold font-serif uppercase">GAMING ARCADE</h3>
+                <p className="text-sm font-serif italic">Live from the Digital Frontier</p>
               </div>
-              <div className="relative h-32 mb-3">
-                <Image
-                  src="/images/crypto-clashers-fighter.png"
-                  alt="Crypto Clashers Fighter"
-                  width={200}
-                  height={128}
-                  className="w-full h-full object-cover border border-black"
-                />
-              </div>
-              <p className="text-sm font-serif mb-3">
-                Elite fighters battle in market-driven combat. Each punch powered by real crypto volatility.
-              </p>
-              <a
-                href="https://github.com/Luckyspot0gold/Crypto_Clashers"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block w-full"
-              >
-                <Button className="newspaper-button w-full">
-                  ENTER RING <ExternalLink className="ml-2 h-4 w-4" />
-                </Button>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-span-4">
-          <div className="border-4 border-black p-1">
-            <div className="border-2 border-black p-4">
-              <div className="text-center mb-4">
-                <h3 className="text-xl font-bold font-serif uppercase">CRYPTO CLASHERS RACING</h3>
-                <p className="text-sm font-serif">8 in the Gate Horse Racing</p>
-              </div>
-              <div className="relative h-32 mb-3">
-                <Image
-                  src="/images/crypto-clashers-racing-poster.png"
-                  alt="Crypto Racing"
-                  width={200}
-                  height={128}
-                  className="w-full h-full object-cover border border-black"
-                />
-              </div>
-              <p className="text-sm font-serif mb-3">
-                High-speed racing where markets determine velocity. Race for crypto, not pink slips!
-              </p>
-              <a
-                href="https://github.com/Luckyspot0gold/Crypto_Clashers_Racing"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block w-full"
-              >
-                <Button className="newspaper-button w-full">
-                  START ENGINES <ExternalLink className="ml-2 h-4 w-4" />
-                </Button>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-span-4">
-          <div className="border-4 border-black p-1">
-            <div className="border-2 border-black p-4">
-              <div className="text-center mb-4">
-                <h3 className="text-xl font-bold font-serif uppercase">CRYPTOPIA GAME</h3>
-                <p className="text-sm font-serif">Educational Story Board Game</p>
-              </div>
-              <div className="relative h-32 mb-3">
-                <Image
-                  src="/images/bull-vs-bear-bully.jpeg"
-                  alt="Cryptopia Game"
-                  width={200}
-                  height={128}
-                  className="w-full h-full object-cover border border-black"
-                />
-              </div>
-              <p className="text-sm font-serif mb-3">
-                Fork of Bulls vs Bears turned educational. Learn crypto with Cutch, Irelynn, Bully and the whales.
-              </p>
-              <a
-                href="https://github.com/Luckyspot0gold/Cryptopia"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block w-full"
-              >
-                <Button className="newspaper-button w-full">
-                  PLAY GAME <ExternalLink className="ml-2 h-4 w-4" />
-                </Button>
-              </a>
+              <GamePreviewSystem />
             </div>
           </div>
         </div>
@@ -342,6 +256,21 @@ export function NewspaperFrontPage() {
               <Link href="/trading">
                 <Button className="newspaper-button w-full">START TRADING</Button>
               </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Revenue Dashboard Section */}
+      <div className="grid grid-cols-12 gap-6 mb-6">
+        <div className="col-span-12">
+          <div className="border-4 border-black p-1">
+            <div className="border-2 border-black p-4 bg-green-50">
+              <div className="text-center mb-4">
+                <h3 className="text-3xl font-bold font-serif uppercase">FRONTIER TREASURY</h3>
+                <p className="text-sm font-serif italic">Live Revenue from the Digital Territory</p>
+              </div>
+              <RevenueDashboard />
             </div>
           </div>
         </div>
