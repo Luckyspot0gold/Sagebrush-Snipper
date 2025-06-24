@@ -76,7 +76,10 @@ export function WantedPosterSidebar() {
   }
 
   return (
-    <div className="wanted-sidebar w-80 bg-gradient-to-b from-amber-50 to-amber-100 border-4 border-amber-800 p-4 space-y-4">
+    <div
+      className="sidebar wanted-theme w-80 bg-gradient-to-b from-amber-50 to-amber-100 border-4 border-amber-800 p-4 space-y-4"
+      style={{ background: "url('/old-paper-texture.jpg'), linear-gradient(145deg, #f4e4bc, #e8d5a3)" }}
+    >
       {/* Header */}
       <div className="wanted-header text-center border-4 border-black bg-red-600 text-white p-4 relative">
         <div className="absolute -top-2 -left-2">
@@ -110,13 +113,22 @@ export function WantedPosterSidebar() {
               <img
                 src={outlaw.avatar || "/placeholder.svg"}
                 alt={outlaw.alias}
-                className="w-full h-full object-cover grayscale"
+                className="outlaw-img w-full h-full object-cover grayscale"
               />
               <div className="absolute inset-0 bg-black opacity-10"></div>
             </div>
 
             {/* Bounty */}
-            <div className="bounty-amount bg-yellow-400 border-2 border-black p-2 transform -rotate-1">
+            <div
+              className="bounty-amount bg-yellow-400 border-2 border-black p-2 transform -rotate-1"
+              style={{
+                position: "absolute",
+                top: "-10px",
+                right: "10px",
+                background: "#D4AF37",
+                transform: "rotate(5deg)",
+              }}
+            >
               <div className="text-lg font-bold text-black headline-primary">{getBountyDisplay(outlaw.bounty)}</div>
             </div>
 
