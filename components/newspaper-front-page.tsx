@@ -33,14 +33,20 @@ export function NewspaperFrontPage() {
   const { playPageFlip, playTypewriter, toggleSounds } = useSoundEffects()
 
   useEffect(() => {
+    // initialise store and SFX once
     initializeMarket()
-    playTypewriter() // Welcome sound
+    playTypewriter()
 
+    // update market every 5 s
     const interval = setInterval(() => {
       updateMarketConditions()
     }, 5000)
+
+    // cleanup
     return () => clearInterval(interval)
-  }, [initializeMarket, updateMarketConditions, playTypewriter])
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // ← empty dependency array ensures it runs only on mount
 
   const currentDate = new Date().toLocaleDateString("en-US", {
     weekday: "long",
