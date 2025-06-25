@@ -1,31 +1,54 @@
 #!/bin/bash
 
-echo "🚀 DEPLOYING ALL DOMAINS FOR HACKATHON SUBMISSION"
-echo "=================================================="
+echo "🚀 DEPLOYING WYOVERSE ECOSYSTEM - ALL DOMAINS & SUBDOMAINS"
+echo "=========================================================="
 
-# Set environment variables
-export NODE_ENV=production
-export SUPABASE_NEXT_PUBLIC_SUPABASE_URL=$SUPABASE_SUPABASE_NEXT_PUBLIC_SUPABASE_URSUPABASE_NEXT_PUBLIC_SUPABASE_ANON_KEY_ANON_KEY=$SUPABASE_NEXT_PUBLIC_SUPABASE_ANON_KEY
+# Set deployment flags
+DEPLOY_FLAGS="--prod --yes --force"
 
 echo "📦 Building production bundle..."
 npm run build
 
-echo "🌐 Deploying to cryptoclashers.games..."
-vercel --prod --scope=your-team --alias=cryptoclashers.games
+echo "🎯 Deploying main domains..."
+echo "🥊 Deploying CryptoClashers.games..."
+vercel $DEPLOY_FLAGS --alias=cryptoclashers.games
 
-echo "💰 Deploying to stoneyard.cash..."
-vercel --prod --scope=your-team --alias=stoneyard.cash
+echo "💰 Deploying StoneYard.cash..."
+vercel $DEPLOY_FLAGS --alias=stoneyard.cash
 
-echo "🤠 Deploying main WyoVerse..."
-vercel --prod --scope=your-team --alias=wyoverse.com
+echo "🌐 Deploying specialized subdomains..."
+echo "🥊 Boxing arena subdomain..."
+vercel $DEPLOY_FLAGS --alias=boxing.cryptoclashers.games
 
-echo "✅ ALL DOMAINS DEPLOYED SUCCESSFULLY!"
-echo "🎯 Ready for hackathon submission!"
+echo "🏁 Racing circuit subdomain..."
+vercel $DEPLOY_FLAGS --alias=racing.cryptoclashers.games
 
-# Test all domains
-echo "🧪 Testing domain responses..."
-curl -I https://cryptoclashers.games
-curl -I https://stoneyard.cash
-curl -I https://wyoverse.com
+echo "🍻 Saloon subdomain..."
+vercel $DEPLOY_FLAGS --alias=saloon.stoneyard.cash
 
-echo "🏆 HACKATHON DEPLOYMENT COMPLETE!"
+echo "🤠 WyoVerse hub subdomain..."
+vercel $DEPLOY_FLAGS --alias=wyoverse.cryptoclashers.games
+
+echo "⚙️ Setting environment variables..."
+vercel env add SUPABASE_NEXT_PUBLIC_SUPABASE_URL "$SUPABASE_URL" --yes
+vercelSUPABASE_NEXT_PUBLIC_SUPABASE_ANON_KEY_ANON_KEY "$SUPABASE_KEY" --yes
+vercel env add NEXT_PUBLIC_DOMAIN_MAIN "cryptoclashers.games" --yes
+vercel env add NEXT_PUBLIC_DOMAIN_TRADING "stoneyard.cash" --yes
+
+echo "🧪 Testing all deployments..."
+domains=(
+  "https://cryptoclashers.games"
+  "https://stoneyard.cash"
+  "https://boxing.cryptoclashers.games"
+  "https://racing.cryptoclashers.games"
+  "https://saloon.stoneyard.cash"
+  "https://wyoverse.cryptoclashers.games"
+)
+
+for domain in "${domains[@]}"; do
+  echo "Testing $domain..."
+  curl -I "$domain" | head -1
+done
+
+echo "✅ ECOSYSTEM DEPLOYMENT COMPLETE!"
+echo "🏆 Ready for hackathon submission!"
