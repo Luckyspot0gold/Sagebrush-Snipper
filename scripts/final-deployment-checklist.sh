@@ -36,3 +36,8 @@ echo "Upload demo video and documentation"
 echo ""
 
 echo "🚀 READY TO WIN!"
+# Login to Supabase
+supabase login
+
+# Initialize project  
+supabase init
