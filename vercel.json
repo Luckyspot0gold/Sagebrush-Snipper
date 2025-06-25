@@ -25,14 +25,6 @@
         { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, X-Requested-With" }
       ]
-    },
-    {
-      "source": "/api/avalanche",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
-      ]
     }
   ],
   "functions": {
@@ -48,5 +40,6 @@
       "source": "/hackathon",
       "destination": "/?tab=hackathon"
     }
-  ]
+  ],
+  "domains": ["cryptoclashers.games", "stoneyard.cash", "wyoverse.com"]
 }
