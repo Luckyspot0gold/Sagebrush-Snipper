@@ -59,16 +59,6 @@ export function CryptoClashersBoxing() {
   const executeAttack = async (attackType: "jab" | "hook" | "uppercut") => {
     if (isAttacking || gameState !== "fighting") return
 
-    if (!selectedFighter || !opponent) {
-      console.error("Missing fighter data")
-      return
-    }
-
-    if (stats.playerHealth <= 0 || stats.opponentHealth <= 0) {
-      console.warn("Game already ended")
-      return
-    }
-
     setIsAttacking(true)
 
     // Calculate damage based on attack type and fighter stats
@@ -127,11 +117,6 @@ export function CryptoClashersBoxing() {
 
   const mintBoxingNFT = async (tokensEarned: number) => {
     try {
-      if (!selectedFighter || !opponent) {
-        console.warn("Missing fighter or opponent data for NFT minting")
-        return
-      }
-
       const response = await fetch("/api/nft/mint", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -144,19 +129,12 @@ export function CryptoClashersBoxing() {
         }),
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
       const result = await response.json()
       if (result.success) {
         setCombatLog((prev) => [...prev, `🎖️ Victory NFT minted! TX: ${result.txHash?.slice(0, 10)}...`])
-      } else {
-        throw new Error(result.error || "NFT minting failed")
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("NFT minting failed:", error)
-      setCombatLog((prev) => [...prev, `⚠️ NFT minting failed: ${error.message}`])
     }
   }
 

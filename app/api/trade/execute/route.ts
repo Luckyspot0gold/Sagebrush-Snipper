@@ -15,43 +15,20 @@ interface MarketData {
 
 export async function POST(request: NextRequest) {
   try {
-    // Parse and validate request body
-    let tradeData: TradeData
-    try {
-      tradeData = await request.json()
-    } catch (parseError) {
-      return NextResponse.json({ success: false, error: "Invalid JSON in request body" }, { status: 400 })
+    const tradeData: TradeData = await request.json()
+
+    // Validate input
+    if (!tradeData.asset || !tradeData.amount || !tradeData.wallet) {
+      return NextResponse.json({ success: false, error: "Missing required trade parameters" }, { status: 400 })
     }
 
-    // Validate required fields
-    const { asset, amount, wallet, tradeType } = tradeData
-
-    if (!asset || typeof asset !== "string") {
-      return NextResponse.json({ success: false, error: "Asset is required and must be a string" }, { status: 400 })
-    }
-
-    if (!amount || typeof amount !== "number" || amount <= 0) {
-      return NextResponse.json({ success: false, error: "Amount must be a positive number" }, { status: 400 })
-    }
-
-    if (!wallet || typeof wallet !== "string") {
-      return NextResponse.json({ success: false, error: "Wallet address is required" }, { status: 400 })
-    }
-
-    if (!tradeType || !["buy", "sell"].includes(tradeType)) {
-      return NextResponse.json({ success: false, error: "Trade type must be 'buy' or 'sell'" }, { status: 400 })
-    }
-
-    // 1. Get market data
-    const marketData = await getMarketData(asset)
-    if (!marketData) {
-      return NextResponse.json({ success: false, error: "Market data not available for this asset" }, { status: 404 })
-    }
+    // 1. Get market data (simulated for demo)
+    const marketData = await getMarketData(tradeData.asset)
 
     // 2. Calculate trade details
     const tradeDetails = calculateTrade(tradeData, marketData)
 
-    // 3. Execute trade simulation
+    // 3. Execute trade simulation (in production, this would interact with DEX)
     const result = await executeTrade(tradeDetails)
 
     return NextResponse.json({
@@ -64,32 +41,20 @@ export async function POST(request: NextRequest) {
     })
   } catch (error: any) {
     console.error("Trade execution failed:", error)
-    return NextResponse.json(
-      {
-        success: false,
-        error: error.message || "Internal server error during trade execution",
-      },
-      { status: 500 },
-    )
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
   }
 }
 
-async function getMarketData(asset: string): Promise<MarketData | null> {
-  try {
-    // In production, fetch from real API with proper error handling
-    const mockData: Record<string, MarketData> = {
-      STONES: { currentPrice: 0.25, volume24h: 150000, priceChange24h: 5.2 },
-      GOLD: { currentPrice: 1850.5, volume24h: 2500000, priceChange24h: -1.8 },
-      SILVER: { currentPrice: 24.75, volume24h: 500000, priceChange24h: 2.1 },
-      AVAX: { currentPrice: 35.8, volume24h: 45000000, priceChange24h: 8.5 },
-    }
-
-    const data = mockData[asset.toUpperCase()]
-    return data || null
-  } catch (error) {
-    console.error("Failed to get market data:", error)
-    return null
+async function getMarketData(asset: string): Promise<MarketData> {
+  // In production, fetch from real API
+  const mockData: Record<string, MarketData> = {
+    STONES: { currentPrice: 0.25, volume24h: 150000, priceChange24h: 5.2 },
+    GOLD: { currentPrice: 1850.5, volume24h: 2500000, priceChange24h: -1.8 },
+    SILVER: { currentPrice: 24.75, volume24h: 500000, priceChange24h: 2.1 },
+    AVAX: { currentPrice: 35.8, volume24h: 45000000, priceChange24h: 8.5 },
   }
+
+  return mockData[asset] || { currentPrice: 1.0, volume24h: 0, priceChange24h: 0 }
 }
 
 function calculateTrade(tradeData: TradeData, marketData: MarketData) {
@@ -99,29 +64,24 @@ function calculateTrade(tradeData: TradeData, marketData: MarketData) {
 
   return {
     ...tradeData,
-    amountOut: Number(amountOut.toFixed(6)),
-    minAmountOut: Number(minAmountOut.toFixed(6)),
-    priceImpact: Number(((tradeData.amount / marketData.volume24h) * 100).toFixed(4)),
+    amountOut,
+    minAmountOut,
+    priceImpact: (tradeData.amount / marketData.volume24h) * 100,
     estimatedGas: 0.002, // AVAX
   }
 }
 
 async function executeTrade(tradeDetails: any) {
-  try {
-    // Simulate blockchain transaction
-    const txHash = `0x${Math.random().toString(16).substr(2, 64)}`
+  // Simulate blockchain transaction
+  const txHash = `0x${Math.random().toString(16).substr(2, 64)}`
 
-    // Simulate processing delay
-    await new Promise((resolve) => setTimeout(resolve, Math.random() * 2000 + 1000))
+  // Simulate processing delay
+  await new Promise((resolve) => setTimeout(resolve, 2000))
 
-    return {
-      txHash,
-      amountOut: tradeDetails.amountOut,
-      priceImpact: tradeDetails.priceImpact,
-      gasUsed: tradeDetails.estimatedGas,
-    }
-  } catch (error) {
-    console.error("Trade execution simulation failed:", error)
-    throw new Error("Trade execution failed")
+  return {
+    txHash,
+    amountOut: tradeDetails.amountOut,
+    priceImpact: tradeDetails.priceImpact,
+    gasUsed: tradeDetails.estimatedGas,
   }
 }

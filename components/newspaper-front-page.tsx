@@ -21,8 +21,6 @@ import {
   Gem,
   Scroll,
   MessageSquare,
-  TestTube,
-  AlertTriangle,
 } from "lucide-react"
 import Image from "next/image"
 import { RevenueDashboard } from "@/components/revenue-dashboard"
@@ -48,17 +46,6 @@ export function NewspaperFrontPage() {
 
   return (
     <div className="max-w-7xl mx-auto newspaper-bg text-black">
-      {/* Add creator testing indicator */}
-      {process.env.NODE_ENV === "development" && (
-        <div className="fixed top-4 right-4 z-50">
-          <Link href="/creator-test">
-            <Button size="sm" className="bg-yellow-500 text-black hover:bg-yellow-600 font-serif">
-              <TestTube className="h-4 w-4 mr-1" />
-              Creator Test
-            </Button>
-          </Link>
-        </div>
-      )}
       {/* Newspaper Header */}
       <div className="border-b-4 border-black pb-4 mb-6">
         <div className="text-center relative py-4">
@@ -184,47 +171,6 @@ export function NewspaperFrontPage() {
                   </Button>
                 </Link>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Breaking News - Wanted Outlaws */}
-      <div className="col-span-12 mt-6">
-        <div className="border-4 border-red-600 p-1 bg-red-50">
-          <div className="border-2 border-red-600 p-4">
-            <div className="text-center mb-4">
-              <h3 className="text-2xl font-bold font-serif uppercase text-red-800">⚠️ BREAKING NEWS ⚠️</h3>
-              <p className="text-sm font-serif italic text-red-700">Digital Frontier Alert</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h4 className="font-serif font-bold text-red-800 mb-2">CRYPTO BANDIT STRIKES AGAIN</h4>
-                <p className="font-serif text-sm text-red-700 mb-2">
-                  The notorious "Crypto Bandit" has been spotted near the Cheyenne Digital Saloon, allegedly involved in
-                  another NFT rustling operation. Citizens are advised to secure their digital wallets and report any
-                  suspicious activity.
-                </p>
-                <p className="font-serif text-xs text-red-600">
-                  Sheriff's Department offering $1,000 reward for information leading to capture.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-serif font-bold text-red-800 mb-2">DEFI DESPERADO ON THE LOOSE</h4>
-                <p className="font-serif text-sm text-red-700 mb-2">
-                  A new outlaw known as the "DeFi Desperado" has been exploiting smart contracts across the territory.
-                  This extremely dangerous individual is considered armed with advanced blockchain knowledge.
-                </p>
-                <p className="font-serif text-xs text-red-600">
-                  $2,000 bounty - DO NOT APPROACH - Contact Marshal immediately.
-                </p>
-              </div>
-            </div>
-            <div className="text-center mt-4">
-              <Button className="bg-red-600 hover:bg-red-700 text-white font-serif">
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                VIEW ALL WANTED POSTERS
-              </Button>
             </div>
           </div>
         </div>

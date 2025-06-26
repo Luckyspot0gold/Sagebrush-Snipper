@@ -6,9 +6,34 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+        ],
+      },
+    ]
+  },
   async rewrites() {
     return [
-      // Subdomain routing
+      // Cloudflare subdomain routing
       {
         source: '/:path*',
         has: [
@@ -17,7 +42,7 @@ const nextConfig = {
             value: 'boxing.cryptoclashers.games',
           },
         ],
-        destination: '/boxing/:path*',
+        destination: '/boxing-arena/:path*',
       },
       {
         source: '/:path*',
@@ -27,14 +52,14 @@ const nextConfig = {
             value: 'racing.cryptoclashers.games',
           },
         ],
-        destination: '/racing/:path*',
+        destination: '/racing-circuit/:path*',
       },
       {
         source: '/:path*',
         has: [
           {
             type: 'host',
-            value: 'saloon.stoneyard.cash',
+            value: 'saloon.cryptoclashers.games',
           },
         ],
         destination: '/saloon/:path*',
@@ -49,11 +74,26 @@ const nextConfig = {
         ],
         destination: '/wyoverse/:path*',
       },
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'api.cryptoclashers.games',
+          },
+        ],
+        destination: '/api/:path*',
+      },
     ]
   },
   images: {
-    domains: ['placeholder.svg', 'blob.v0.dev'],
-    unoptimized: true,
+    domains: ['cryptoclashers.games', 'cdn.cryptoclashers.games', 'placeholder.svg', 'blob.v0.dev'],
+    unoptimized: false,
+    loader: 'custom',
+    loaderFile: './lib/cloudflare-image-loader.ts',
+  },
+  experimental: {
+    runtime: 'edge',
   },
 }
 

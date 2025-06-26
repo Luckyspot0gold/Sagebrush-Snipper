@@ -1,61 +1,22 @@
-import { NewspaperFrontPage } from "@/components/newspaper-front-page"
-import { Sidebar } from "@/components/sidebar"
-import { WantedPosterSidebar } from "@/components/wanted-poster-sidebar"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
-import { TestTube, Eye } from "lucide-react"
+import Image from "next/image"
 
-export default function HomePage() {
+export default function Home() {
   return (
-    <div className="min-h-screen bg-[#f4f1e8] frontier-paper">
-      {/* Creator Testing Banner */}
-      <div className="bg-yellow-100 border-b-2 border-yellow-400 p-2">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Badge className="bg-yellow-500 text-black font-serif">
-              <TestTube className="h-4 w-4 mr-1" />
-              CREATOR TESTING MODE
-            </Badge>
-            <span className="font-serif text-sm">Wyoming Pioneer Newspaper - Live Preview</span>
-          </div>
-          <div className="flex gap-2">
-            <Link href="/games">
-              <Button size="sm" variant="outline" className="font-serif">
-                <Eye className="h-4 w-4 mr-1" />
-                Test Games
-              </Button>
-            </Link>
-            <Link href="/market">
-              <Button size="sm" variant="outline" className="font-serif">
-                Test Market
-              </Button>
-            </Link>
-            <Link href="/onboarding">
-              <Button size="sm" variant="outline" className="font-serif">
-                Test Onboarding
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
+    <main>
+      <h1>Welcome to My Website</h1>
+      <p>This is the homepage.</p>
 
-      <div className="flex">
-        {/* Left Sidebar */}
-        <div className="hidden lg:block w-64 fixed left-0 top-12 h-full overflow-y-auto border-r-4 border-double border-[#8B4513] bg-[#f9f6f0]">
-          <Sidebar />
-        </div>
+      {/* Example 1: Image with priority (to be updated) */}
+      <img src="/logo.svg" alt="Logo" width={120} height={40} loading="eager" />
 
-        {/* Main Content - Wyoming Pioneer Newspaper */}
-        <div className="flex-1 lg:ml-64 lg:mr-80 pt-2">
-          <NewspaperFrontPage />
-        </div>
+      {/* Example 2: Another image with priority (to be updated) */}
+      <img src="/banner.png" alt="Banner" width={600} height={200} loading="eager" />
 
-        {/* Right Sidebar - Wanted Posters */}
-        <div className="hidden lg:block w-80 fixed right-0 top-12 h-full overflow-y-auto border-l-4 border-double border-[#8B4513] bg-[#f9f6f0]">
-          <WantedPosterSidebar />
-        </div>
-      </div>
-    </div>
+      {/* Example 3: Next/Image component (no change needed) */}
+      <Image src="/next.svg" alt="Next.js Logo" width={100} height={30} />
+
+      {/* Example 4: Image without priority (no change needed) */}
+      <img src="/icon.png" alt="Icon" width={50} height={50} />
+    </main>
   )
 }
