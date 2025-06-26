@@ -1,4 +1,5 @@
 import { Sidebar } from "@/components/sidebar"
+import { NewspaperFrontPage } from "@/components/newspaper-front-page"
 
 export default function HomePage() {
   return (
@@ -12,6 +13,7 @@ export default function HomePage() {
         <p className="text-muted-foreground">
           Welcome, pioneer! Use the sidebar to explore Market Pulse, Boxing Arena, Land Management, and more.
         </p>
+        <NewspaperFrontPage />
       </section>
     </main>
   )
