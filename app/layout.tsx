@@ -3,14 +3,15 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "@/components/ui/toaster"
-import { MusicPlayer } from "@/components/music-player"
+import { Toaster } from "@/components/ui/sonner"
+import { Sidebar } from "@/components/sidebar"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "WyoVerse Pioneer - Digital Frontier Newspaper",
-  description: "The authentic 1880s frontier experience with modern blockchain technology",
+  title: "WyoVerse - Digital Frontier Metaverse",
+  description:
+    "Explore the digital frontier with real-time crypto markets, social good affiliates, and frontier gaming",
     generator: 'v0.dev'
 }
 
@@ -23,12 +24,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          {/* Frontier Music Player */}
-          <div className="fixed top-4 right-4 z-50">
-            <MusicPlayer />
-          </div>
+          <div className="flex min-h-screen">
+            {/* Sidebar */}
+            <Sidebar />
 
-          {children}
+            {/* Main Content */}
+            <main className="flex-1 ml-64">{children}</main>
+          </div>
           <Toaster />
         </ThemeProvider>
       </body>

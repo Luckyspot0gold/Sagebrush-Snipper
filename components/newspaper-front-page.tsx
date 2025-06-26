@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 
 export function NewspaperFrontPage() {
   return (
@@ -23,60 +24,61 @@ export function NewspaperFrontPage() {
           {/* Lead Story */}
           <div className="mb-6">
             <h2 className="text-4xl font-bold font-serif mb-2 border-b-2 border-black pb-1">
-              LEGENDARY CELTIC WOLF MANDALA DISCOVERED IN DIGITAL MINES
+              STONE CONQUERS MECHANICAL BULL AT CHEYENNE FRONTIER DAYS
             </h2>
-            <p className="text-sm italic mb-3">
-              Mystical artifact valued at 2.5 AVAX draws collectors from across the frontier
-            </p>
+            <p className="text-sm italic mb-3">Legendary rider showcases skills in epic cyberpunk garage showdown</p>
 
             <div className="grid grid-cols-3 gap-4 mb-4">
               <div className="col-span-2">
                 <img
-                  src="/images/wolfirishscotishposter.png"
-                  alt="Celtic Wolf Mandala"
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/mechwolfClutch-zJKfkWRqTeqs3hWZB5lC9ziH14u4sK.jpeg"
+                  alt="Stone in Cyberpunk Garage"
                   className="w-full h-48 object-cover border-2 border-black"
                 />
+                <p className="text-xs text-center mt-1 italic">
+                  Stone prepares his ride in the neon-lit garage before the mechanical bull challenge
+                </p>
               </div>
               <div className="space-y-2 text-sm">
                 <p className="font-bold">BREAKING NEWS</p>
                 <p>
-                  Local prospectors struck digital gold yesterday when they uncovered a legendary Celtic Wolf Mandala
-                  deep in the WyoVerse mines.
+                  In a spectacular display of frontier grit meets modern technology, legendary rider Stone dominated the
+                  mechanical bull competition at this year's Cheyenne Frontier Days celebration.
                 </p>
                 <p>
-                  The intricate artwork, featuring golden scrollwork and mystical symbols, has been authenticated by
-                  Venice AI experts.
+                  The cyberpunk-themed garage provided the perfect backdrop for Stone's preparation, complete with neon
+                  lighting and high-tech equipment that would make any frontier mechanic proud.
                 </p>
                 <p>
-                  "Never seen anything like it," said Marshal Bill, local barkeep and crypto expert. "That there
-                  mandala's got more detail than a Swiss pocket watch."
+                  "Never seen anything like it," said Marshal Bill, local barkeep and rodeo expert. "That boy's got more
+                  balance than a Swiss timepiece and twice the determination."
                 </p>
               </div>
             </div>
 
             <div className="columns-3 gap-4 text-sm text-justify">
               <p>
-                The discovery has sent shockwaves through the digital frontier community, with collectors and investors
-                flocking to the WyoVerse Art Gallery to witness the legendary piece firsthand.
+                The mechanical bull challenge has become a centerpiece of the modern Cheyenne Frontier Days, blending
+                traditional rodeo skills with cutting-edge technology. Stone's performance drew cheers from thousands of
+                spectators who witnessed his record-breaking 8-minute ride.
               </p>
 
               <p>
-                According to gallery curator Venice AI, the mandala represents "the mystical connection between ancient
-                Celtic traditions and our modern digital frontier." The piece features intricate purple and gold
-                scrollwork surrounding a majestic golden wolf, all contained within traditional Celtic knotwork
-                patterns.
+                The cyberpunk garage where Stone prepared has become a symbol of the new frontier - where traditional
+                Western values meet futuristic innovation. The neon-lit workspace features state-of-the-art tools and
+                equipment that help modern cowboys maintain their edge.
               </p>
 
               <p>
-                The artifact has been classified as "Legendary" rarity, making it one of only a handful of such pieces
-                in existence. Early bidding has reached 2.5 AVAX, equivalent to approximately $80 at current market
-                rates.
+                Event organizers report this was the largest crowd ever assembled for the mechanical bull competition,
+                with visitors traveling from across the digital frontier to witness the spectacle. The combination of
+                traditional rodeo skills and modern technology continues to draw new audiences to frontier events.
               </p>
 
               <p>
-                "This discovery validates our belief that the digital frontier holds treasures beyond imagination,"
-                stated WyoVerse Governor Lucky McGold. "We expect this to attract even more settlers to our growing
-                territory."
+                Stone's victory adds another chapter to the growing legend of WyoVerse champions who bridge the gap
+                between the old West and the digital age. His preparation in the cyberpunk garage has inspired a new
+                generation of frontier riders to embrace both tradition and innovation.
               </p>
             </div>
           </div>
@@ -85,77 +87,52 @@ export function NewspaperFrontPage() {
           <div className="grid grid-cols-2 gap-6 mb-6">
             <div>
               <h3 className="text-2xl font-bold font-serif mb-2 border-b border-black">
-                CRYPTO CLASHERS TOURNAMENT DRAWS RECORD CROWDS
+                CRYPTO CLASHERS ARENA PACKED FOR BEAR VS BEAR SHOWDOWN
               </h3>
               <img
-                src="/images/cryptoclasherboxingposter.jpg"
-                alt="Crypto Clashers Boxing"
-                className
-                alt="Crypto Clashers Boxing"
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1743043971090%20%281%29.jpg-TyFJgCLBlZzWhb3NZU0aufYHBu6j5d.jpeg"
+                alt="Bears Boxing in Arena"
                 className="w-full h-32 object-cover border border-black mb-2"
               />
               <p className="text-sm">
-                The epic bull vs bear showdown at the Crypto Clashers Boxing Arena drew over 10,000 spectators last
-                weekend. The mountain arena echoed with cheers as fighters battled for supremacy in the ring.
+                The Crypto Clashers Boxing Arena witnessed an unprecedented bear vs bear match that had the crowd on
+                their feet. Two massive grizzlies faced off in the ring, showcasing the raw power and skill that has
+                made the arena famous across the frontier.
               </p>
-              <p className="text-xs mt-2 italic">See Sports Section for full coverage</p>
+              <p className="text-xs mt-2 italic">Full coverage on Sports Section, Page 3</p>
             </div>
 
             <div>
               <h3 className="text-2xl font-bold font-serif mb-2 border-b border-black">
-                RACING CIRCUIT OPENS TO GREAT FANFARE
+                CELTIC WOLF MANDALA BREAKS AUCTION RECORDS
               </h3>
               <img
-                src="/images/cryptoclasherwcarsposter.jpg"
-                alt="Crypto Clashers Racing"
+                src="/images/wolfirishscotishposter.png"
+                alt="Celtic Wolf Mandala"
                 className="w-full h-32 object-cover border border-black mb-2"
               />
               <p className="text-sm">
-                The new Crypto Clashers Racing Circuit officially opened with a spectacular sunset race featuring both
-                classic and modern vehicles. High-speed blockchain racing has arrived in the territory.
+                The legendary Celtic Wolf Mandala discovered in the digital mines has shattered all previous auction
+                records, selling for 2.5 AVAX to a private collector from the Venice AI district.
               </p>
-              <p className="text-xs mt-2 italic">Full story on Page 3</p>
+              <p className="text-xs mt-2 italic">Art Gallery coverage on Page 4</p>
             </div>
           </div>
 
           {/* Historical Feature */}
           <div className="mb-6">
             <h3 className="text-2xl font-bold font-serif mb-2 border-b border-black">
-              HISTORICAL FRONTIER ENCAMPMENT PHOTOGRAPHS SURFACE
-            </h3>
-            <div className="grid grid-cols-3 gap-4">
-              <img
-                src="/images/weirdC.H.F.D.img.png"
-                alt="Historical Encampment"
-                className="w-full h-24 object-cover border border-black"
-              />
-              <div className="col-span-2 text-sm">
-                <p>
-                  Rare photographs of authentic Native American encampments have been discovered in the territorial
-                  archives. These images provide invaluable insight into the real frontier days that inspire our digital
-                  world.
-                </p>
-                <p className="mt-2">
-                  The photographs show teepees, horsemen, and daily life in the original Wyoming Territory, serving as
-                  historical foundation for our modern digital frontier experience.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Aerial Coverage */}
-          <div>
-            <h3 className="text-2xl font-bold font-serif mb-2 border-b border-black">
-              CHEYENNE FRONTIER DAYS SPECTACULAR DRAWS MASSIVE CROWDS
+              AERIAL PHOTOGRAPHY CAPTURES FRONTIER DAYS SPECTACLE
             </h3>
             <img
               src="/images/arialcheyennerodeo.png"
-              alt="Cheyenne Frontier Days Aerial"
+              alt="Aerial view of Cheyenne Frontier Days"
               className="w-full h-40 object-cover border border-black mb-2"
             />
             <p className="text-sm">
-              Aerial photography reveals the massive scale of this year's Cheyenne Frontier Days celebration. Thousands
-              gathered to witness authentic Western events that continue to inspire our digital frontier community.
+              Stunning aerial photography reveals the massive scale of this year's Cheyenne Frontier Days celebration.
+              The event drew record crowds to witness traditional rodeo events, mechanical bull competitions, and the
+              latest in frontier technology demonstrations.
             </p>
           </div>
         </div>
@@ -169,7 +146,7 @@ export function NewspaperFrontPage() {
               <div className="text-center">
                 <div className="text-2xl font-bold">32°F</div>
                 <div className="text-sm">Partly Cloudy</div>
-                <div className="text-xs mt-2">Perfect weather for crypto mining and digital prospecting</div>
+                <div className="text-xs mt-2">Perfect weather for mechanical bull riding and crypto mining</div>
               </div>
             </CardContent>
           </Card>
@@ -177,7 +154,7 @@ export function NewspaperFrontPage() {
           {/* Market Report */}
           <Card className="border-2 border-black">
             <CardContent className="p-4">
-              <h4 className="font-bold text-center mb-2">MARKET REPORT</h4>
+              <h4 className="font-bold text-center mb-2">LIVE MARKET REPORT</h4>
               <div className="space-y-1 text-xs">
                 <div className="flex justify-between">
                   <span>Bitcoin (BTC)</span>
@@ -196,22 +173,72 @@ export function NewspaperFrontPage() {
                   <span className="text-green-600">$156.78 ↑4.5%</span>
                 </div>
               </div>
+              <Badge className="w-full mt-2 bg-green-100 text-green-800">🔴 LIVE DATA via Coinbase API</Badge>
             </CardContent>
           </Card>
 
-          {/* LuckyspotOgold Games Advertisement */}
+          {/* Social Good Affiliate Section */}
+          <Card className="border-2 border-black bg-gradient-to-r from-green-100 to-blue-100">
+            <CardContent className="p-4">
+              <h4 className="font-bold text-center mb-2">💚 SOCIAL GOOD NETWORK</h4>
+              <div className="space-y-3">
+                <div className="text-center">
+                  <div className="text-xs font-bold">EARN WHILE HELPING OTHERS</div>
+                  <div className="text-xs">5% of all earnings support social causes</div>
+                </div>
+
+                <div className="space-y-2">
+                  <Button
+                    size="sm"
+                    className="w-full bg-red-500 hover:bg-red-600 text-white"
+                    onClick={() =>
+                      window.open(
+                        "https://go.socialgood.inc/?adj_redirect=https%3A%2F%2Fsocialgood.inc%2Fapp%2F1%2F&adj_t=1gbx67rh&adj_deeplink_js=1&referralCode=SVJDQ6",
+                        "_blank",
+                      )
+                    }
+                  >
+                    💚 SocialGood.inc
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                    onClick={() => window.open("https://docs.deso.org/", "_blank")}
+                  >
+                    🔗 DeSo Blockchain
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                    onClick={() => window.open("https://temu.to/m/u7wq0kfazcq", "_blank")}
+                  >
+                    🛍️ Temu Deals (frp288931)
+                  </Button>
+                </div>
+
+                <div className="text-xs text-center text-gray-600">
+                  <div>Total Donated: $1,247.85</div>
+                  <div>Lives Impacted: 261</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* LuckyspotOgold Games */}
           <Card className="border-2 border-black bg-yellow-100">
             <CardContent className="p-4">
-              <h4 className="font-bold text-center mb-2">🎮 GAMES & ENTERTAINMENT</h4>
+              <h4 className="font-bold text-center mb-2">🎮 LUCKYSPOTOGOLD GAMES</h4>
               <div className="space-y-3">
                 <div className="text-center">
                   <img
                     src="/images/cryptoclasherboxingposter.jpg"
-                    alt="Crypto Clashers"
+                    alt="Crypto Clashers Boxing"
                     className="w-full h-20 object-cover border border-black mb-1"
                   />
                   <div className="text-xs font-bold">CRYPTO CLASHERS BOXING</div>
-                  <div className="text-xs">Epic bull vs bear combat!</div>
+                  <div className="text-xs">Epic bear vs bear combat!</div>
                 </div>
 
                 <div className="text-center">
@@ -231,33 +258,16 @@ export function NewspaperFrontPage() {
                     className="w-full h-20 object-cover border border-black mb-1"
                   />
                   <div className="text-xs font-bold">CLUTCH CHRONICLES</div>
-                  <div className="text-xs">Steampunk RPG adventures!</div>
+                  <div className="text-xs">Cyberpunk frontier adventures!</div>
                 </div>
 
-                <div className="text-center text-xs">
-                  <strong>All games by LuckyspotOgold@github</strong>
-                </div>
-
-                <Button size="sm" className="w-full">
-                  Play Now!
+                <Button
+                  size="sm"
+                  className="w-full"
+                  onClick={() => window.open("https://github.com/LuckyspotOgold", "_blank")}
+                >
+                  🎮 Play All Games!
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Wanted Poster */}
-          <Card className="border-2 border-black bg-red-100">
-            <CardContent className="p-4">
-              <h4 className="font-bold text-center mb-2">⚠️ WANTED ⚠️</h4>
-              <img
-                src="/images/wyoversestonewanted.png"
-                alt="Wanted Poster"
-                className="w-full h-32 object-cover border border-black mb-2"
-              />
-              <div className="text-center text-xs">
-                <div className="font-bold">DIGITAL OUTLAWS</div>
-                <div>Reward: 1000 WYO Tokens</div>
-                <div className="mt-1">Report suspicious mining activity to Marshal Bill</div>
               </div>
             </CardContent>
           </Card>
@@ -268,47 +278,25 @@ export function NewspaperFrontPage() {
               <h4 className="font-bold text-center mb-2">CLASSIFIEDS</h4>
               <div className="space-y-2 text-xs">
                 <div className="border-b pb-1">
-                  <strong>MINING EQUIPMENT FOR SALE</strong>
+                  <strong>MECHANICAL BULL TRAINING</strong>
                   <br />
-                  High-grade crypto pickaxes and digital shovels. Contact Prospector Pete.
+                  Learn from Stone himself! Cyberpunk garage sessions available.
                 </div>
                 <div className="border-b pb-1">
-                  <strong>SALOON HELP WANTED</strong>
+                  <strong>CRYPTO MINING EQUIPMENT</strong>
                   <br />
-                  Bar Keep Bill seeks assistant for busy frontier establishment.
+                  High-grade digital pickaxes and quantum shovels. Contact Prospector Pete.
                 </div>
                 <div className="border-b pb-1">
-                  <strong>LAND DEEDS AVAILABLE</strong>
+                  <strong>NEON GARAGE RENTALS</strong>
                   <br />
-                  Prime digital real estate in WyoVerse. Financing available.
+                  Cyberpunk-themed workspaces for frontier mechanics and riders.
                 </div>
                 <div>
-                  <strong>TRADING POST OPEN</strong>
+                  <strong>AFFILIATE OPPORTUNITIES</strong>
                   <br />
-                  Buy, sell, trade NFTs and crypto. Fair prices guaranteed.
+                  Join our social good network. Earn while helping others!
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Art Gallery Promotion */}
-          <Card className="border-2 border-black bg-purple-100">
-            <CardContent className="p-4">
-              <h4 className="font-bold text-center mb-2">🎨 ART GALLERY</h4>
-              <div className="text-center text-xs">
-                <img
-                  src="/images/wolfirishscotishposter.png"
-                  alt="Celtic Mandala"
-                  className="w-full h-20 object-cover border border-black mb-2"
-                />
-                <div className="font-bold">LEGENDARY CELTIC MANDALA</div>
-                <div>Now on display!</div>
-                <div className="mt-2">
-                  Visit the WyoVerse Art Gallery to view this and other exclusive NFT collections.
-                </div>
-                <Button size="sm" className="w-full mt-2">
-                  Visit Gallery
-                </Button>
               </div>
             </CardContent>
           </Card>
@@ -323,21 +311,21 @@ export function NewspaperFrontPage() {
             <br />
             Published daily in the Digital Frontier
             <br />
-            Subscription: 0.1 AVAX/month
+            Real-time crypto data via Coinbase API
           </div>
           <div>
-            <strong>CONTACT INFORMATION</strong>
+            <strong>SOCIAL GOOD NETWORK</strong>
             <br />
-            Telegraph: @WyoVersePioneer
+            SocialGood.inc • DeSo • Temu Affiliates
             <br />
-            Pony Express: WyoVerse Territory
+            5% of earnings support community causes
           </div>
           <div>
             <strong>POWERED BY</strong>
             <br />
             LuckyspotOgold@github
             <br />
-            Built with frontier spirit & modern tech
+            Stone's Mechanical Bull Academy
           </div>
         </div>
       </div>
