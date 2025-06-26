@@ -1,55 +1,43 @@
-import { BarChart3, LayoutDashboard, ListChecks, TrendingUp, User2, Users } from "lucide-react"
+"use client"
 
-import type { MainNavItem, SidebarNavItem } from "@/types"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { LayoutDashboard, Users, Settings, HelpCircle, Trophy, Share2, BookOpen, Gift, TrendingUp } from "lucide-react"
 
-interface DashboardConfig {
-  mainNav: MainNavItem[]
-  sidebarNav: SidebarNavItem[]
+import { cn } from "@/lib/utils"
+import { NavItem } from "@/components/nav-item"
+
+const navItems = [
+  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { title: "User Mgmt", href: "/users", icon: Users },
+  { title: "Settings", href: "/settings", icon: Settings },
+  { title: "Help", href: "/help", icon: HelpCircle },
+  { title: "Onboarding", href: "/onboarding", icon: Trophy },
+  { title: "Share Wins", href: "/social-sharing", icon: Share2 },
+  { title: "Frontier Stories", href: "/frontier-stories", icon: BookOpen },
+  { title: "Daily Rewards", href: "/daily-rewards", icon: Gift },
+  { title: "Market Pulse", href: "/market-pulse", icon: TrendingUp },
+]
+
+interface SidebarProps {
+  isCollapsed?: boolean
 }
 
-export const dashboardConfig: DashboardConfig = {
-  mainNav: [
-    {
-      title: "Documentation",
-      href: "/docs",
-    },
-    {
-      title: "Support",
-      href: "/support",
-      disabled: true,
-    },
-  ],
-  sidebarNav: [
-    {
-      title: "Dashboard",
-      href: "/dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      title: "Analytics",
-      href: "/dashboard/analytics",
-      icon: BarChart3,
-    },
-    {
-      title: "Users",
-      href: "/dashboard/users",
-      icon: Users,
-    },
-    {
-      title: "Customers",
-      href: "/dashboard/customers",
-      icon: User2,
-    },
-    {
-      title: "Invoices",
-      href: "/dashboard/invoices",
-      icon: ListChecks,
-    },
-    {
-      href: "/market-pulse",
-      icon: TrendingUp,
-      title: "Market Pulse",
-      description: "Real-time trading & supply chain",
-    },
-  ],
+export function Sidebar({ isCollapsed = false }: SidebarProps) {
+  const pathname = usePathname()
+
+  return (
+    <aside className={cn("border-r bg-background h-screen", isCollapsed ? "w-16" : "w-64")}>
+      <div className="flex h-16 items-center border-b px-4">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="text-xl font-bold">CryptoClashers</span>
+        </Link>
+      </div>
+      <nav className="py-4 px-2 space-y-1">
+        {navItems.map((item) => (
+          <NavItem key={item.href} href={item.href} icon={item.icon} title={item.title} isCollapsed={isCollapsed} />
+        ))}
+      </nav>
+    </aside>
+  )
 }
