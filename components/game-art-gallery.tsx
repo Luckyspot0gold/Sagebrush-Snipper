@@ -2,327 +2,205 @@
 
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Heart, ExternalLink, Share2, ShoppingCart } from "lucide-react"
-import { motion } from "framer-motion"
+import { Button } from "@/components/ui/button"
+import { Heart, ExternalLink, Github } from "lucide-react"
 
-interface ArtPiece {
-  id: string
-  title: string
-  artist: string
-  description: string
-  imageUrl: string
-  price: number
-  currency: string
-  rarity: "common" | "rare" | "epic" | "legendary"
-  likes: number
-  gameConnection?: string
-  externalLink?: string
-  githubRepo?: string
-}
-
-const ART_COLLECTION: ArtPiece[] = [
+const artworks = [
   {
-    id: "celtic-wolf-mandala",
+    id: 1,
     title: "Celtic Wolf Mandala",
-    artist: "Venice AI Studio",
-    description:
-      "An intricate Celtic-inspired mandala featuring a golden wolf surrounded by ornate purple and gold scrollwork. This legendary NFT represents the spiritual connection between ancient Celtic traditions and the digital frontier.",
-    imageUrl: "/images/wolfirishscotishposter.png",
-    price: 2.5,
-    currency: "AVAX",
-    rarity: "legendary",
-    likes: 847,
-    gameConnection: "Mystical Wolves Collection",
-    externalLink: "https://github.com/LuckyspotOgold",
+    artist: "Venice AI",
+    image: "/images/wolfirishscotishposter.png",
+    price: "2.5 AVAX",
+    rarity: "Legendary",
+    likes: 127,
+    description: "An intricate Celtic-inspired mandala featuring a golden wolf in ornate purple and gold scrollwork.",
+    gameConnection: "Clutch Chronicles RPG",
+    githubLink: "https://github.com/LuckyspotOgold",
   },
   {
-    id: "crypto-clashers-boxing",
+    id: 2,
     title: "Crypto Clashers Boxing Arena",
     artist: "Stoneyard Gaming",
-    description:
-      "Epic promotional artwork for the legendary Crypto Clashers Boxing game featuring the ultimate showdown between Bull and Bear fighters in the mountain wilderness arena.",
-    imageUrl: "/images/cryptoclasherboxingposter.jpg",
-    price: 1.8,
-    currency: "AVAX",
-    rarity: "epic",
-    likes: 623,
+    image: "/images/cryptoclasherboxingposter.jpg",
+    price: "1.8 AVAX",
+    rarity: "Epic",
+    likes: 89,
+    description: "Epic bull vs bear boxing match in the mountain wilderness arena.",
     gameConnection: "Crypto Clashers Boxing",
-    externalLink: "https://github.com/LuckyspotOgold",
-    githubRepo: "https://github.com/LuckyspotOgold/crypto-clashers-boxing",
+    githubLink: "https://github.com/LuckyspotOgold/crypto-clashers",
   },
   {
-    id: "crypto-clashers-racing",
-    title: "Crypto Clashers Racing Circuit",
+    id: 3,
+    title: "Racing Circuit Championship",
     artist: "Stoneyard Gaming",
-    description:
-      "High-octane promotional poster showcasing both the boxing arena and racing circuit elements of the Crypto Clashers universe, featuring classic and modern vehicles.",
-    imageUrl: "/images/cryptoclasherwcarsposter.jpg",
-    price: 1.8,
-    currency: "AVAX",
-    rarity: "epic",
-    likes: 591,
+    image: "/images/cryptoclasherwcarsposter.jpg",
+    price: "1.5 AVAX",
+    rarity: "Epic",
+    likes: 76,
+    description: "High-speed racing action with classic and modern vehicles in the crypto arena.",
     gameConnection: "Crypto Clashers Racing",
-    externalLink: "https://github.com/LuckyspotOgold",
-    githubRepo: "https://github.com/LuckyspotOgold/crypto-clashers-racing",
+    githubLink: "https://github.com/LuckyspotOgold/crypto-racing",
   },
   {
-    id: "wyoverse-wanted-poster",
-    title: "WyoVerse Digital Frontier",
-    artist: "WyoVerse Studios",
-    description:
-      "Iconic silhouette of a frontier marshal against the backdrop of a digital frontier town, with cryptocurrency symbols floating in the starry sky above.",
-    imageUrl: "/images/wyoversestonewanted.png",
-    price: 3.2,
-    currency: "AVAX",
-    rarity: "legendary",
-    likes: 1024,
+    id: 4,
+    title: "WyoVerse Wanted Poster",
+    artist: "Frontier Studios",
+    image: "/images/wyoversestonewanted.png",
+    price: "3.2 AVAX",
+    rarity: "Legendary",
+    likes: 156,
+    description: "Iconic cowboy silhouette against frontier town with crypto symbols in the starry sky.",
     gameConnection: "WyoVerse Metaverse",
-    externalLink: "https://wyoverse.com",
+    githubLink: "https://github.com/LuckyspotOgold",
   },
   {
-    id: "frontier-encampment",
-    title: "Historical Frontier Encampment",
-    artist: "Frontier Archives",
-    description:
-      "Rare historical photograph documenting a Native American encampment with teepees and horseback riders, preserved for the digital frontier archives.",
-    imageUrl: "/images/weirdC.H.F.D.img.png",
-    price: 0.9,
-    currency: "AVAX",
-    rarity: "rare",
-    likes: 342,
-    gameConnection: "Native History Collection",
+    id: 5,
+    title: "Frontier Encampment",
+    artist: "Historical Archives",
+    image: "/images/weirdC.H.F.D.img.png",
+    price: "0.8 AVAX",
+    rarity: "Rare",
+    likes: 43,
+    description: "Authentic historical scene of Native American encampment with teepees and horseback riders.",
+    gameConnection: "Native History Module",
+    githubLink: "https://github.com/LuckyspotOgold",
   },
   {
-    id: "clutch-armored-knight",
-    title: "Clutch: The Armored Knight",
-    artist: "Venice AI Studio",
-    description:
-      "Steampunk fantasy artwork featuring the legendary wolf warrior Clutch in full armor, riding through a modern cityscape on his trusty steed.",
-    imageUrl: "/images/clutchonhorse.webp",
-    price: 2.1,
-    currency: "AVAX",
-    rarity: "epic",
-    likes: 756,
-    gameConnection: "Clutch Chronicles RPG",
-    externalLink: "https://github.com/LuckyspotOgold",
+    id: 6,
+    title: "Clutch Armored Knight",
+    artist: "Venice AI",
+    image: "/images/clutchonhorse.webp",
+    price: "2.1 AVAX",
+    rarity: "Epic",
+    likes: 98,
+    description: "Fantasy steampunk wolf warrior in full armor riding through a modern cityscape.",
+    gameConnection: "Clutch Chronicles",
+    githubLink: "https://github.com/LuckyspotOgold/clutch-chronicles",
   },
   {
-    id: "cheyenne-frontier-days",
-    title: "Cheyenne Frontier Days Spectacular",
-    artist: "Aerial Photography Co.",
-    description:
-      "Breathtaking aerial view of the famous Cheyenne Frontier Days rodeo, capturing thousands of spectators and the authentic Western atmosphere.",
-    imageUrl: "/images/arialcheyennerodeo.png",
-    price: 1.2,
-    currency: "AVAX",
-    rarity: "rare",
-    likes: 445,
-    gameConnection: "Digital Rodeo Events",
+    id: 7,
+    title: "Cheyenne Frontier Days",
+    artist: "Aerial Photography",
+    image: "/images/arialcheyennerodeo.png",
+    price: "1.2 AVAX",
+    rarity: "Rare",
+    likes: 67,
+    description: "Spectacular aerial view of Cheyenne Frontier Days rodeo with crowds and arena activities.",
+    gameConnection: "Digital Rodeo",
+    githubLink: "https://github.com/LuckyspotOgold",
   },
   {
-    id: "bolt-market-simulator",
-    title: "Bolt Market Simulator Interface",
-    artist: "Bolt.new Studios",
-    description:
-      "Screenshot of the revolutionary market simulator built with Bolt.new, showcasing advanced trading interfaces and real-time market analysis tools.",
-    imageUrl: "/images/bolt-market-simulator.jpeg",
-    price: 0.7,
-    currency: "AVAX",
-    rarity: "common",
-    likes: 289,
-    gameConnection: "Market Simulator Pro",
-    externalLink: "https://bolt.new/~/market-simulator",
+    id: 8,
+    title: "Bolt Market Simulator",
+    artist: "Bolt.new",
+    image: "/images/bolt-market-simulator.jpeg",
+    price: "1.0 AVAX",
+    rarity: "Common",
+    likes: 34,
+    description: "Advanced market simulation interface built with Bolt.new technology.",
+    gameConnection: "Market Simulator",
+    githubLink: "https://bolt.new/~/market-simulator",
   },
 ]
 
+const rarityColors = {
+  Common: "bg-gray-500",
+  Rare: "bg-blue-500",
+  Epic: "bg-purple-500",
+  Legendary: "bg-yellow-500",
+}
+
 export function GameArtGallery() {
-  const [likedPieces, setLikedPieces] = useState<Set<string>>(new Set())
-  const [selectedRarity, setSelectedRarity] = useState<string>("all")
+  const [likedItems, setLikedItems] = useState<number[]>([])
 
-  const handleLike = (pieceId: string) => {
-    setLikedPieces((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.has(pieceId)) {
-        newSet.delete(pieceId)
-      } else {
-        newSet.add(pieceId)
-      }
-      return newSet
-    })
+  const toggleLike = (id: number) => {
+    setLikedItems((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]))
   }
-
-  const handlePurchase = (piece: ArtPiece) => {
-    // Simulate NFT purchase
-    alert(`Initiating purchase of "${piece.title}" for ${piece.price} ${piece.currency}`)
-  }
-
-  const handleShare = (piece: ArtPiece) => {
-    const shareText = `Check out this amazing NFT: "${piece.title}" by ${piece.artist} - Available for ${piece.price} ${piece.currency} on WyoVerse!`
-    if (navigator.share) {
-      navigator.share({
-        title: piece.title,
-        text: shareText,
-        url: window.location.href,
-      })
-    } else {
-      navigator.clipboard.writeText(shareText)
-      alert("Share text copied to clipboard!")
-    }
-  }
-
-  const getRarityColor = (rarity: string) => {
-    switch (rarity) {
-      case "common":
-        return "bg-gray-500"
-      case "rare":
-        return "bg-blue-500"
-      case "epic":
-        return "bg-purple-500"
-      case "legendary":
-        return "bg-yellow-500"
-      default:
-        return "bg-gray-500"
-    }
-  }
-
-  const filteredArt =
-    selectedRarity === "all" ? ART_COLLECTION : ART_COLLECTION.filter((piece) => piece.rarity === selectedRarity)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-100 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-amber-900 mb-2 font-serif">🎨 FRONTIER ART GALLERY 🎨</h1>
-          <p className="text-lg text-amber-700">Discover and collect exclusive digital frontier artwork</p>
-
-          {/* LuckyspotOgold@github Promotion */}
-          <div className="mt-4 p-4 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg border-2 border-purple-300">
-            <h3 className="text-xl font-bold text-purple-800 mb-2">🎮 Featured Games by LuckyspotOgold@github</h3>
-            <p className="text-purple-700">
-              Explore amazing games including <strong>Crypto Clashers Boxing</strong>,{" "}
-              <strong>Crypto Clashers Racing</strong>, and more!
-            </p>
-            <Button
-              className="mt-2 bg-purple-600 hover:bg-purple-700"
-              onClick={() => window.open("https://github.com/LuckyspotOgold", "_blank")}
-            >
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Visit GitHub Portfolio
-            </Button>
-          </div>
-        </div>
-
-        {/* Filter Buttons */}
-        <div className="flex justify-center gap-2 mb-8">
-          {["all", "common", "rare", "epic", "legendary"].map((rarity) => (
-            <Button
-              key={rarity}
-              variant={selectedRarity === rarity ? "default" : "outline"}
-              onClick={() => setSelectedRarity(rarity)}
-              className={`${selectedRarity === rarity ? getRarityColor(rarity) : ""} font-serif`}
-            >
-              {rarity.charAt(0).toUpperCase() + rarity.slice(1)}
-            </Button>
-          ))}
-        </div>
-
-        {/* Art Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredArt.map((piece, index) => (
-            <motion.div
-              key={piece.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className="overflow-hidden border-4 border-amber-200 bg-white hover:shadow-xl transition-shadow">
-                {/* Image */}
-                <div className="relative">
-                  <img
-                    src={piece.imageUrl || "/placeholder.svg"}
-                    alt={piece.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <Badge className={`absolute top-2 right-2 ${getRarityColor(piece.rarity)} text-white`}>
-                    {piece.rarity.toUpperCase()}
-                  </Badge>
-                </div>
-
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg font-serif text-amber-900">{piece.title}</CardTitle>
-                  <p className="text-sm text-amber-700">by {piece.artist}</p>
-                </CardHeader>
-
-                <CardContent>
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-3">{piece.description}</p>
-
-                  {piece.gameConnection && (
-                    <div className="mb-3">
-                      <Badge variant="outline" className="text-xs">
-                        🎮 {piece.gameConnection}
-                      </Badge>
-                    </div>
-                  )}
-
-                  {/* Price */}
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-lg font-bold text-green-600">
-                      {piece.price} {piece.currency}
-                    </span>
-                    <div className="flex items-center gap-1 text-sm text-gray-500">
-                      <Heart className="w-4 h-4" />
-                      {piece.likes + (likedPieces.has(piece.id) ? 1 : 0)}
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={() => handlePurchase(piece)}
-                      className="bg-green-600 hover:bg-green-700 flex-1"
-                    >
-                      <ShoppingCart className="w-4 h-4 mr-1" />
-                      Buy
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleLike(piece.id)}
-                      className={likedPieces.has(piece.id) ? "text-red-500 border-red-500" : ""}
-                    >
-                      <Heart className={`w-4 h-4 ${likedPieces.has(piece.id) ? "fill-current" : ""}`} />
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleShare(piece)}>
-                      <Share2 className="w-4 h-4" />
-                    </Button>
-                    {piece.externalLink && (
-                      <Button size="sm" variant="outline" onClick={() => window.open(piece.externalLink, "_blank")}>
-                        <ExternalLink className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-12 p-6 bg-amber-100 rounded-lg">
-          <h3 className="text-xl font-bold text-amber-900 mb-2">Support Digital Frontier Artists</h3>
-          <p className="text-amber-700 mb-4">
-            Every purchase supports independent game developers and digital artists in the frontier community.
+    <div className="container mx-auto p-6">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold mb-4">WyoVerse Art Gallery</h1>
+        <p className="text-lg text-muted-foreground">
+          Discover and collect exclusive NFT artwork from the digital frontier
+        </p>
+        <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <p className="text-amber-800">
+            🎮 <strong>Featured Games by LuckyspotOgold@github:</strong> Crypto Clashers Boxing, Racing Circuit, Clutch
+            Chronicles
           </p>
-          <div className="flex justify-center gap-4">
-            <Button className="bg-amber-600 hover:bg-amber-700">Submit Your Art</Button>
-            <Button variant="outline" className="border-amber-600 text-amber-600">
-              Artist Guidelines
-            </Button>
-          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {artworks.map((artwork) => (
+          <Card key={artwork.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <div className="relative">
+              <img src={artwork.image || "/placeholder.svg"} alt={artwork.title} className="w-full h-48 object-cover" />
+              <Badge
+                className={`absolute top-2 right-2 ${rarityColors[artwork.rarity as keyof typeof rarityColors]} text-white`}
+              >
+                {artwork.rarity}
+              </Badge>
+            </div>
+
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">{artwork.title}</CardTitle>
+              <p className="text-sm text-muted-foreground">by {artwork.artist}</p>
+            </CardHeader>
+
+            <CardContent className="space-y-3">
+              <p className="text-sm">{artwork.description}</p>
+
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-lg">{artwork.price}</span>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleLike(artwork.id)}
+                    className="flex items-center gap-1"
+                  >
+                    <Heart
+                      className={`h-4 w-4 ${likedItems.includes(artwork.id) ? "fill-red-500 text-red-500" : ""}`}
+                    />
+                    {artwork.likes + (likedItems.includes(artwork.id) ? 1 : 0)}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="text-xs text-muted-foreground">🎮 Connected to: {artwork.gameConnection}</div>
+
+              <div className="flex gap-2">
+                <Button size="sm" className="flex-1">
+                  Buy NFT
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <a href={artwork.githubLink} target="_blank" rel="noopener noreferrer">
+                    <Github className="h-4 w-4" />
+                  </a>
+                </Button>
+                <Button variant="outline" size="sm">
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="mt-12 text-center">
+        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 rounded-lg">
+          <h2 className="text-2xl font-bold mb-2">Visit LuckyspotOgold on GitHub</h2>
+          <p className="mb-4">Explore our complete collection of blockchain games and NFT projects</p>
+          <Button variant="secondary" asChild>
+            <a href="https://github.com/LuckyspotOgold" target="_blank" rel="noopener noreferrer">
+              <Github className="mr-2 h-4 w-4" />
+              View All Projects
+            </a>
+          </Button>
         </div>
       </div>
     </div>
