@@ -31,7 +31,7 @@ vercel $DEPLOY_FLAGS --alias=wyoverse.cryptoclashers.games
 
 echo "⚙️ Setting environment variables..."
 vercel env add SUPABASE_NEXT_PUBLIC_SUPABASE_URL "$SUPABASE_URL" --yes
-vercelSUPABASE_NEXT_PUBLIC_SUPABASE_ANON_KEY_ANON_KEY "$SUPABASE_KEY" --yes
+vercel env add SUPABASE_NEXT_PUBLIC_SUPABASE_ANON_KEY "$SUPABASE_KEY" --yes
 vercel env add NEXT_PUBLIC_DOMAIN_MAIN "cryptoclashers.games" --yes
 vercel env add NEXT_PUBLIC_DOMAIN_TRADING "stoneyard.cash" --yes
 

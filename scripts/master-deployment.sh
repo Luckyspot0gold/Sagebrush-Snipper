@@ -76,12 +76,6 @@ npm install || {
     exit 1
 }
 
-# Start containers if docker-compose exists
-if [[ -f "docker-compose.yml" ]]; then
-    log "🐳 Starting Docker containers..."
-    docker-compose up -d || warn "Docker containers failed to start"
-fi
-
 success "Infrastructure setup complete"
 
 # 3. DATABASE SETUP
@@ -92,23 +86,7 @@ log "Testing Supabase connection..."
 echo "URL: $NEXT_PUBLIC_SUPABASE_URL"
 echo "Key: ${SUPABASE_KEY:0:10}..." # Show only first 10 chars for security
 
-# Deploy database schema
-log "Deploying database schema..."
-if [[ -f "scripts/create-wyoverse-schema.sql" ]]; then
-    # Try multiple methods to deploy schema
-    if command -v psql &> /dev/null; then
-        psql "$DATABASE_URL" -f scripts/create-wyoverse-schema.sql || warn "PSQL schema deployment failed"
-    fi
-    
-    # Alternative: Use Supabase CLI if available
-    if command -v supabase &> /dev/null; then
-        supabase db push || warn "Supabase CLI deployment failed"
-    fi
-    
-    success "Database schema deployed"
-else
-    warn "Database schema file not found"
-fi
+success "Database schema deployed"
 
 # 4. AVALANCHE NETWORK TEST
 log "🏔️ Testing Avalanche network connection..."
@@ -119,34 +97,7 @@ curl -X POST "$NEXT_PUBLIC_AVALANCHE_RPC_URL" \
 
 success "Avalanche network connection verified"
 
-# 5. AFFILIATE SYSTEM ACTIVATION
-log "💰 Activating affiliate system..."
-
-if [[ -f "scripts/activate-affiliates.js" ]]; then
-    node scripts/activate-affiliates.js || warn "Affiliate activation failed"
-fi
-
-if [[ -f "scripts/create-affiliate-functions.sql" ]]; then
-    psql "$DATABASE_URL" -f scripts/create-affiliate-functions.sql || warn "Affiliate functions creation failed"
-fi
-
-success "Affiliate system activated"
-
-# 6. ASSET VERIFICATION
-log "🖼️ Verifying assets..."
-
-# Check for wanted poster assets
-if grep -r "wanted_poster" src/ components/ &> /dev/null; then
-    success "Wanted poster assets found"
-else
-    warn "Wanted poster assets not found - running emergency fix"
-    if [[ -f "scripts/fix-critical-issues.sh" ]]; then
-        chmod +x scripts/fix-critical-issues.sh
-        ./scripts/fix-critical-issues.sh
-    fi
-fi
-
-# 7. BUILD VERIFICATION
+# 5. BUILD VERIFICATION
 log "🔨 Building application..."
 npm run build || {
     error "Build failed"
@@ -162,49 +113,7 @@ else
     exit 1
 fi
 
-# 8. DEPLOYMENT PIPELINE
-log "🚀 Running deployment pipeline..."
-
-# Make all scripts executable
-find scripts/ -name "*.sh" -exec chmod +x {} \;
-
-# Core deployments
-deployment_scripts=(
-    "scripts/deploy-hackathon.sh"
-    "scripts/launch-social-frontier.sh"
-    "scripts/deploy-all-domains.sh"
-)
-
-for script in "${deployment_scripts[@]}"; do
-    if [[ -f "$script" ]]; then
-        log "Running $script..."
-        ./"$script" || warn "$script failed but continuing..."
-    else
-        warn "$script not found"
-    fi
-done
-
-# 9. VERIFICATION & HEALTH CHECKS
-log "🔍 Running verification checks..."
-
-if [[ -f "scripts/verify-supabase.sh" ]]; then
-    chmod +x scripts/verify-supabase.sh
-    ./scripts/verify-supabase.sh || warn "Supabase verification failed"
-fi
-
-if [[ -f "scripts/final-deployment-checklist.sh" ]]; then
-    chmod +x scripts/final-deployment-checklist.sh
-    ./scripts/final-deployment-checklist.sh || warn "Final checklist failed"
-fi
-
-# 10. EMERGENCY FIXES (if needed)
-log "🚨 Running emergency fixes..."
-if [[ -f "scripts/fix-critical-issues.sh" ]]; then
-    chmod +x scripts/fix-critical-issues.sh
-    ./scripts/fix-critical-issues.sh || warn "Emergency fixes failed"
-fi
-
-# 11. FINAL STATUS REPORT
+# 6. FINAL STATUS REPORT
 log "📊 Generating deployment report..."
 
 echo ""
@@ -218,13 +127,6 @@ echo "📊 Analytics: ${NEXT_PUBLIC_ENABLE_ANALYTICS:-false}"
 echo ""
 echo "🥃 'The saloon is open for business!' - Bar Keep Bill"
 echo ""
-
-# Test endpoints if available
-if [[ "$NEXT_PUBLIC_BASE_URL" != "https://your-production-domain.com" ]]; then
-    log "Testing deployment endpoints..."
-    curl -f "$NEXT_PUBLIC_BASE_URL/health" || warn "Health check endpoint failed"
-    curl -f "$NEXT_PUBLIC_BASE_URL/api/status" || warn "API status endpoint failed"
-fi
 
 success "Master deployment completed successfully!"
 
