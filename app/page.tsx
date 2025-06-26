@@ -1,22 +1,26 @@
-import Image from "next/image"
+import { NewspaperFrontPage } from "@/components/newspaper-front-page"
+import { Sidebar } from "@/components/sidebar"
+import { WantedPosterSidebar } from "@/components/wanted-poster-sidebar"
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <main>
-      <h1>Welcome to My Website</h1>
-      <p>This is the homepage.</p>
+    <div className="min-h-screen bg-[#f4f1e8] frontier-paper">
+      <div className="flex">
+        {/* Left Sidebar */}
+        <div className="hidden lg:block w-64 fixed left-0 top-0 h-full overflow-y-auto border-r-4 border-double border-[#8B4513] bg-[#f9f6f0]">
+          <Sidebar />
+        </div>
 
-      {/* Example 1: Image with priority (to be updated) */}
-      <img src="/logo.svg" alt="Logo" width={120} height={40} loading="eager" />
+        {/* Main Content */}
+        <div className="flex-1 lg:ml-64 lg:mr-80">
+          <NewspaperFrontPage />
+        </div>
 
-      {/* Example 2: Another image with priority (to be updated) */}
-      <img src="/banner.png" alt="Banner" width={600} height={200} loading="eager" />
-
-      {/* Example 3: Next/Image component (no change needed) */}
-      <Image src="/next.svg" alt="Next.js Logo" width={100} height={30} />
-
-      {/* Example 4: Image without priority (no change needed) */}
-      <img src="/icon.png" alt="Icon" width={50} height={50} />
-    </main>
+        {/* Right Sidebar - Wanted Posters */}
+        <div className="hidden lg:block w-80 fixed right-0 top-0 h-full overflow-y-auto border-l-4 border-double border-[#8B4513] bg-[#f9f6f0]">
+          <WantedPosterSidebar />
+        </div>
+      </div>
+    </div>
   )
 }
