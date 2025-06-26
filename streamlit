@@ -1,5 +1,4 @@
-
-```bash
+\`\`\`bash
 # Clone the legend
 git clone https://github.com/Luckyspot0gold/Sagebrush-Snipper.git
 cd Sagebrush-Snipper
@@ -11,4 +10,4 @@ pip install -r requirements.txt
 streamlit run core/sagebrush_sniper.py
 
 # Visit http://localhost:8501 and start huntin'!
-```
+\`\`\`

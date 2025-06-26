@@ -1,6 +1,6 @@
 **Here's your legendary README.md to replace what's there:**
 
-```markdown
+\`\`\`markdown
 # 🏜️ Pioneer SNIPER 🎯
 
 > *"Trading so fast, nobody can track it"*

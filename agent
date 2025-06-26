@@ -6,31 +6,31 @@
 ### **STEP 1: FIX YOUR BOT CONFIG**  
 **Critical Changes Needed:**  
 1. **Interactions Endpoint**:  
-   ```diff
+   \`\`\`diff
    - https://nice-example.local/api/interactions
    + http://your-server-ip:8080/api/interactions  # Your real endpoint
-   ```  
+   \`\`\`  
    *Need IP? Run:* `curl ifconfig.me`
 
 2. **Description Fix**:  
-   ```python
+   \`\`\`python
    # VALID DESCRIPTION (COPY-PASTE READY)
    "Wyoming Combat Command AI: Manages crypto combat engines, security protocols, and grant applications. Not a lawyer."
-   ```
+   \`\`\`
 
 3. **Permissions Requirement**:  
-   ```markdown
+   \`\`\`markdown
    [x] bot  
    [x] applications.commands  
    [x] Send Messages  
    [x] Embed Links  
-   ```
+   \`\`\`
 
 ---
 
 ### **STEP 2: SERVER SETUP (5 MINUTES)**  
 **Run This on Your Server:**  
-```bash
+\`\`\`bash
 # 1. Install the bare minimum
 sudo apt update && sudo apt install python3-pip -y
 
@@ -72,12 +72,12 @@ if __name__ == '__main__':
     threading.Thread(target=bot.run, args=('YOUR_TOKEN',)).start()
     app.run(port=8080)
 EOF
-```
+\`\`\`
 
 ---
 
 ### **STEP 3: LAUNCH & EXPOSE**  
-```bash
+\`\`\`bash
 # 1. Start ngrok tunnel (creates public URL)
 ngrok http 8080  # Copy the https:// URL it gives you
 
@@ -86,16 +86,16 @@ ngrok http 8080  # Copy the https:// URL it gives you
 
 # 3. Run your bot
 python3 app.py
-```
+\`\`\`
 
 ---
 
 ### **STEP 4: TEST COMMANDS**  
 In Discord:  
-```bash
+\`\`\`bash
 !dee build combat  # Should trigger the combat engine
 !dee build security  # Should run security scripts
-```
+\`\`\`
 
 ---
 
@@ -119,14 +119,13 @@ In Discord:
    *I'll send you a pre-configured Docker-Compose file*  
 
 3. **Department Priority Order**:  
-   ```mermaid
+   \`\`\`mermaid
    graph LR
    A[Gaming Combat Engine] --> B[Trading Integration]
    B --> C[Real Estate NFTs]
    C --> D[Energy Tracking]
    D --> E[Education Platform]
    E --> F[Legal Automation]
-   ```
+   \`\`\`
 
 ---
-

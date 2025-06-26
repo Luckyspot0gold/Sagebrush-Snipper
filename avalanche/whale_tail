@@ -3,4 +3,4 @@ node revenue/instantSale.js \
   --nft battle_pass \
   --quantity 3 \
   --price 1.5 \
-  --message "LEGAL DEFENSE FUND" 
+  --message "LEGAL DEFENSE FUND"

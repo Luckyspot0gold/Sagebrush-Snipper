@@ -1,4 +1,4 @@
-```mermaid  
+\`\`\`mermaid  
 graph LR  
     A[Sagebrush Sniper] --> D[Quant Trading Core]  
     B[CryptoClashing] --> D  
@@ -6,4 +6,4 @@ graph LR
     E --> F[Hackathon Submission]  
     F --> G[Venice AI]  
     F --> H[Solana Grizzlython]  
-```  
+\`\`\`

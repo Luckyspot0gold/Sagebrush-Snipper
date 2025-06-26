@@ -11,17 +11,17 @@ main
 First, let's make sure your repo has everything Streamlit Cloud needs:
 
 **Create `requirements.txt` in your root directory:**
-```txt
+\`\`\`txt
 streamlit>=1.28.0
 yfinance>=0.2.18
 plotly>=5.17.0
 pandas>=2.0.0
 numpy>=1.24.0
 requests>=2.31.0
-```
+\`\`\`
 
 **Create `strategy/indicators.py`:**
-```python
+\`\`\`python
 # 🏜️ Technical Indicators - Sharp as a desert wind
 import numpy as np
 import pandas as pd
@@ -70,10 +70,10 @@ class TechnicalIndicators:
         data['MACD_signal'] = data['MACD'].ewm(span=9).mean()
         data['MACD_histogram'] = data['MACD'] - data['MACD_signal']
         return data
-```
+\`\`\`
 
 **Create `strategy/signals.py`:**
-```python
+\`\`\`python
 # 🎯 Signal Generation - Faster than a rattlesnake strike
 import numpy as np
 
@@ -180,7 +180,7 @@ class SignalGenerator:
             'macd': 0,
             'volume_ratio': 1
         }
-```
+\`\`\`
 
 ### **Step 2: Deploy to Streamlit Cloud** 🚀
 

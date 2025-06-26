@@ -1,6 +1,6 @@
 # 🚀 Quick Draw Setup
 
-```bash
+\`\`\`bash
 # Clone the legend
 git clone https://github.com/Luckyspot0gold/Sagebrush-Snipper.git
 cd Sagebrush-Snipper
@@ -12,7 +12,7 @@ pip install -r requirements.txt
 streamlit run core/sagebrush_sniper.py
 
 # Visit http://localhost:8501 and start huntin'!
-```
+\`\`\`
 
 ## 🎯 How to Use
 
@@ -23,7 +23,7 @@ streamlit run core/sagebrush_sniper.py
 
 ## 🏜️ Project Structure
 
-```
+\`\`\`
 Sagebrush-Snipper/
 ├── core/                    # Main application code
 │   ├── sagebrush_sniper.py  # Primary sniper application
@@ -35,4 +35,4 @@ Sagebrush-Snipper/
 ├── tests/                   # Unit tests
 ├── requirements.txt         # Dependencies
 └── deploy.sh               # Quick deployment script
-```
+\`\`\`
