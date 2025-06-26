@@ -8,6 +8,7 @@ interface AffiliateClick {
   referralCode?: string
   ipAddress?: string
   userAgent?: string
+  socialGoodContribution?: number
 }
 
 interface AdSlot {
@@ -22,19 +23,34 @@ interface AdSlot {
   clicks: number
   createdAt: Date
   updatedAt: Date
+  socialGoodPercentage?: number
 }
 
 interface RevenueShare {
   platform: number
   affiliate: number
   advertiser: number
+  socialGood: number
   total: number
+}
+
+interface SocialGoodMetrics {
+  totalDonated: number
+  causesSupported: string[]
+  impactScore: number
+  participatingUsers: number
 }
 
 export class AffiliateTracker {
   private static instance: AffiliateTracker
   private clicks: Map<string, AffiliateClick> = new Map()
   private adSlots: Map<string, AdSlot> = new Map()
+  private socialGoodMetrics: SocialGoodMetrics = {
+    totalDonated: 0,
+    causesSupported: [],
+    impactScore: 0,
+    participatingUsers: 0,
+  }
   private isInitialized = false
 
   static getInstance(): AffiliateTracker {
@@ -48,10 +64,9 @@ export class AffiliateTracker {
     if (this.isInitialized) return
 
     try {
-      // Load existing data from database/localStorage
       await this.loadExistingData()
       this.isInitialized = true
-      console.log("✅ Affiliate tracker initialized")
+      console.log("✅ Affiliate tracker with social good initialized")
     } catch (error) {
       console.error("❌ Failed to initialize affiliate tracker:", error)
       throw error
@@ -60,11 +75,10 @@ export class AffiliateTracker {
 
   private async loadExistingData(): Promise<void> {
     try {
-      // In a real app, this would load from your database
-      // For now, we'll use localStorage as a fallback
       if (typeof window !== "undefined") {
         const storedClicks = localStorage.getItem("affiliate_clicks")
         const storedSlots = localStorage.getItem("ad_slots")
+        const storedSocialGood = localStorage.getItem("social_good_metrics")
 
         if (storedClicks) {
           const clicks = JSON.parse(storedClicks)
@@ -86,6 +100,10 @@ export class AffiliateTracker {
             })
           })
         }
+
+        if (storedSocialGood) {
+          this.socialGoodMetrics = JSON.parse(storedSocialGood)
+        }
       }
     } catch (error) {
       console.warn("Could not load existing affiliate data:", error)
@@ -97,6 +115,7 @@ export class AffiliateTracker {
       if (typeof window !== "undefined") {
         localStorage.setItem("affiliate_clicks", JSON.stringify(Array.from(this.clicks.values())))
         localStorage.setItem("ad_slots", JSON.stringify(Array.from(this.adSlots.values())))
+        localStorage.setItem("social_good_metrics", JSON.stringify(this.socialGoodMetrics))
       }
     } catch (error) {
       console.warn("Could not persist affiliate data:", error)
@@ -119,7 +138,13 @@ export class AffiliateTracker {
     }
 
     const multiplier = tierMultipliers[userTier as keyof typeof tierMultipliers] || 0.05
-    return Math.round(baseBid * multiplier * 100) / 100 // Round to 2 decimal places
+    return Math.round(baseBid * multiplier * 100) / 100
+  }
+
+  calculateSocialGoodContribution(commission: number, adId: string): number {
+    const ad = this.adSlots.get(adId)
+    const socialGoodPercentage = ad?.socialGoodPercentage || 0.05 // Default 5%
+    return Math.round(commission * socialGoodPercentage * 100) / 100
   }
 
   async trackClick(adId: string, userId: string, userTier = "bronze"): Promise<string> {
@@ -138,6 +163,7 @@ export class AffiliateTracker {
       }
 
       const commission = this.calculateCommission(adId, userTier)
+      const socialGoodContribution = this.calculateSocialGoodContribution(commission, adId)
 
       const click: AffiliateClick = {
         id: `click_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -148,6 +174,7 @@ export class AffiliateTracker {
         tier: userTier as any,
         ipAddress: await this.getClientIP(),
         userAgent: typeof window !== "undefined" ? window.navigator.userAgent : undefined,
+        socialGoodContribution,
       }
 
       // Store the click
@@ -159,15 +186,20 @@ export class AffiliateTracker {
       ad.updatedAt = new Date()
       this.adSlots.set(adId, ad)
 
+      // Update social good metrics
+      this.socialGoodMetrics.totalDonated += socialGoodContribution
+      this.socialGoodMetrics.impactScore += socialGoodContribution * 10 // Impact multiplier
+
       // Persist data
       await this.persistData()
 
-      // In a real app, you'd also send this to your backend
+      // Send to backend
       await this.sendToBackend(click)
 
-      console.log("✅ Affiliate click tracked:", {
+      console.log("✅ Affiliate click tracked with social good:", {
         clickId: click.id,
         commission: click.commission,
+        socialGoodContribution: click.socialGoodContribution,
         tier: click.tier,
       })
 
@@ -204,25 +236,35 @@ export class AffiliateTracker {
       }
     } catch (error) {
       console.warn("Could not send click to backend:", error)
-      // Don't throw here - we still want to track locally
     }
   }
 
   getRevenueShare(totalRevenue: number): RevenueShare {
-    const platformShare = totalRevenue * 0.3 // 30%
+    const socialGoodShare = totalRevenue * 0.05 // 5% to social good
+    const platformShare = totalRevenue * 0.25 // 25%
     const affiliateShare = totalRevenue * 0.7 // 70%
 
     return {
       platform: Math.round(platformShare * 100) / 100,
       affiliate: Math.round(affiliateShare * 100) / 100,
-      advertiser: 0, // Advertiser pays, doesn't receive
+      socialGood: Math.round(socialGoodShare * 100) / 100,
+      advertiser: 0,
       total: totalRevenue,
     }
+  }
+
+  getSocialGoodMetrics(): SocialGoodMetrics {
+    return { ...this.socialGoodMetrics }
   }
 
   getUserEarnings(userId: string): number {
     const userClicks = Array.from(this.clicks.values()).filter((click) => click.userId === userId)
     return userClicks.reduce((total, click) => total + click.commission, 0)
+  }
+
+  getUserSocialGoodContribution(userId: string): number {
+    const userClicks = Array.from(this.clicks.values()).filter((click) => click.userId === userId)
+    return userClicks.reduce((total, click) => total + (click.socialGoodContribution || 0), 0)
   }
 
   addAdSlot(slot: Omit<AdSlot, "id" | "impressions" | "clicks" | "createdAt" | "updatedAt">): string {
@@ -236,12 +278,13 @@ export class AffiliateTracker {
       clicks: 0,
       createdAt: now,
       updatedAt: now,
+      socialGoodPercentage: slot.socialGoodPercentage || 0.05, // Default 5%
     }
 
     this.adSlots.set(id, newSlot)
     this.persistData()
 
-    console.log("✅ Ad slot created:", id)
+    console.log("✅ Ad slot created with social good:", id)
     return id
   }
 
@@ -267,6 +310,10 @@ export class AffiliateTracker {
     return Array.from(this.clicks.values()).reduce((total, click) => total + click.commission, 0)
   }
 
+  getTotalSocialGoodContributions(): number {
+    return Array.from(this.clicks.values()).reduce((total, click) => total + (click.socialGoodContribution || 0), 0)
+  }
+
   getStats() {
     const clicks = Array.from(this.clicks.values())
     const slots = Array.from(this.adSlots.values())
@@ -274,6 +321,7 @@ export class AffiliateTracker {
     return {
       totalClicks: clicks.length,
       totalRevenue: this.getTotalRevenue(),
+      totalSocialGoodContributions: this.getTotalSocialGoodContributions(),
       activeAds: slots.filter((slot) => slot.isActive).length,
       totalAds: slots.length,
       averageCommission: clicks.length > 0 ? this.getTotalRevenue() / clicks.length : 0,
@@ -281,6 +329,7 @@ export class AffiliateTracker {
         const today = new Date()
         return click.timestamp.toDateString() === today.toDateString()
       }).length,
+      socialGoodMetrics: this.socialGoodMetrics,
     }
   }
 }

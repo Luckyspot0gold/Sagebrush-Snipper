@@ -4,8 +4,9 @@ import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Star, DollarSign, Target, Award, ExternalLink } from "lucide-react"
+import { Star, DollarSign, Target, Award, ExternalLink, Heart } from "lucide-react"
 import { affiliateTracker } from "@/lib/affiliate-tracking"
+import { SocialGoodAffiliateSection } from "./social-good-affiliate-section"
 
 interface OutlawPlayer {
   id: string
@@ -27,6 +28,7 @@ interface AdSlot {
   destinationUrl: string
   commissionRate: number
   isActive: boolean
+  socialGoodPercentage?: number
   adContent?: {
     title: string
     description: string
@@ -73,17 +75,21 @@ const mockOutlaws: OutlawPlayer[] = [
 export function WantedSidebar() {
   const [outlaws] = useState<OutlawPlayer[]>(mockOutlaws)
   const [showAdForm, setShowAdForm] = useState(false)
+  const [showSocialGood, setShowSocialGood] = useState(false)
   const [adSlot, setAdSlot] = useState<AdSlot | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [socialGoodStats, setSocialGoodStats] = useState({
+    totalContributed: 0,
+    userContribution: 0,
+  })
 
   useEffect(() => {
-    // Load active ad slot for sidebar position
     loadAdSlot()
+    loadSocialGoodStats()
   }, [])
 
   const loadAdSlot = async () => {
     try {
-      // In a real app, this would fetch from your database
       const mockAdSlot: AdSlot = {
         id: "sidebar_ad_1",
         position: "sidebar",
@@ -91,6 +97,7 @@ export function WantedSidebar() {
         advertiser: "Frontier Trading Co.",
         destinationUrl: "https://frontier-trading.example.com",
         commissionRate: 0.08,
+        socialGoodPercentage: 0.05, // 5% goes to social good
         isActive: true,
         adContent: {
           title: "FRONTIER TRADING CO.",
@@ -104,15 +111,32 @@ export function WantedSidebar() {
     }
   }
 
+  const loadSocialGoodStats = async () => {
+    try {
+      await affiliateTracker.initialize()
+      const stats = affiliateTracker.getStats()
+      const userContrib = affiliateTracker.getUserSocialGoodContribution("current_user_id")
+
+      setSocialGoodStats({
+        totalContributed: stats.totalSocialGoodContributions || 0,
+        userContribution: userContrib,
+      })
+    } catch (error) {
+      console.error("Failed to load social good stats:", error)
+    }
+  }
+
   const handleAdClick = async (adId: string) => {
     try {
       setIsLoading(true)
-      const userId = "current_user_id" // Get from auth context
-      const userTier = "silver" // Get from user profile
+      const userId = "current_user_id"
+      const userTier = "silver"
 
       const destinationUrl = await affiliateTracker.trackClick(adId, userId, userTier)
 
-      // Open in new tab
+      // Refresh social good stats after click
+      await loadSocialGoodStats()
+
       window.open(destinationUrl, "_blank")
     } catch (error) {
       console.error("Failed to track ad click:", error)
@@ -138,6 +162,17 @@ export function WantedSidebar() {
     return `$${bounty.toLocaleString()} IN GOLD`
   }
 
+  if (showSocialGood) {
+    return (
+      <div className="w-80 p-4">
+        <Button onClick={() => setShowSocialGood(false)} variant="outline" className="mb-4 w-full">
+          ← Back to Wanted Posters
+        </Button>
+        <SocialGoodAffiliateSection />
+      </div>
+    )
+  }
+
   return (
     <div className="sidebar wanted-theme w-80 p-4 space-y-4">
       {/* Header */}
@@ -153,22 +188,48 @@ export function WantedSidebar() {
         <div className="text-xs mt-2 opacity-90">By Order of the Wyoming Territory Marshal</div>
       </div>
 
+      {/* Social Good Impact Banner */}
+      <Card className="border-4 border-green-500 bg-gradient-to-r from-green-50 to-blue-50 p-3 text-center">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <Heart className="h-5 w-5 text-red-500 fill-red-500" />
+          <h4 className="font-bold text-green-800 headline-primary">SOCIAL GOOD IMPACT</h4>
+        </div>
+        <div className="text-sm space-y-1">
+          <p className="text-gray-700">
+            Total Contributed:{" "}
+            <span className="font-bold text-green-600">${socialGoodStats.totalContributed.toFixed(2)}</span>
+          </p>
+          {socialGoodStats.userContribution > 0 && (
+            <p className="text-gray-700">
+              Your Impact:{" "}
+              <span className="font-bold text-blue-600">${socialGoodStats.userContribution.toFixed(2)}</span>
+            </p>
+          )}
+          <p className="text-xs text-gray-600 italic">5% of all affiliate earnings support community causes</p>
+        </div>
+        <Button
+          size="sm"
+          onClick={() => setShowSocialGood(true)}
+          className="mt-2 w-full bg-green-600 hover:bg-green-700 text-white"
+        >
+          <Heart className="h-3 w-3 mr-1" />
+          VIEW IMPACT
+        </Button>
+      </Card>
+
       {/* Top Outlaws */}
       {outlaws.slice(0, 3).map((outlaw, index) => (
         <Card key={outlaw.id} className="wanted-poster border-4 border-black bg-amber-50 p-4 relative">
-          {/* Rank Badge */}
           <div className="absolute -top-2 -left-2 z-10">
             <Badge className={`${getReputationColor(outlaw.reputation)} text-xs font-bold px-2 py-1`}>
               #{index + 1}
             </Badge>
           </div>
 
-          {/* Nail holes */}
           <div className="absolute top-2 left-2 w-2 h-2 bg-gray-600 rounded-full"></div>
           <div className="absolute top-2 right-2 w-2 h-2 bg-gray-600 rounded-full"></div>
 
           <div className="text-center space-y-3">
-            {/* Outlaw Image */}
             <div className="relative mx-auto w-24 h-24 border-2 border-black">
               <img
                 src={outlaw.avatar || "/placeholder.svg"}
@@ -178,12 +239,10 @@ export function WantedSidebar() {
               <div className="absolute inset-0 bg-black opacity-10"></div>
             </div>
 
-            {/* Bounty */}
             <div className="bounty absolute -top-2 -right-2 bg-yellow-400 border-2 border-black p-2 transform rotate-12 z-20">
               <div className="text-sm font-bold text-black headline-primary">{getBountyDisplay(outlaw.bounty)}</div>
             </div>
 
-            {/* Details */}
             <div className="space-y-1 text-sm pt-4">
               <p className="font-bold text-lg headline-secondary">"{outlaw.alias}"</p>
               <p className="text-xs italic">{outlaw.name}</p>
@@ -201,7 +260,6 @@ export function WantedSidebar() {
               )}
             </div>
 
-            {/* Action Button */}
             <Button
               size="sm"
               className="frontier-button w-full text-xs"
@@ -214,7 +272,7 @@ export function WantedSidebar() {
         </Card>
       ))}
 
-      {/* Ad Slot */}
+      {/* Enhanced Ad Slot with Social Good */}
       {adSlot && adSlot.isActive ? (
         <Card className="wanted-poster ad-slot border-4 border-dashed border-green-600 bg-green-50 p-4 text-center">
           <div className="space-y-3">
@@ -225,10 +283,16 @@ export function WantedSidebar() {
             <div className="pt-4">
               <h4 className="text-lg font-bold headline-primary">{adSlot.adContent?.title}</h4>
               <p className="text-sm text-gray-700 my-2">{adSlot.adContent?.description}</p>
-              <p className="text-xs text-green-600 mb-3">
-                <DollarSign className="inline h-3 w-3 mr-1" />
-                {(adSlot.commissionRate * 100).toFixed(0)}% commission on referrals
-              </p>
+              <div className="text-xs space-y-1 mb-3">
+                <p className="text-green-600">
+                  <DollarSign className="inline h-3 w-3 mr-1" />
+                  {(adSlot.commissionRate * 100).toFixed(0)}% commission on referrals
+                </p>
+                <p className="text-blue-600">
+                  <Heart className="inline h-3 w-3 mr-1" />
+                  {((adSlot.socialGoodPercentage || 0.05) * 100).toFixed(0)}% goes to social good
+                </p>
+              </div>
             </div>
 
             <Button
@@ -253,6 +317,9 @@ export function WantedSidebar() {
               <p className="font-semibold">
                 <DollarSign className="inline h-4 w-4 mr-1" />
                 5-15% commission on referred players
+              </p>
+              <p className="text-xs text-green-600">
+                <Heart className="inline h-3 w-3 mr-1" />+ 5% automatically donated to social causes
               </p>
               <p className="text-xs text-gray-600">Advertise your business to frontier traders</p>
             </div>
