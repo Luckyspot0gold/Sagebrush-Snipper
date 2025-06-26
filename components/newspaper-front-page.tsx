@@ -237,8 +237,8 @@ export function NewspaperFrontPage() {
           <div className="border-4 border-black p-1">
             <div className="border-2 border-black p-4">
               <div className="text-center mb-4">
-                <h3 className="text-2xl font-bold font-serif uppercase">FRONTIER TRADER</h3>
-                <p className="text-sm font-serif">Advanced Trading Tools</p>
+                <h3 className="text-2xl font-bold font-serif uppercase">FRONTIER TRADING POST</h3>
+                <p className="text-sm font-serif">Advanced Digital Gold Trading</p>
               </div>
               <div className="relative h-32 mb-3">
                 <Image
@@ -248,13 +248,26 @@ export function NewspaperFrontPage() {
                   height={128}
                   className="w-full h-full object-cover border border-black"
                 />
+                <div className="absolute bottom-2 right-2 bg-[#f8f3e3] border border-black px-2 py-1 text-xs font-serif">
+                  Live Trading Floor
+                </div>
               </div>
               <p className="text-sm font-serif mb-3">
-                Advanced trading bots and market analysis tools for the digital frontier. Navigate the volatile crypto
-                markets with precision.
+                Advanced trading algorithms meet frontier wisdom. Navigate volatile crypto markets with the precision of
+                a seasoned prospector and the grit of a true pioneer.
               </p>
-              <Link href="/trading">
-                <Button className="newspaper-button w-full">START TRADING</Button>
+              <div className="grid grid-cols-2 gap-2 mb-3 text-xs font-serif">
+                <div className="border border-black p-2 text-center bg-green-50">
+                  <div className="font-bold text-green-600">+$352.40</div>
+                  <div>Today's Profits</div>
+                </div>
+                <div className="border border-black p-2 text-center bg-blue-50">
+                  <div className="font-bold text-blue-600">87.3%</div>
+                  <div>Win Rate</div>
+                </div>
+              </div>
+              <Link href="/frontier-trader">
+                <Button className="newspaper-button w-full">🏛️ ENTER TRADING POST 🏛️</Button>
               </Link>
             </div>
           </div>

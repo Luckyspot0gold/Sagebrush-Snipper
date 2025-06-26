@@ -44,6 +44,7 @@ const sidebarSections = [
     title: "Business",
     items: [
       { name: "Business Section", href: "/business", icon: Newspaper },
+      { name: "Frontier Trader", href: "/frontier-trader", icon: TrendingUp },
       { name: "Finance Hub", href: "/finance", icon: LineChart },
       { name: "Trading Desk", href: "/trading", icon: TrendingUp },
       { name: "Market Data", href: "/market", icon: BarChart3 },
