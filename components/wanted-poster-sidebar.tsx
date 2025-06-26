@@ -1,9 +1,9 @@
-import React from "react";
-import { WantedPoster } from "@/types";
-import Image from "next/image";
+import type React from "react"
+import type { WantedPoster } from "@/types"
+import Image from "next/image"
 
 interface WantedPosterSidebarProps {
-  posters: WantedPoster[];
+  posters: WantedPoster[]
 }
 
 const WantedPosterSidebar: React.FC<WantedPosterSidebarProps> = ({ posters }) => {
@@ -14,13 +14,7 @@ const WantedPosterSidebar: React.FC<WantedPosterSidebarProps> = ({ posters }) =>
         {posters.map((poster) => (
           <div key={poster.id} className="poster">
             <div className="poster-header">
-              <Image
-                src="/wanted-star.svg"
-                alt="Wanted Star"
-                width={24}
-                height={24}
-                priority
-              />
+              <Image src="/wanted-star.svg" alt="Wanted Star" width={24} height={24} priority />
               <h3>Wanted</h3>
             </div>
             <Image
@@ -39,7 +33,7 @@ const WantedPosterSidebar: React.FC<WantedPosterSidebarProps> = ({ posters }) =>
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default WantedPosterSidebar;
+export default WantedPosterSidebar
