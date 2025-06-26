@@ -5,7 +5,7 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "WyoVerse - Frontier Gaming Ecosystem",
   description: "Multi-domain frontier metaverse with social capital integration",
-  generator: "v0.dev",
+    generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -15,23 +15,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        {/* IM Fell English – main newspaper font */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital,wght@0,400;0,700;1,400&display=swap"
-        />
-        {/* Crimson Text – body copy fallback */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap"
-        />
-        {/* Playfair Display – feature headings */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap"
-        />
-      </head>
       <body>{children}</body>
     </html>
   )
