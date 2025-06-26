@@ -2,16 +2,27 @@ import type { WantedPoster } from "@/types"
 import Image from "next/image"
 
 interface WantedPosterSidebarProps {
-  posters: WantedPoster[]
+  posters?: WantedPoster[]
 }
+
+const fallbackPosters: WantedPoster[] = [
+  {
+    id: "demo-1",
+    name: "Unknown Outlaw",
+    img: "/placeholder-user.jpg",
+    reward: 500,
+  },
+]
 
 /* --------------------------- FIXED NAMED EXPORT --------------------------- */
 export function WantedPosterSidebar({ posters }: WantedPosterSidebarProps) {
+  const postersToShow = posters && posters.length > 0 ? posters : fallbackPosters
+
   return (
     <div className="sidebar">
       <h2 className="font-serif text-lg mb-2">Most Wanted</h2>
       <div className="posters-container space-y-4">
-        {posters.map((poster) => (
+        {postersToShow.map((poster) => (
           <div key={poster.id} className="poster border-2 border-black p-2 bg-[#fffbea]">
             <div className="poster-header flex items-center gap-2 mb-1">
               <Image src="/wanted-star.svg" alt="Wanted Star" width={24} height={24} priority />
@@ -35,3 +46,5 @@ export function WantedPosterSidebar({ posters }: WantedPosterSidebarProps) {
     </div>
   )
 }
+
+export default WantedPosterSidebar
