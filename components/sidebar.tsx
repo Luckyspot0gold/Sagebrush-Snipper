@@ -19,18 +19,47 @@ import {
   Heart,
   ChevronLeft,
   ChevronRight,
+  Store,
+  Pickaxe,
+  Wind,
+  GraduationCap,
+  Mountain,
+  FileText,
+  Gem,
+  HardHat,
+  Scroll,
+  Landmark,
+  MessageSquare,
+  LandPlot,
+  Video,
+  Coins,
 } from "lucide-react"
 
 const navigation = [
-  { name: "Home", href: "/", icon: Home },
-  { name: "Market", href: "/market", icon: TrendingUp },
+  { name: "WyoVerse Pioneer", href: "/", icon: Home },
+  { name: "Market Data", href: "/market", icon: TrendingUp },
   { name: "Art Gallery", href: "/art", icon: Palette },
-  { name: "Games", href: "/games", icon: Gamepad2 },
+  { name: "Games Portal", href: "/games", icon: Gamepad2 },
   { name: "Community", href: "/community", icon: Users },
   { name: "Calendar", href: "/calendar", icon: Calendar },
-  { name: "Explore", href: "/explore", icon: MapPin },
-  { name: "News", href: "/news", icon: Newspaper },
+  { name: "Explore Territory", href: "/explore", icon: MapPin },
+  { name: "Business", href: "/business", icon: Newspaper },
   { name: "Social Good", href: "/social-good", icon: Heart },
+  { name: "General Store", href: "/store", icon: Store },
+  { name: "Mining Operations", href: "/mining", icon: Pickaxe },
+  { name: "Energy Markets", href: "/energy", icon: Wind },
+  { name: "Education", href: "/education", icon: GraduationCap },
+  { name: "Tourism", href: "/tourism", icon: Mountain },
+  { name: "Classifieds", href: "/classifieds", icon: FileText },
+  { name: "Stones & NFTs", href: "/stones", icon: Gem },
+  { name: "OSHA Training", href: "/osha", icon: HardHat },
+  { name: "Native History", href: "/native-history", icon: Scroll },
+  { name: "Wyoming Pyramid", href: "/wyoming-pyramid", icon: Landmark },
+  { name: "Saloon", href: "/saloon", icon: MessageSquare },
+  { name: "Land Deeds", href: "/land-deeds", icon: LandPlot },
+  { name: "Boxing Arena", href: "/boxing-arena", icon: Users },
+  { name: "Racing Circuit", href: "/racing-circuit", icon: Video },
+  { name: "Digital Rodeo", href: "/digital-rodeo", icon: Coins },
 ]
 
 export function Sidebar() {
@@ -64,7 +93,7 @@ export function Sidebar() {
 
         {/* Navigation */}
         <ScrollArea className="flex-1 px-3 py-4">
-          <nav className="space-y-2">
+          <nav className="space-y-1">
             {navigation.map((item) => {
               const isActive = pathname === item.href
               return (
@@ -117,6 +146,7 @@ export function Sidebar() {
               <div className="font-semibold">WyoVerse Pioneer</div>
               <div>Digital Frontier • Est. 1880</div>
               <div className="mt-1 text-green-600">💚 Social Good Enabled</div>
+              <div className="mt-1 text-blue-600">📊 Real-Time Data</div>
             </div>
           </div>
         )}

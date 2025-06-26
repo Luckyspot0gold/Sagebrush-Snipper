@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { RealTimeMarketWidget } from "@/components/real-time-market-widget"
 
 export function NewspaperFrontPage() {
   return (
@@ -14,7 +14,7 @@ export function NewspaperFrontPage() {
         <div className="flex justify-between items-center text-sm">
           <div>VOL. 144, NO. 365</div>
           <div className="font-bold">DIGITAL FRONTIER EDITION</div>
-          <div>DECEMBER 26, 2024</div>
+          <div>{new Date().toLocaleDateString()}</div>
         </div>
       </div>
 
@@ -31,7 +31,7 @@ export function NewspaperFrontPage() {
             <div className="grid grid-cols-3 gap-4 mb-4">
               <div className="col-span-2">
                 <img
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/mechwolfClutch-zJKfkWRqTeqs3hWZB5lC9ziH14u4sK.jpeg"
+                  src="/images/mechwolfClutch.jpeg"
                   alt="Stone in Cyberpunk Garage"
                   className="w-full h-48 object-cover border-2 border-black"
                 />
@@ -90,7 +90,7 @@ export function NewspaperFrontPage() {
                 CRYPTO CLASHERS ARENA PACKED FOR BEAR VS BEAR SHOWDOWN
               </h3>
               <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/1743043971090%20%281%29.jpg-TyFJgCLBlZzWhb3NZU0aufYHBu6j5d.jpeg"
+                src="/images/bears-boxing-arena-crowd.jpeg"
                 alt="Bears Boxing in Arena"
                 className="w-full h-32 object-cover border border-black mb-2"
               />
@@ -139,43 +139,8 @@ export function NewspaperFrontPage() {
 
         {/* Sidebar */}
         <div className="col-span-4 space-y-6">
-          {/* Weather */}
-          <Card className="border-2 border-black">
-            <CardContent className="p-4">
-              <h4 className="font-bold text-center mb-2">FRONTIER WEATHER</h4>
-              <div className="text-center">
-                <div className="text-2xl font-bold">32°F</div>
-                <div className="text-sm">Partly Cloudy</div>
-                <div className="text-xs mt-2">Perfect weather for mechanical bull riding and crypto mining</div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Market Report */}
-          <Card className="border-2 border-black">
-            <CardContent className="p-4">
-              <h4 className="font-bold text-center mb-2">LIVE MARKET REPORT</h4>
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between">
-                  <span>Bitcoin (BTC)</span>
-                  <span className="text-green-600">$67,234 ↑2.3%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Avalanche (AVAX)</span>
-                  <span className="text-green-600">$32.15 ↑3.2%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Ethereum (ETH)</span>
-                  <span className="text-red-600">$3,456 ↓1.2%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Solana (SOL)</span>
-                  <span className="text-green-600">$156.78 ↑4.5%</span>
-                </div>
-              </div>
-              <Badge className="w-full mt-2 bg-green-100 text-green-800">🔴 LIVE DATA via Coinbase API</Badge>
-            </CardContent>
-          </Card>
+          {/* Real-time Weather and Market Data */}
+          <RealTimeMarketWidget />
 
           {/* Social Good Affiliate Section */}
           <Card className="border-2 border-black bg-gradient-to-r from-green-100 to-blue-100">

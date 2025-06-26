@@ -14,18 +14,36 @@ export async function GET() {
 
     console.log(`📊 Received ${products.length} products from Coinbase`)
 
-    // Transform Coinbase data to our format with real-time prices
+    // Get real-time prices for major cryptocurrencies
+    const majorCryptos = ["BTC", "ETH", "AVAX", "SOL", "ADA", "DOT", "LINK", "MATIC", "LTC", "UNI"]
+
     const cryptoData = await Promise.all(
-      products.slice(0, 40).map(async (product) => {
+      majorCryptos.map(async (symbol) => {
         try {
-          // Get real-time ticker data
-          const ticker = await enhancedCoinbaseAPI.getProductTicker(product.product_id)
+          const productId = `${symbol}-USD`
+          const product = products.find((p) => p.product_id === productId)
+
+          if (!product) {
+            console.log(`⚠️ Product not found: ${productId}`)
+            return null
+          }
+
+          // Get real-time price
+          const currentPrice = await enhancedCoinbaseAPI.getRealTimePrice(symbol)
+
+          // Get ticker for additional data
+          const ticker = await enhancedCoinbaseAPI.getProductTicker(productId)
 
           // Get candlestick data for RSI calculation
-          const candles = await enhancedCoinbaseAPI.getProductCandles(product.product_id)
+          const candles = await enhancedCoinbaseAPI.getProductCandles(productId)
 
-          // Calculate current price from ticker or product data
-          const currentPrice = ticker?.price ? Number.parseFloat(ticker.price) : Number.parseFloat(product.price)
+          // Calculate price change percentage
+          let priceChange24h = 0
+          if (candles.length >= 2) {
+            const currentPrice = Number.parseFloat(candles[candles.length - 1].close)
+            const price24hAgo = Number.parseFloat(candles[0].close)
+            priceChange24h = ((currentPrice - price24hAgo) / price24hAgo) * 100
+          }
 
           // Extract prices for RSI calculation
           const prices = candles.map((candle) => Number.parseFloat(candle.close))
@@ -49,19 +67,19 @@ export async function GET() {
 
           // Calculate 24h high/low from recent data
           const recent24h = prices.slice(-24)
-          const high24h = Math.max(...recent24h)
-          const low24h = Math.min(...recent24h)
+          const high24h = recent24h.length > 0 ? Math.max(...recent24h) : currentPrice
+          const low24h = recent24h.length > 0 ? Math.min(...recent24h) : currentPrice
 
           // Calculate market cap (estimated)
-          const estimatedSupply = getEstimatedSupply(product.base_currency_id)
+          const estimatedSupply = getEstimatedSupply(symbol)
           const marketCap = currentPrice * estimatedSupply
 
           return {
-            id: product.base_currency_id.toLowerCase(),
-            name: product.base_name,
-            symbol: product.base_currency_id,
+            id: symbol.toLowerCase(),
+            name: getFullName(symbol),
+            symbol: symbol,
             current_price: currentPrice,
-            price_change_percentage_24h: Number.parseFloat(product.price_percentage_change_24h || "0"),
+            price_change_percentage_24h: priceChange24h,
             market_cap: marketCap,
             total_volume: Number.parseFloat(product.volume_24h || "0"),
             high_24h: high24h,
@@ -74,7 +92,7 @@ export async function GET() {
             is_live: true,
           }
         } catch (error) {
-          console.error(`❌ Error processing ${product.product_id}:`, error)
+          console.error(`❌ Error processing ${symbol}:`, error)
           return null
         }
       }),
@@ -115,7 +133,6 @@ export async function GET() {
 }
 
 function getEstimatedSupply(symbol: string): number {
-  // Estimated circulating supplies for major cryptocurrencies
   const supplies: Record<string, number> = {
     BTC: 19700000,
     ETH: 120000000,
@@ -127,28 +144,24 @@ function getEstimatedSupply(symbol: string): number {
     MATIC: 10000000000,
     LTC: 75000000,
     UNI: 1000000000,
-    ATOM: 400000000,
-    ALGO: 10000000000,
-    FTM: 3000000000,
-    NEAR: 1000000000,
-    LUNA: 1000000000,
-    ICP: 500000000,
-    HBAR: 50000000000,
-    EGLD: 30000000,
-    XTZ: 1000000000,
-    THETA: 1000000000,
-    VET: 86000000000,
-    FIL: 400000000,
-    SAND: 3000000000,
-    MANA: 2000000000,
-    AXS: 270000000,
-    ENJ: 1000000000,
-    GALA: 50000000000,
-    IMX: 2000000000,
-    FLOW: 1400000000,
   }
+  return supplies[symbol] || 1000000000
+}
 
-  return supplies[symbol] || 1000000000 // Default 1B if unknown
+function getFullName(symbol: string): string {
+  const names: Record<string, string> = {
+    BTC: "Bitcoin",
+    ETH: "Ethereum",
+    AVAX: "Avalanche",
+    SOL: "Solana",
+    ADA: "Cardano",
+    DOT: "Polkadot",
+    LINK: "Chainlink",
+    MATIC: "Polygon",
+    LTC: "Litecoin",
+    UNI: "Uniswap",
+  }
+  return names[symbol] || symbol
 }
 
 function getFallbackCryptoData() {
