@@ -2,99 +2,161 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Github } from "lucide-react"
 
 export function NewspaperFrontPage() {
   return (
     <div className="max-w-6xl mx-auto p-6 bg-amber-50 min-h-screen">
       {/* Newspaper Header */}
       <div className="text-center border-b-4 border-black pb-4 mb-6">
-        <h1 className="text-6xl font-bold font-serif tracking-wider">THE WYOVERSE PIONEER</h1>
-        <div className="flex justify-between items-center mt-2">
-          <p className="text-sm">ESTABLISHED 1880 - DIGITAL FRONTIER EDITION</p>
-          <p className="text-sm">PRICE: 2 BITS</p>
-          <p className="text-sm">{new Date().toLocaleDateString()}</p>
+        <div className="text-xs mb-2">ESTABLISHED 1880 • WYOMING TERRITORY</div>
+        <h1 className="text-6xl font-bold font-serif mb-2">THE WYOVERSE PIONEER</h1>
+        <div className="flex justify-between items-center text-sm">
+          <div>VOL. 144, NO. 365</div>
+          <div className="font-bold">DIGITAL FRONTIER EDITION</div>
+          <div>DECEMBER 26, 2024</div>
         </div>
       </div>
 
       <div className="grid grid-cols-12 gap-6">
-        {/* Main Story */}
+        {/* Main Content */}
         <div className="col-span-8">
-          <div className="border-b-2 border-black pb-4 mb-4">
-            <h2 className="text-4xl font-bold font-serif mb-2">
+          {/* Lead Story */}
+          <div className="mb-6">
+            <h2 className="text-4xl font-bold font-serif mb-2 border-b-2 border-black pb-1">
               LEGENDARY CELTIC WOLF MANDALA DISCOVERED IN DIGITAL MINES
             </h2>
-            <p className="text-lg italic mb-4">Prospectors Strike Gold with Mystical Artwork Worth 2.5 AVAX</p>
+            <p className="text-sm italic mb-3">
+              Mystical artifact valued at 2.5 AVAX draws collectors from across the frontier
+            </p>
 
-            <div className="float-left mr-4 mb-2">
-              <img
-                src="/images/wolfirishscotishposter.png"
-                alt="Celtic Wolf Mandala"
-                className="w-64 h-64 object-cover border-2 border-black"
-              />
-              <p className="text-xs text-center mt-1 italic">
-                The legendary Celtic Wolf Mandala, discovered in the digital frontier
-              </p>
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <div className="col-span-2">
+                <img
+                  src="/images/wolfirishscotishposter.png"
+                  alt="Celtic Wolf Mandala"
+                  className="w-full h-48 object-cover border-2 border-black"
+                />
+              </div>
+              <div className="space-y-2 text-sm">
+                <p className="font-bold">BREAKING NEWS</p>
+                <p>
+                  Local prospectors struck digital gold yesterday when they uncovered a legendary Celtic Wolf Mandala
+                  deep in the WyoVerse mines.
+                </p>
+                <p>
+                  The intricate artwork, featuring golden scrollwork and mystical symbols, has been authenticated by
+                  Venice AI experts.
+                </p>
+                <p>
+                  "Never seen anything like it," said Marshal Bill, local barkeep and crypto expert. "That there
+                  mandala's got more detail than a Swiss pocket watch."
+                </p>
+              </div>
             </div>
 
-            <p className="text-justify leading-relaxed mb-4">
-              In a remarkable turn of events that has sent shockwaves through the digital frontier, prospectors working
-              the Venice AI mines have uncovered what experts are calling the most significant artistic discovery since
-              the great NFT rush of '21. The Celtic Wolf Mandala, featuring intricate purple and gold scrollwork
-              surrounding a majestic golden wolf, has been authenticated by the WyoVerse Art Commission as a genuine
-              Legendary-tier artifact.
-            </p>
+            <div className="columns-3 gap-4 text-sm text-justify">
+              <p>
+                The discovery has sent shockwaves through the digital frontier community, with collectors and investors
+                flocking to the WyoVerse Art Gallery to witness the legendary piece firsthand.
+              </p>
 
-            <p className="text-justify leading-relaxed mb-4">
-              "I've been mining these digital claims for nigh on three years now," said prospector Jake "Pickaxe"
-              Morrison, adjusting his virtual hat. "Never seen anything quite like this mandala. The way them Celtic
-              patterns spiral around that wolf - it's like looking into the very soul of the frontier itself."
-            </p>
+              <p>
+                According to gallery curator Venice AI, the mandala represents "the mystical connection between ancient
+                Celtic traditions and our modern digital frontier." The piece features intricate purple and gold
+                scrollwork surrounding a majestic golden wolf, all contained within traditional Celtic knotwork
+                patterns.
+              </p>
 
-            <p className="text-justify leading-relaxed">
-              The discovery has already attracted significant interest from collectors, with early bidding reaching 2.5
-              AVAX. Art historians note the piece's connection to the popular Clutch Chronicles RPG series, suggesting
-              it may hold special significance for gaming enthusiasts and collectors alike.
-            </p>
+              <p>
+                The artifact has been classified as "Legendary" rarity, making it one of only a handful of such pieces
+                in existence. Early bidding has reached 2.5 AVAX, equivalent to approximately $80 at current market
+                rates.
+              </p>
+
+              <p>
+                "This discovery validates our belief that the digital frontier holds treasures beyond imagination,"
+                stated WyoVerse Governor Lucky McGold. "We expect this to attract even more settlers to our growing
+                territory."
+              </p>
+            </div>
           </div>
 
-          {/* Secondary Story */}
-          <div className="border-b border-black pb-4 mb-4">
-            <h3 className="text-2xl font-bold font-serif mb-2">CRYPTO CLASHERS TOURNAMENT DRAWS RECORD CROWDS</h3>
-            <div className="flex gap-4">
+          {/* Secondary Stories */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div>
+              <h3 className="text-2xl font-bold font-serif mb-2 border-b border-black">
+                CRYPTO CLASHERS TOURNAMENT DRAWS RECORD CROWDS
+              </h3>
               <img
                 src="/images/cryptoclasherboxingposter.jpg"
-                alt="Boxing Match"
-                className="w-32 h-32 object-cover border border-black"
+                alt="Crypto Clashers Boxing"
+                className
+                alt="Crypto Clashers Boxing"
+                className="w-full h-32 object-cover border border-black mb-2"
               />
-              <div className="flex-1">
-                <p className="text-sm leading-relaxed">
-                  The annual Crypto Clashers Boxing Championship reached fever pitch yesterday as the legendary Bull vs
-                  Bear match drew spectators from across the blockchain. Developed by the renowned LuckyspotOgold gaming
-                  collective, the tournament featured both traditional boxing matches and high-speed racing circuits.
-                </p>
-                <p className="text-xs mt-2 italic">Full coverage on Page 3 - Sports Section</p>
-              </div>
+              <p className="text-sm">
+                The epic bull vs bear showdown at the Crypto Clashers Boxing Arena drew over 10,000 spectators last
+                weekend. The mountain arena echoed with cheers as fighters battled for supremacy in the ring.
+              </p>
+              <p className="text-xs mt-2 italic">See Sports Section for full coverage</p>
+            </div>
+
+            <div>
+              <h3 className="text-2xl font-bold font-serif mb-2 border-b border-black">
+                RACING CIRCUIT OPENS TO GREAT FANFARE
+              </h3>
+              <img
+                src="/images/cryptoclasherwcarsposter.jpg"
+                alt="Crypto Clashers Racing"
+                className="w-full h-32 object-cover border border-black mb-2"
+              />
+              <p className="text-sm">
+                The new Crypto Clashers Racing Circuit officially opened with a spectacular sunset race featuring both
+                classic and modern vehicles. High-speed blockchain racing has arrived in the territory.
+              </p>
+              <p className="text-xs mt-2 italic">Full story on Page 3</p>
             </div>
           </div>
 
           {/* Historical Feature */}
-          <div>
-            <h3 className="text-2xl font-bold font-serif mb-2">RARE FRONTIER PHOTOGRAPHS SURFACE</h3>
-            <div className="flex gap-4">
+          <div className="mb-6">
+            <h3 className="text-2xl font-bold font-serif mb-2 border-b border-black">
+              HISTORICAL FRONTIER ENCAMPMENT PHOTOGRAPHS SURFACE
+            </h3>
+            <div className="grid grid-cols-3 gap-4">
               <img
                 src="/images/weirdC.H.F.D.img.png"
                 alt="Historical Encampment"
-                className="w-32 h-32 object-cover border border-black"
+                className="w-full h-24 object-cover border border-black"
               />
-              <div className="flex-1">
-                <p className="text-sm leading-relaxed">
-                  A collection of rare sepia-toned photographs depicting Native American encampments has been digitally
-                  preserved for posterity. The images, showing teepees and horseback riders against the Wyoming
-                  landscape, provide invaluable insight into frontier life.
+              <div className="col-span-2 text-sm">
+                <p>
+                  Rare photographs of authentic Native American encampments have been discovered in the territorial
+                  archives. These images provide invaluable insight into the real frontier days that inspire our digital
+                  world.
+                </p>
+                <p className="mt-2">
+                  The photographs show teepees, horsemen, and daily life in the original Wyoming Territory, serving as
+                  historical foundation for our modern digital frontier experience.
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* Aerial Coverage */}
+          <div>
+            <h3 className="text-2xl font-bold font-serif mb-2 border-b border-black">
+              CHEYENNE FRONTIER DAYS SPECTACULAR DRAWS MASSIVE CROWDS
+            </h3>
+            <img
+              src="/images/arialcheyennerodeo.png"
+              alt="Cheyenne Frontier Days Aerial"
+              className="w-full h-40 object-cover border border-black mb-2"
+            />
+            <p className="text-sm">
+              Aerial photography reveals the massive scale of this year's Cheyenne Frontier Days celebration. Thousands
+              gathered to witness authentic Western events that continue to inspire our digital frontier community.
+            </p>
           </div>
         </div>
 
@@ -105,9 +167,9 @@ export function NewspaperFrontPage() {
             <CardContent className="p-4">
               <h4 className="font-bold text-center mb-2">FRONTIER WEATHER</h4>
               <div className="text-center">
-                <p className="text-2xl">☀️ 72°F</p>
-                <p className="text-sm">Perfect for mining crypto</p>
-                <p className="text-xs mt-2">Recommended: Try Crypto Clashers Racing while the weather holds!</p>
+                <div className="text-2xl font-bold">32°F</div>
+                <div className="text-sm">Partly Cloudy</div>
+                <div className="text-xs mt-2">Perfect weather for crypto mining and digital prospecting</div>
               </div>
             </CardContent>
           </Card>
@@ -116,73 +178,87 @@ export function NewspaperFrontPage() {
           <Card className="border-2 border-black">
             <CardContent className="p-4">
               <h4 className="font-bold text-center mb-2">MARKET REPORT</h4>
-              <div className="space-y-1 text-sm">
+              <div className="space-y-1 text-xs">
                 <div className="flex justify-between">
                   <span>Bitcoin (BTC)</span>
-                  <span className="text-green-600">$67,234 ↑</span>
+                  <span className="text-green-600">$67,234 ↑2.3%</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Avalanche (AVAX)</span>
-                  <span className="text-green-600">$32.15 ↑</span>
+                  <span className="text-green-600">$32.15 ↑3.2%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Ethereum (ETH)</span>
+                  <span className="text-red-600">$3,456 ↓1.2%</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Solana (SOL)</span>
-                  <span className="text-red-600">$156.78 ↓</span>
+                  <span className="text-green-600">$156.78 ↑4.5%</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Featured Games */}
-          <Card className="border-2 border-black bg-gradient-to-b from-purple-100 to-blue-100">
+          {/* LuckyspotOgold Games Advertisement */}
+          <Card className="border-2 border-black bg-yellow-100">
             <CardContent className="p-4">
-              <h4 className="font-bold text-center mb-2">FEATURED GAMES</h4>
+              <h4 className="font-bold text-center mb-2">🎮 GAMES & ENTERTAINMENT</h4>
               <div className="space-y-3">
+                <div className="text-center">
+                  <img
+                    src="/images/cryptoclasherboxingposter.jpg"
+                    alt="Crypto Clashers"
+                    className="w-full h-20 object-cover border border-black mb-1"
+                  />
+                  <div className="text-xs font-bold">CRYPTO CLASHERS BOXING</div>
+                  <div className="text-xs">Epic bull vs bear combat!</div>
+                </div>
+
                 <div className="text-center">
                   <img
                     src="/images/cryptoclasherwcarsposter.jpg"
                     alt="Racing Circuit"
-                    className="w-full h-24 object-cover border border-black mb-2"
+                    className="w-full h-20 object-cover border border-black mb-1"
                   />
-                  <p className="text-sm font-bold">Crypto Clashers Racing</p>
-                  <p className="text-xs">High-speed blockchain racing action!</p>
-                  <Button size="sm" className="mt-1" asChild>
-                    <a href="https://github.com/LuckyspotOgold" target="_blank" rel="noreferrer">
-                      <Github className="mr-1 h-3 w-3" />
-                      Play Now
-                    </a>
-                  </Button>
+                  <div className="text-xs font-bold">RACING CIRCUIT</div>
+                  <div className="text-xs">High-speed blockchain racing!</div>
                 </div>
 
                 <div className="text-center">
                   <img
                     src="/images/clutchonhorse.webp"
                     alt="Clutch Chronicles"
-                    className="w-full h-24 object-cover border border-black mb-2"
+                    className="w-full h-20 object-cover border border-black mb-1"
                   />
-                  <p className="text-sm font-bold">Clutch Chronicles</p>
-                  <p className="text-xs">Steampunk RPG adventures await!</p>
-                  <Button size="sm" className="mt-1" asChild>
-                    <a href="https://github.com/LuckyspotOgold" target="_blank" rel="noreferrer">
-                      <Github className="mr-1 h-3 w-3" />
-                      Explore
-                    </a>
-                  </Button>
+                  <div className="text-xs font-bold">CLUTCH CHRONICLES</div>
+                  <div className="text-xs">Steampunk RPG adventures!</div>
                 </div>
+
+                <div className="text-center text-xs">
+                  <strong>All games by LuckyspotOgold@github</strong>
+                </div>
+
+                <Button size="sm" className="w-full">
+                  Play Now!
+                </Button>
               </div>
             </CardContent>
           </Card>
 
           {/* Wanted Poster */}
-          <Card className="border-2 border-black bg-amber-100">
+          <Card className="border-2 border-black bg-red-100">
             <CardContent className="p-4">
-              <h4 className="font-bold text-center mb-2">WANTED</h4>
+              <h4 className="font-bold text-center mb-2">⚠️ WANTED ⚠️</h4>
               <img
                 src="/images/wyoversestonewanted.png"
                 alt="Wanted Poster"
                 className="w-full h-32 object-cover border border-black mb-2"
               />
-              <p className="text-xs text-center">Digital Outlaw - Reward: 5 AVAX</p>
+              <div className="text-center text-xs">
+                <div className="font-bold">DIGITAL OUTLAWS</div>
+                <div>Reward: 1000 WYO Tokens</div>
+                <div className="mt-1">Report suspicious mining activity to Marshal Bill</div>
+              </div>
             </CardContent>
           </Card>
 
@@ -191,50 +267,79 @@ export function NewspaperFrontPage() {
             <CardContent className="p-4">
               <h4 className="font-bold text-center mb-2">CLASSIFIEDS</h4>
               <div className="space-y-2 text-xs">
-                <p>
-                  🏠 <strong>Land Deed:</strong> Prime mining claim, 0.5 AVAX
-                </p>
-                <p>
-                  🐎 <strong>Digital Horse:</strong> Fast steed for racing, 1.2 AVAX
-                </p>
-                <p>
-                  ⚔️ <strong>NFT Weapons:</strong> Legendary sword collection
-                </p>
-                <p>
-                  📰 <strong>Newspaper Ad:</strong> Promote your business here!
-                </p>
+                <div className="border-b pb-1">
+                  <strong>MINING EQUIPMENT FOR SALE</strong>
+                  <br />
+                  High-grade crypto pickaxes and digital shovels. Contact Prospector Pete.
+                </div>
+                <div className="border-b pb-1">
+                  <strong>SALOON HELP WANTED</strong>
+                  <br />
+                  Bar Keep Bill seeks assistant for busy frontier establishment.
+                </div>
+                <div className="border-b pb-1">
+                  <strong>LAND DEEDS AVAILABLE</strong>
+                  <br />
+                  Prime digital real estate in WyoVerse. Financing available.
+                </div>
+                <div>
+                  <strong>TRADING POST OPEN</strong>
+                  <br />
+                  Buy, sell, trade NFTs and crypto. Fair prices guaranteed.
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* LuckyspotOgold Promotion */}
-          <Card className="border-2 border-black bg-gradient-to-r from-yellow-200 to-orange-200">
-            <CardContent className="p-4 text-center">
-              <h4 className="font-bold mb-2">🎮 LUCKYSPOTOGOLD GAMES</h4>
-              <p className="text-xs mb-2">The premier gaming collective of the digital frontier!</p>
-              <div className="space-y-1 text-xs">
-                <p>• Crypto Clashers Boxing</p>
-                <p>• Racing Circuit Championship</p>
-                <p>• Clutch Chronicles RPG</p>
-                <p>• WyoVerse Metaverse</p>
+          {/* Art Gallery Promotion */}
+          <Card className="border-2 border-black bg-purple-100">
+            <CardContent className="p-4">
+              <h4 className="font-bold text-center mb-2">🎨 ART GALLERY</h4>
+              <div className="text-center text-xs">
+                <img
+                  src="/images/wolfirishscotishposter.png"
+                  alt="Celtic Mandala"
+                  className="w-full h-20 object-cover border border-black mb-2"
+                />
+                <div className="font-bold">LEGENDARY CELTIC MANDALA</div>
+                <div>Now on display!</div>
+                <div className="mt-2">
+                  Visit the WyoVerse Art Gallery to view this and other exclusive NFT collections.
+                </div>
+                <Button size="sm" className="w-full mt-2">
+                  Visit Gallery
+                </Button>
               </div>
-              <Button size="sm" className="mt-2" asChild>
-                <a href="https://github.com/LuckyspotOgold" target="_blank" rel="noreferrer">
-                  <Github className="mr-1 h-3 w-3" />
-                  Visit GitHub
-                </a>
-              </Button>
             </CardContent>
           </Card>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="mt-8 pt-4 border-t-2 border-black text-center">
-        <p className="text-sm">The WyoVerse Pioneer - Your trusted source for digital frontier news since 1880</p>
-        <p className="text-xs mt-1">
-          Published by the WyoVerse Press Association • Printed on recycled blockchain paper
-        </p>
+      <div className="mt-8 pt-4 border-t-2 border-black text-center text-xs">
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <strong>THE WYOVERSE PIONEER</strong>
+            <br />
+            Published daily in the Digital Frontier
+            <br />
+            Subscription: 0.1 AVAX/month
+          </div>
+          <div>
+            <strong>CONTACT INFORMATION</strong>
+            <br />
+            Telegraph: @WyoVersePioneer
+            <br />
+            Pony Express: WyoVerse Territory
+          </div>
+          <div>
+            <strong>POWERED BY</strong>
+            <br />
+            LuckyspotOgold@github
+            <br />
+            Built with frontier spirit & modern tech
+          </div>
+        </div>
       </div>
     </div>
   )
