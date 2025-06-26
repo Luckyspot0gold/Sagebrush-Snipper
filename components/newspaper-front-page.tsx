@@ -1,311 +1,300 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ExternalLink, Calendar, MapPin } from "lucide-react"
-import Image from "next/image"
+import { ExternalLink, TrendingUp, TrendingDown } from "lucide-react"
 
 export function NewspaperFrontPage() {
+  const currentDate = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
+
   return (
-    <div className="min-h-screen bg-amber-50 p-4">
+    <div className="min-h-screen bg-amber-50 p-4" style={{ fontFamily: "serif" }}>
       <div className="max-w-6xl mx-auto bg-white shadow-2xl">
         {/* Newspaper Header */}
-        <div className="border-b-4 border-amber-900 p-6 bg-gradient-to-r from-amber-100 to-orange-100">
+        <div className="border-b-4 border-black p-6 bg-gradient-to-r from-amber-100 to-yellow-100">
           <div className="text-center">
-            <h1 className="text-6xl font-bold text-amber-900 mb-2" style={{ fontFamily: "serif" }}>
+            <h1 className="text-6xl font-bold text-black mb-2" style={{ fontFamily: "Old English Text MT, serif" }}>
               The WyoVerse Pioneer
             </h1>
-            <div className="flex justify-between items-center text-sm text-amber-700">
-              <span>ESTABLISHED 1880 • DIGITAL FRONTIER EDITION</span>
-              <span>DECEMBER 26, 2024 • PRICE: 2 BITS</span>
-              <span>VOLUME CXLIV • NO. 360</span>
+            <div className="flex justify-between items-center text-sm">
+              <span>EST. 1852 • VOLUME CLXXII</span>
+              <span className="font-bold">{currentDate}</span>
+              <span>PRICE: 2 STONES</span>
             </div>
-            <div className="border-t border-amber-600 mt-2 pt-2">
-              <p className="text-amber-800 font-semibold">"WHERE THE DIGITAL FRONTIER MEETS PIONEER SPIRIT"</p>
+            <div className="border-t border-b border-black py-1 mt-2">
+              <p className="text-lg font-bold">AUTHENTIC FRONTIER NEWS • DIGITAL TERRITORY COVERAGE</p>
             </div>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-4 gap-6 p-6">
-          {/* Main Story Column */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Lead Story */}
-            <Card className="border-2 border-amber-200">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex-1">
-                    <h2 className="text-3xl font-bold text-amber-900 mb-3" style={{ fontFamily: "serif" }}>
-                      LEGENDARY CELTIC WOLF MANDALA DISCOVERED IN DIGITAL MINES
-                    </h2>
-                    <p className="text-lg text-gray-700 mb-4 leading-relaxed">
-                      Local prospectors working the digital frontier have uncovered what experts are calling the most
-                      significant artistic find since the Great NFT Rush of '21. The intricate Celtic Wolf Mandala,
-                      featuring ornate purple and gold scrollwork, was found embedded in the blockchain ledger by miners
-                      from the LuckyspotOgold collective.
-                    </p>
-                    <p className="text-gray-600 mb-4">
-                      "I ain't never seen nothin' like it," said Prospector Bill, local saloon keeper and part-time
-                      digital archaeologist. "That there wolf's got more detail than a Swiss pocket watch, and the
-                      colors shine brighter than fool's gold."
-                    </p>
-                  </div>
-                  <div className="w-64">
-                    <Image
-                      src="/images/wolfirishscotishposter.png"
-                      alt="Celtic Wolf Mandala"
-                      width={256}
-                      height={256}
-                      className="rounded-lg border-2 border-amber-300"
-                    />
-                    <p className="text-xs text-center mt-2 text-gray-500">The legendary Celtic Wolf Mandala</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        <div className="grid grid-cols-12 gap-4 p-6">
+          {/* Main Story */}
+          <div className="col-span-8">
+            <div className="border-b-2 border-black pb-4 mb-4">
+              <h2 className="text-4xl font-bold mb-2">LEGENDARY CELTIC WOLF MANDALA DISCOVERED</h2>
+              <p className="text-lg italic mb-3">
+                Mystical artifact found in digital frontier archives sparks collector frenzy
+              </p>
 
-            {/* Crypto Clashers Tournament Coverage */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <Card className="border-2 border-purple-200">
-                <CardContent className="p-4">
-                  <Image
-                    src="/images/cryptoclasherboxingposter.jpg"
-                    alt="Crypto Clashers Boxing"
-                    width={300}
-                    height={200}
-                    className="w-full rounded-lg mb-3"
-                  />
-                  <h3 className="text-xl font-bold text-purple-900 mb-2">
-                    BULL VS BEAR: CHAMPIONSHIP BOUT DRAWS RECORD CROWD
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-3">
-                    The Stoneyard Gaming arena was packed to capacity as the legendary Bull and Bear faced off in what
-                    many are calling the fight of the century. Market volatility reached new heights as spectators
-                    placed their bets.
-                  </p>
-                  <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
-                    <ExternalLink className="w-3 h-3 mr-1" />
-                    Watch Highlights
-                  </Button>
-                </CardContent>
-              </Card>
+              <div className="float-left mr-4 mb-2">
+                <img
+                  src="/images/wolfirishscotishposter.png"
+                  alt="Celtic Wolf Mandala"
+                  className="w-64 h-64 object-cover border-2 border-black"
+                />
+                <p className="text-xs text-center mt-1 italic">The legendary Celtic Wolf Mandala NFT</p>
+              </div>
 
-              <Card className="border-2 border-blue-200">
-                <CardContent className="p-4">
-                  <Image
-                    src="/images/cryptoclasherwcarsposter.jpg"
-                    alt="Racing Championship"
-                    width={300}
-                    height={200}
-                    className="w-full rounded-lg mb-3"
-                  />
-                  <h3 className="text-xl font-bold text-blue-900 mb-2">
-                    RACING CIRCUIT EXPANDS: NEW MOUNTAIN TRACK OPENS
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-3">
-                    The Crypto Clashers Racing Circuit announced the opening of their spectacular mountain sunset track,
-                    featuring both classic muscle cars and modern supercars in high-stakes blockchain racing.
-                  </p>
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                    <ExternalLink className="w-3 h-3 mr-1" />
-                    Join Race
-                  </Button>
-                </CardContent>
-              </Card>
+              <p className="text-justify mb-3">
+                <span className="text-6xl float-left mr-2 leading-none font-bold">A</span>
+                remarkable discovery has sent shockwaves through the digital frontier community this week. The legendary
+                Celtic Wolf Mandala, an intricate piece of digital artwork featuring ornate purple and gold scrollwork
+                surrounding a majestic golden wolf, has been authenticated by the Venice AI Studio archives.
+              </p>
+
+              <p className="text-justify mb-3">
+                Local prospector and art collector Jeremiah "Gold Rush" McGillicuddy was the first to spot the artifact
+                during a routine exploration of the digital territories. "I've been mining these digital claims for nigh
+                on twenty years," McGillicuddy told our reporter, "but I ain't never seen nothing like this here
+                mandala. The craftsmanship is finer than anything from the old country."
+              </p>
+
+              <p className="text-justify">
+                The piece, now valued at 2.5 AVAX, represents the spiritual connection between ancient Celtic traditions
+                and the modern digital frontier. Art experts believe it may be part of a larger collection hidden
+                throughout the WyoVerse territories.
+              </p>
             </div>
 
-            {/* Historical Discovery */}
-            <Card className="border-2 border-amber-200">
-              <CardContent className="p-4">
-                <div className="flex gap-4">
-                  <Image
-                    src="/images/weirdC.H.F.D.img.png"
-                    alt="Historical Encampment"
-                    width={200}
-                    height={150}
-                    className="rounded-lg border border-amber-300"
+            {/* Secondary Story */}
+            <div className="border-b border-black pb-4 mb-4">
+              <h3 className="text-2xl font-bold mb-2">CRYPTO CLASHERS TOURNAMENT DRAWS RECORD CROWDS</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <img
+                    src="/images/cryptoclasherboxingposter.jpg"
+                    alt="Boxing Tournament"
+                    className="w-full h-32 object-cover border border-black mb-2"
                   />
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold text-amber-900 mb-2">RARE FRONTIER PHOTOGRAPH SURFACES</h3>
-                    <p className="text-sm text-gray-600 mb-2">
-                      A remarkable sepia-toned photograph showing a Native American encampment has been discovered in
-                      the WyoVerse historical archives. The image provides unprecedented insight into frontier life and
-                      will be featured in the upcoming museum exhibition.
-                    </p>
-                    <Badge variant="outline" className="text-xs">
-                      <Calendar className="w-3 h-3 mr-1" />
-                      Historical Archives
-                    </Badge>
-                  </div>
+                  <p className="text-sm">
+                    The annual Crypto Clashers Boxing Championship saw unprecedented attendance as Bull and Bear
+                    fighters battled for supremacy in the mountain arena. Developed by the renowned Stoneyard Gaming
+                    studio, the tournament featured cutting-edge blockchain technology and real cryptocurrency prizes.
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                <div>
+                  <img
+                    src="/images/cryptoclasherwcarsposter.jpg"
+                    alt="Racing Circuit"
+                    className="w-full h-32 object-cover border border-black mb-2"
+                  />
+                  <p className="text-sm">
+                    The racing circuit component drew speed enthusiasts from across the frontier, featuring both classic
+                    frontier vehicles and modern racing machines. LuckyspotOgold@github's innovative game design has
+                    revolutionized competitive gaming in the digital territories.
+                  </p>
+                </div>
+              </div>
+            </div>
 
-            {/* Cheyenne Frontier Days Coverage */}
-            <Card className="border-2 border-green-200">
-              <CardContent className="p-4">
-                <h3 className="text-2xl font-bold text-green-900 mb-3">CHEYENNE FRONTIER DAYS: AERIAL SPECTACULAR</h3>
-                <Image
-                  src="/images/arialcheyennerodeo.png"
-                  alt="Cheyenne Frontier Days Aerial"
-                  width={600}
-                  height={300}
-                  className="w-full rounded-lg mb-3"
+            {/* Historical Feature */}
+            <div>
+              <h3 className="text-2xl font-bold mb-2">RARE FRONTIER ENCAMPMENT PHOTOGRAPHS SURFACE</h3>
+              <div className="flex gap-4">
+                <img
+                  src="/images/weirdC.H.F.D.img.png"
+                  alt="Historical Encampment"
+                  className="w-48 h-32 object-cover border border-black"
                 />
-                <p className="text-gray-600 mb-3">
-                  Our photographer captured this breathtaking aerial view of the famous Cheyenne Frontier Days rodeo,
-                  showing thousands of spectators gathered to witness the greatest show in the West. The event continues
-                  to draw visitors from across the digital frontier.
-                </p>
-                <div className="flex gap-2">
-                  <Badge variant="outline">
-                    <MapPin className="w-3 h-3 mr-1" />
-                    Cheyenne, Wyoming
-                  </Badge>
-                  <Badge variant="outline">Frontier Days 2024</Badge>
+                <div>
+                  <p className="text-sm text-justify">
+                    A collection of rare historical photographs documenting Native American encampments has been
+                    discovered in the frontier archives. These sepia-toned images provide invaluable insight into the
+                    authentic frontier experience, showing teepees, horseback riders, and daily life in the territorial
+                    period.
+                  </p>
+                  <p className="text-sm text-justify mt-2">
+                    The photographs will be displayed in the WyoVerse Historical Society museum and are available as
+                    limited edition NFTs for collectors interested in preserving frontier heritage.
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-4">
+          <div className="col-span-4 space-y-4">
             {/* Weather */}
-            <Card className="border-2 border-blue-200">
-              <CardContent className="p-4">
-                <h4 className="font-bold text-blue-900 mb-2">FRONTIER WEATHER</h4>
-                <div className="text-sm text-gray-600">
-                  <p>Today: Partly cloudy, 45°F</p>
-                  <p>Tomorrow: Snow likely, 32°F</p>
-                  <p className="mt-2 text-xs">"Perfect weather for indoor gaming!" - Local Meteorologist</p>
+            <Card className="border-2 border-black">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">FRONTIER WEATHER</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <div className="text-3xl mb-2">☀️</div>
+                  <p className="font-bold">72°F</p>
+                  <p className="text-sm">Perfect for digital prospecting</p>
+                  <p className="text-xs mt-2 italic">Recommended: Try the boxing arena today!</p>
                 </div>
               </CardContent>
             </Card>
 
             {/* Market Report */}
-            <Card className="border-2 border-yellow-200">
-              <CardContent className="p-4">
-                <h4 className="font-bold text-yellow-900 mb-2">CRYPTO MARKET REPORT</h4>
-                <div className="text-sm space-y-1">
-                  <div className="flex justify-between">
-                    <span>Bitcoin</span>
-                    <span className="text-green-600">↑ $98,234</span>
+            <Card className="border-2 border-black">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">MARKET TELEGRAPH</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span>Bitcoin (BTC)</span>
+                    <div className="flex items-center gap-1 text-green-600">
+                      <TrendingUp className="w-3 h-3" />
+                      <span>$43,250</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>AVAX</span>
-                    <span className="text-green-600">↑ $42.18</span>
+                  <div className="flex justify-between items-center">
+                    <span>Avalanche (AVAX)</span>
+                    <div className="flex items-center gap-1 text-green-600">
+                      <TrendingUp className="w-3 h-3" />
+                      <span>$42.15</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>SOL</span>
-                    <span className="text-red-600">↓ $198.45</span>
+                  <div className="flex justify-between items-center">
+                    <span>Solana (SOL)</span>
+                    <div className="flex items-center gap-1 text-red-600">
+                      <TrendingDown className="w-3 h-3" />
+                      <span>$98.50</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>STONES</span>
+                    <div className="flex items-center gap-1 text-green-600">
+                      <TrendingUp className="w-3 h-3" />
+                      <span>$0.45</span>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Featured Games Advertisement */}
-            <Card className="border-2 border-purple-200 bg-purple-50">
-              <CardContent className="p-4">
-                <h4 className="font-bold text-purple-900 mb-2 text-center">🎮 LUCKYSPOTOGOLD GAMES</h4>
+            {/* LuckyspotOgold Games Advertisement */}
+            <Card className="border-4 border-purple-600 bg-gradient-to-b from-purple-100 to-blue-100">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg text-purple-800">🎮 FEATURED GAMES</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="space-y-3">
                   <div className="text-center">
-                    <Image
-                      src="/images/wyoversestonewanted.png"
-                      alt="WyoVerse Wanted"
-                      width={150}
-                      height={100}
-                      className="w-full rounded mb-2"
-                    />
-                    <p className="text-xs font-semibold">NEW ERA IN GAMEFI!</p>
+                    <h4 className="font-bold text-purple-900">LuckyspotOgold@github</h4>
+                    <p className="text-sm text-purple-700">Revolutionary GameFi Experiences</p>
                   </div>
 
-                  <div className="text-xs space-y-2">
-                    <div className="bg-white p-2 rounded">
-                      <strong>🥊 Crypto Clashers Boxing</strong>
-                      <p>Epic bull vs bear combat!</p>
+                  <div className="space-y-2">
+                    <div className="p-2 bg-white rounded border">
+                      <p className="font-bold text-sm">🥊 Crypto Clashers Boxing</p>
+                      <p className="text-xs">Epic bull vs bear combat</p>
                     </div>
-                    <div className="bg-white p-2 rounded">
-                      <strong>🏁 Racing Circuit</strong>
-                      <p>High-speed blockchain racing!</p>
+                    <div className="p-2 bg-white rounded border">
+                      <p className="font-bold text-sm">🏁 Crypto Clashers Racing</p>
+                      <p className="text-xs">High-speed blockchain racing</p>
                     </div>
-                    <div className="bg-white p-2 rounded">
-                      <strong>⚔️ Clutch Chronicles</strong>
-                      <p>Steampunk RPG adventures!</p>
+                    <div className="p-2 bg-white rounded border">
+                      <p className="font-bold text-sm">⚔️ Clutch Chronicles</p>
+                      <p className="text-xs">Steampunk RPG adventures</p>
                     </div>
                   </div>
 
-                  <Button size="sm" className="w-full bg-purple-600 hover:bg-purple-700" asChild>
-                    <a href="https://github.com/LuckyspotOgold" target="_blank" rel="noreferrer">
-                      <ExternalLink className="w-3 h-3 mr-1" />
-                      Play All Games
-                    </a>
+                  <Button
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                    onClick={() => window.open("https://github.com/LuckyspotOgold", "_blank")}
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Play Now!
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Clutch Chronicles Feature */}
-            <Card className="border-2 border-gray-200">
-              <CardContent className="p-4">
-                <h4 className="font-bold text-gray-900 mb-2">CLUTCH CHRONICLES</h4>
-                <Image
-                  src="/images/clutchonhorse.webp"
-                  alt="Clutch on Horse"
-                  width={150}
-                  height={100}
-                  className="w-full rounded mb-2"
-                />
-                <p className="text-xs text-gray-600 mb-2">
-                  The armored knight Clutch continues his epic journey through the steampunk frontier, bringing justice
-                  to the digital realm.
-                </p>
-                <Badge variant="outline" className="text-xs">
-                  New Chapter Available
-                </Badge>
-              </CardContent>
-            </Card>
-
             {/* Wanted Poster */}
-            <Card className="border-2 border-red-200 bg-red-50">
-              <CardContent className="p-4">
-                <h4 className="font-bold text-red-900 mb-2 text-center">WANTED</h4>
-                <div className="text-center text-xs">
-                  <p className="font-semibold">DIGITAL OUTLAWS</p>
-                  <p>Last seen near the blockchain mines</p>
-                  <p className="mt-2">REWARD: 100 AVAX</p>
-                  <p className="text-red-600 font-bold">APPROACH WITH CAUTION</p>
+            <Card className="border-2 border-red-600 bg-yellow-100">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg text-red-800">⚠️ WANTED ⚠️</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <img
+                    src="/images/wyoversestonewanted.png"
+                    alt="Wanted Poster"
+                    className="w-full h-32 object-cover border border-black mb-2"
+                  />
+                  <p className="text-sm font-bold">DIGITAL OUTLAW</p>
+                  <p className="text-xs">Last seen in the crypto territories</p>
+                  <p className="text-xs font-bold text-red-600">REWARD: 100 STONES</p>
                 </div>
               </CardContent>
             </Card>
 
             {/* Classifieds */}
-            <Card className="border-2 border-amber-200">
-              <CardContent className="p-4">
-                <h4 className="font-bold text-amber-900 mb-2">CLASSIFIEDS</h4>
-                <div className="text-xs space-y-2">
+            <Card className="border-2 border-black">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">CLASSIFIEDS</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 text-xs">
                   <div className="border-b pb-1">
-                    <strong>FOR SALE:</strong> Digital horse, well-trained, 50 AVAX
+                    <p className="font-bold">LAND FOR SALE</p>
+                    <p>Prime digital real estate in Crypto Canyon. 2.5 AVAX. Contact McGillicuddy.</p>
                   </div>
                   <div className="border-b pb-1">
-                    <strong>WANTED:</strong> Experienced miners for new dig site
+                    <p className="font-bold">BOXING LESSONS</p>
+                    <p>Learn from Crypto Clashers champions. All skill levels welcome.</p>
                   </div>
                   <div className="border-b pb-1">
-                    <strong>LOST:</strong> Golden spurs, reward offered
+                    <p className="font-bold">LOST: ARMORED HORSE</p>
+                    <p>Belongs to knight named Clutch. Last seen near city limits.</p>
                   </div>
                   <div>
-                    <strong>SERVICES:</strong> NFT appraisals by certified expert
+                    <p className="font-bold">FRONTIER PHOTOGRAPHY</p>
+                    <p>Aerial shots available. Cheyenne Frontier Days specialist.</p>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Event Coverage */}
+            <Card className="border-2 border-black">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">EVENT COVERAGE</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <img
+                  src="/images/arialcheyennerodeo.png"
+                  alt="Cheyenne Frontier Days"
+                  className="w-full h-24 object-cover border border-black mb-2"
+                />
+                <p className="text-xs">
+                  <strong>CHEYENNE FRONTIER DAYS:</strong> Spectacular aerial photography captures the grandeur of the
+                  world's largest outdoor rodeo. Thousands gathered to celebrate authentic frontier traditions.
+                </p>
               </CardContent>
             </Card>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="border-t-2 border-amber-900 p-4 bg-amber-100 text-center">
-          <p className="text-sm text-amber-800">
-            The WyoVerse Pioneer • Published daily in the Digital Frontier • Subscriptions available for 10 AVAX
-            annually •<strong>Visit LuckyspotOgold@github for the latest games!</strong>
+        <div className="border-t-2 border-black p-4 bg-amber-100 text-center">
+          <p className="text-sm">
+            <strong>The WyoVerse Pioneer</strong> • Published daily in the Digital Frontier • Subscriptions: 5
+            STONES/month • Advertising inquiries welcome
+          </p>
+          <p className="text-xs mt-1">
+            "All the news that's fit to mine" • Est. 1852 • Serving the frontier community with pride
           </p>
         </div>
       </div>
