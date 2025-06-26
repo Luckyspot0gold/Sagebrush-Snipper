@@ -21,6 +21,7 @@ import {
   Gem,
   Scroll,
   MessageSquare,
+  TestTube,
 } from "lucide-react"
 import Image from "next/image"
 import { RevenueDashboard } from "@/components/revenue-dashboard"
@@ -46,6 +47,17 @@ export function NewspaperFrontPage() {
 
   return (
     <div className="max-w-7xl mx-auto newspaper-bg text-black">
+      {/* Add creator testing indicator */}
+      {process.env.NODE_ENV === "development" && (
+        <div className="fixed top-4 right-4 z-50">
+          <Link href="/creator-test">
+            <Button size="sm" className="bg-yellow-500 text-black hover:bg-yellow-600 font-serif">
+              <TestTube className="h-4 w-4 mr-1" />
+              Creator Test
+            </Button>
+          </Link>
+        </div>
+      )}
       {/* Newspaper Header */}
       <div className="border-b-4 border-black pb-4 mb-6">
         <div className="text-center relative py-4">
