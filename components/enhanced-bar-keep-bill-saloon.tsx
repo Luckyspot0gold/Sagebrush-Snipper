@@ -11,12 +11,11 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Progress } from "@/components/ui/progress"
 import { useMarketStore } from "@/lib/stores/market-store"
 import { Volume2, VolumeX } from "lucide-react"
-import { useFrontierAudio } from "@/lib/frontier-audio-system"
 
 interface Bottle {
   id: string
   name: string
-  type: "whiskey" | "beer" | "sarsaparilla" | "coffee"
+  type: "whiskey" | "beer" | "sarsaparilla" | "coffee" | "milk"
   price: number
   effect: string
   image: string
@@ -32,8 +31,8 @@ interface BillMood {
 
 const SALOON_BOTTLES: Bottle[] = [
   {
-    id: "frontier-whiskey",
-    name: "Frontier Whiskey",
+    id: "wyoverse-whiskey",
+    name: "Wyoverse Whiskey",
     type: "whiskey",
     price: 25,
     effect: "+20 Wisdom, Market insights boost",
@@ -41,8 +40,8 @@ const SALOON_BOTTLES: Bottle[] = [
     alcoholContent: 40,
   },
   {
-    id: "wyoming-bourbon",
-    name: "Wyoming Bourbon",
+    id: "buffalo-bourbon",
+    name: "Buffalo Bourbon",
     type: "whiskey",
     price: 35,
     effect: "+30 Wisdom, Trading confidence boost",
@@ -50,8 +49,8 @@ const SALOON_BOTTLES: Bottle[] = [
     alcoholContent: 45,
   },
   {
-    id: "prairie-beer",
-    name: "Prairie Beer",
+    id: "prairie-pilsner",
+    name: "Prairie Pilsner",
     type: "beer",
     price: 15,
     effect: "+10 Energy, Social boost",
@@ -59,8 +58,8 @@ const SALOON_BOTTLES: Bottle[] = [
     alcoholContent: 5,
   },
   {
-    id: "sarsaparilla",
-    name: "Frontier Sarsaparilla",
+    id: "snipers-sarsaparilla",
+    name: "Snipers Sarsaparilla",
     type: "sarsaparilla",
     price: 10,
     effect: "+15 Energy, Clear thinking",
@@ -74,6 +73,15 @@ const SALOON_BOTTLES: Bottle[] = [
     price: 8,
     effect: "+25 Energy, Alert mind",
     image: "☕",
+    alcoholContent: 0,
+  },
+  {
+    id: "frontier-milk",
+    name: "Fresh Frontier Milk",
+    type: "milk",
+    price: 5,
+    effect: "+10 Health, Growing strong",
+    image: "🥛",
     alcoholContent: 0,
   },
 ]
@@ -103,35 +111,72 @@ export function EnhancedBarKeepBillSaloon() {
   const [volume, setVolume] = useState(0.7)
   const [isTyping, setIsTyping] = useState(false)
   const [selectedBottle, setSelectedBottle] = useState<Bottle | null>(null)
-  const [barAtmosphere, setBarAtmosphere] = useState("busy") // busy, quiet, rowdy
+  const [barAtmosphere, setBarAtmosphere] = useState("busy")
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null)
 
   const { assets, marketMood, marketSentiment } = useMarketStore()
-  const { playSuccess, playWarning, startAmbient, stopAmbient } = useFrontierAudio()
 
-  // Saloon sound effects
-  const playBottleClink = () => {
-    if (soundEnabled) {
-      const audio = new Audio("/sounds/bottle-clink.mp3")
-      audio.volume = volume
-      audio.play().catch(() => {})
+  // Initialize Web Audio API
+  useEffect(() => {
+    if (typeof window !== "undefined" && !audioContext) {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+      setAudioContext(ctx)
+    }
+  }, [audioContext])
+
+  // Enhanced sound system with actual audio generation
+  const playSound = (frequency: number, duration: number, type: "sine" | "square" | "sawtooth" = "sine") => {
+    if (!soundEnabled || !audioContext) return
+
+    try {
+      const oscillator = audioContext.createOscillator()
+      const gainNode = audioContext.createGain()
+
+      oscillator.connect(gainNode)
+      gainNode.connect(audioContext.destination)
+
+      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime)
+      oscillator.type = type
+
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime)
+      gainNode.gain.linearRampToValueAtTime(volume * 0.3, audioContext.currentTime + 0.01)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration)
+
+      oscillator.start(audioContext.currentTime)
+      oscillator.stop(audioContext.currentTime + duration)
+    } catch (error) {
+      console.warn("Audio playback failed:", error)
     }
   }
 
+  const playBottleClink = () => {
+    playSound(800, 0.1, "sine")
+    setTimeout(() => playSound(600, 0.1, "sine"), 100)
+  }
+
   const playPourDrink = () => {
-    if (soundEnabled) {
-      const audio = new Audio("/sounds/pour-drink.mp3")
-      audio.volume = volume
-      audio.play().catch(() => {})
+    // Simulate pouring sound with multiple frequencies
+    for (let i = 0; i < 10; i++) {
+      setTimeout(() => {
+        playSound(200 + Math.random() * 100, 0.1, "sawtooth")
+      }, i * 50)
     }
   }
 
   const playPianoMusic = () => {
-    if (soundEnabled) {
-      const audio = new Audio("/sounds/saloon-piano.mp3")
-      audio.volume = volume * 0.3
-      audio.loop = true
-      audio.play().catch(() => {})
-    }
+    // Simple piano melody
+    const notes = [261.63, 293.66, 329.63, 349.23, 392.0, 440.0, 493.88] // C major scale
+    notes.forEach((note, index) => {
+      setTimeout(() => {
+        playSound(note, 0.5, "sine")
+      }, index * 200)
+    })
+  }
+
+  const playWelcomeSound = () => {
+    playSound(440, 0.2, "sine")
+    setTimeout(() => playSound(554.37, 0.2, "sine"), 200)
+    setTimeout(() => playSound(659.25, 0.3, "sine"), 400)
   }
 
   // Bill's enhanced dialogue system
@@ -147,7 +192,7 @@ export function EnhancedBarKeepBillSaloon() {
 
     // Drink-related responses
     if (lowerQuery.includes("drink") || lowerQuery.includes("whiskey") || lowerQuery.includes("beer")) {
-      return `*gestures to the impressive bottle collection behind the bar* Take yer pick, partner! Got everything from smooth Wyoming bourbon to refreshing sarsaparilla. Each one's got its own special properties for a frontier trader like yerself.`
+      return `*gestures to the impressive bottle collection behind the bar* Take yer pick, partner! Got everything from smooth Buffalo Bourbon to refreshing Snipers Sarsaparilla. Even got fresh milk for the young'uns!`
     }
 
     // General wisdom
@@ -181,6 +226,9 @@ export function EnhancedBarKeepBillSaloon() {
     setQuery("")
     setIsTyping(true)
 
+    // Play message sound
+    playSound(300, 0.1, "sine")
+
     // Simulate Bill thinking and responding
     setTimeout(
       () => {
@@ -194,6 +242,7 @@ export function EnhancedBarKeepBillSaloon() {
 
         setConversation((prev) => [...prev, billMessage])
         setIsTyping(false)
+        playWelcomeSound()
 
         // Update Bill's stats
         setBillMood((prev) => ({
@@ -208,7 +257,7 @@ export function EnhancedBarKeepBillSaloon() {
 
   const orderDrink = (bottle: Bottle) => {
     playPourDrink()
-    playBottleClink()
+    setTimeout(() => playBottleClink(), 500)
 
     setSelectedBottle(bottle)
 
@@ -237,6 +286,11 @@ export function EnhancedBarKeepBillSaloon() {
           energyChange = 15
           wisdomChange = 5
           break
+        case "milk":
+          newMood = "cheerful"
+          energyChange = 10
+          wisdomChange = 5
+          break
       }
 
       return {
@@ -255,7 +309,8 @@ export function EnhancedBarKeepBillSaloon() {
       coffee:
         "*pours steaming black coffee* Strong enough to wake the dead! This'll keep ya sharp for them market moves.",
       sarsaparilla:
-        "*slides the fizzy drink across* The thinking man's beverage! Clear head, clear profits, I always say.",
+        "*slides the fizzy drink across* The sharpshooter's choice! Clear head, clear profits, I always say.",
+      milk: "*pours fresh milk* Perfect for the young pioneers! Gotta grow up strong in this frontier.",
     }
 
     const responseMessage = {
@@ -270,11 +325,8 @@ export function EnhancedBarKeepBillSaloon() {
 
   const toggleSound = () => {
     setSoundEnabled(!soundEnabled)
-    if (soundEnabled) {
-      stopAmbient()
-    } else {
-      startAmbient()
-      playPianoMusic()
+    if (!soundEnabled) {
+      playWelcomeSound()
     }
   }
 
@@ -297,7 +349,7 @@ export function EnhancedBarKeepBillSaloon() {
 
   useEffect(() => {
     // Start ambient saloon sounds
-    if (soundEnabled) {
+    if (soundEnabled && audioContext) {
       playPianoMusic()
     }
 
@@ -310,7 +362,7 @@ export function EnhancedBarKeepBillSaloon() {
     return () => {
       clearInterval(atmosphereInterval)
     }
-  }, [soundEnabled])
+  }, [soundEnabled, audioContext])
 
   return (
     <div className="newspaper-bg min-h-screen p-6">
@@ -339,19 +391,22 @@ export function EnhancedBarKeepBillSaloon() {
                 </div>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <Button variant="ghost" size="sm" onClick={toggleSound} className="text-white hover:bg-white/20">
                 {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
               </Button>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.1"
-                value={volume}
-                onChange={(e) => setVolume(Number.parseFloat(e.target.value))}
-                className="w-20"
-              />
+              <div className="flex flex-col items-center">
+                <span className="text-xs text-white mb-1">Volume</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={volume}
+                  onChange={(e) => setVolume(Number.parseFloat(e.target.value))}
+                  className="w-20"
+                />
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -385,7 +440,7 @@ export function EnhancedBarKeepBillSaloon() {
 
                   {/* Bill behind the bar */}
                   <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
-                    <div className="text-6xl">{getMoodEmoji()}</div>
+                    <div className="text-6xl animate-bounce">{getMoodEmoji()}</div>
                   </div>
 
                   {/* Bar stools */}
@@ -398,7 +453,7 @@ export function EnhancedBarKeepBillSaloon() {
                 {/* Bottle Shelf */}
                 <div className="bg-amber-900 p-4 rounded-lg border-2 border-black">
                   <h4 className="text-lg font-serif text-white mb-3 text-center">Bill's Premium Collection</h4>
-                  <div className="flex justify-center gap-4 flex-wrap">
+                  <div className="grid grid-cols-3 md:grid-cols-6 gap-4 justify-items-center">
                     {SALOON_BOTTLES.map((bottle) => (
                       <div
                         key={bottle.id}
@@ -536,6 +591,9 @@ export function EnhancedBarKeepBillSaloon() {
                       </Button>
                       <Button onClick={() => playPourDrink()} className="frontier-button w-full font-serif">
                         🍺 Pour Drink
+                      </Button>
+                      <Button onClick={() => playWelcomeSound()} className="frontier-button w-full font-serif">
+                        🤠 Welcome Sound
                       </Button>
                     </div>
                   </div>

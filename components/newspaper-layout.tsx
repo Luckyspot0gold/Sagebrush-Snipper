@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
 import { DashboardLayout } from "@/components/dashboard-layout"
@@ -12,7 +11,7 @@ import { ArrowRight, Newspaper } from "lucide-react"
 
 interface NewspaperLayoutProps {
   children: React.ReactNode
-  title: string
+  title?: string
   subtitle?: string
 }
 
@@ -20,6 +19,7 @@ export function NewspaperLayout({ children, title, subtitle }: NewspaperLayoutPr
   const pathname = usePathname()
   const { marketMood } = useMarketStore()
   const [currentDate, setCurrentDate] = useState("")
+  const [isFlipping, setIsFlipping] = useState(false)
 
   useEffect(() => {
     setCurrentDate(
@@ -32,17 +32,25 @@ export function NewspaperLayout({ children, title, subtitle }: NewspaperLayoutPr
     )
   }, [])
 
+  // Page flip animation when content changes
+  useEffect(() => {
+    setIsFlipping(true)
+    const timer = setTimeout(() => setIsFlipping(false), 300)
+    return () => clearTimeout(timer)
+  }, [pathname, children])
+
   // Generate a unique "volume" and "issue" number based on the pathname
   const getVolumeAndIssue = () => {
     const pathHash = pathname.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
-
     const volume = Math.max(1, (pathHash % 10) + 1)
     const issue = Math.max(1, ((pathHash * 13) % 100) + 1)
-
     return { volume, issue }
   }
 
   const { volume, issue } = getVolumeAndIssue()
+
+  // Get page title from pathname if not provided
+  const pageTitle = title || pathname.split("/").pop()?.replace("-", " ").toUpperCase() || "WYOVERSE NEWS"
 
   return (
     <DashboardLayout>
@@ -75,7 +83,7 @@ export function NewspaperLayout({ children, title, subtitle }: NewspaperLayoutPr
           <div className="border-4 border-black p-1 mb-6">
             <div className="border-2 border-black p-4">
               <div className="text-center mb-4">
-                <h2 className="text-4xl font-bold font-serif uppercase mb-1">{title}</h2>
+                <h2 className="text-4xl font-bold font-serif uppercase mb-1">{pageTitle}</h2>
                 {subtitle && <h3 className="text-xl font-serif italic">{subtitle}</h3>}
               </div>
 
@@ -89,8 +97,18 @@ export function NewspaperLayout({ children, title, subtitle }: NewspaperLayoutPr
                 </div>
               </div>
 
-              {/* Main Content */}
-              <div className="border-t-2 border-black pt-4">{children}</div>
+              {/* Main Content with Page Flip Animation */}
+              <div
+                className={`border-t-2 border-black pt-4 transition-all duration-300 ${
+                  isFlipping ? "opacity-0 transform rotateY-90" : "opacity-100 transform rotateY-0"
+                }`}
+                style={{
+                  transformStyle: "preserve-3d",
+                  perspective: "1000px",
+                }}
+              >
+                {children}
+              </div>
             </div>
           </div>
 
