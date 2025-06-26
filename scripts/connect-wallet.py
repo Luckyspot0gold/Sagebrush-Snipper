@@ -1,6 +1,5 @@
-
 ### 1. Avalanche Wallet Connector (React + Bolt.New)
-```javascript
+\`\`\`javascript
 // File: src/components/WalletConnector.jsx
 import { Bolt } from '@bolt-io/sdk';
 
@@ -33,10 +32,10 @@ export default function WalletConnector() {
     </button>
   );
 }
-```
+\`\`\`
 
 ### 2. Trade Execution Function (Node.js + Wyoverse)
-```javascript
+\`\`\`javascript
 // File: server/trade.js
 import { Bolt } from '@bolt-io/sdk';
 import axios from 'axios';
@@ -68,10 +67,10 @@ export async function executeTrade(tradeData) {
     return { success: false, error: error.message };
   }
 }
-```
+\`\`\`
 
 ### 3. Boxing Minigame Integration (Phaser.js + Crypto Clashers)
-```javascript
+\`\`\`javascript
 // File: src/games/BoxingMinigame.js
 import Phaser from 'phaser';
 
@@ -107,10 +106,10 @@ export default class BoxingGame extends Phaser.Scene {
     console.log("Reward minted:", data.txHash);
   }
 }
-```
+\`\`\`
 
 ### 4. NFT Minting for Crypto Clashers (Bolt.New)
-```javascript
+\`\`\`javascript
 // File: server/mint-nft.js
 import { Bolt } from '@bolt-io/sdk';
 
@@ -133,10 +132,10 @@ export async function mintBoxingNFT(walletAddress) {
 
   return { txHash: tx.hash, nftId: tx.tokenId };
 }
-```
+\`\`\`
 
 ### 5. Venice AI Dialog System (React Hook)
-```javascript
+\`\`\`javascript
 // File: src/hooks/useVeniceAI.js
 import { useState } from 'react';
 
@@ -173,24 +172,24 @@ export default function useVeniceAI() {
 
   return { dialogue, isLoading, generateDialogue };
 }
-```
+\`\`\`
 
 ### Integration Guide (Do this NOW):
 1. **Set up environment variables**:
-```env
+\`\`\`env
 # .env file
 REACT_APP_BOLT_API_KEY=your_bolt_key
 VENICE_API_KEY=your_venice_key
 WYOVERSE_API=https://kzmo3svpd08ymikgt9px.lite.vusercontent.net
-```
+\`\`\`
 
 2. **Install dependencies**:
-```bash
+\`\`\`bash
 npm install @bolt-io/sdk axios phaser
-```
+\`\`\`
 
 3. **File structure**:
-```
+\`\`\`
 src/
 ├── components/
 │   ├── WalletConnector.jsx
