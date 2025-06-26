@@ -1,11 +1,8 @@
-/>
-Replace the entire file with:
-```tsx
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-export default function MarketPulseEngine() {
+export function MarketPulseEngine() {
   return (
     <Card>
       <CardHeader>
