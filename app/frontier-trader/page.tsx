@@ -1,362 +1,494 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { NewspaperLayout } from "@/components/newspaper-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Wallet, TrendingUp, Shield, Zap, ExternalLink, CheckCircle, AlertCircle } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Wallet, TrendingUp, TrendingDown, DollarSign, BarChart3, ExternalLink, Volume2, VolumeX } from "lucide-react"
 import Image from "next/image"
-import { FrontierTraderDashboard } from "@/components/frontier-trader-dashboard"
+import { useToast } from "@/hooks/use-toast"
 
-interface WalletConnection {
-  id: string
-  name: string
-  icon: string
-  description: string
+interface WalletState {
+  connected: boolean
+  address: string
+  balance: number
   network: string
-  status: "disconnected" | "connecting" | "connected"
-  address?: string
+}
+
+interface MarketData {
+  symbol: string
+  price: number
+  change24h: number
+  volume: number
 }
 
 export default function FrontierTraderPage() {
-  const [wallets, setWallets] = useState<WalletConnection[]>([
-    {
-      id: "avalanche",
-      name: "Avalanche (MetaMask)",
-      icon: "🔺",
-      description: "Connect to Avalanche C-Chain for AVAX trading",
-      network: "Avalanche",
-      status: "disconnected",
-    },
-    {
-      id: "coinbase",
-      name: "Coinbase Wallet",
-      icon: "💙",
-      description: "Professional-grade wallet for institutional trading",
-      network: "Multi-chain",
-      status: "disconnected",
-    },
-    {
-      id: "phantom",
-      name: "Phantom Wallet",
-      icon: "👻",
-      description: "Solana ecosystem wallet for SOL and SPL tokens",
-      network: "Solana",
-      status: "disconnected",
-    },
+  const [walletState, setWalletState] = useState<WalletState>({
+    connected: false,
+    address: "",
+    balance: 0,
+    network: "",
+  })
+
+  const [marketData, setMarketData] = useState<MarketData[]>([
+    { symbol: "AVAX", price: 42.5, change24h: 5.2, volume: 1250000 },
+    { symbol: "ETH", price: 2340.8, change24h: -2.1, volume: 8900000 },
+    { symbol: "BTC", price: 67890.0, change24h: 3.8, volume: 15600000 },
   ])
 
-  const [connectedWallet, setConnectedWallet] = useState<string | null>(null)
-  const [showDashboard, setShowDashboard] = useState(false)
+  const [soundEnabled, setSoundEnabled] = useState(true)
+  const [isConnecting, setIsConnecting] = useState(false)
+  const { toast } = useToast()
 
-  // Avalanche network configuration
-  const AVALANCHE_CONFIG = {
-    chainId: "0xA86A",
-    chainName: "Avalanche Network",
-    nativeCurrency: {
-      name: "AVAX",
-      symbol: "AVAX",
-      decimals: 18,
-    },
-    rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
-    blockExplorerUrls: ["https://snowtrace.io/"],
-  }
-
+  // Avalanche Wallet Connection
   const connectAvalanche = async () => {
-    updateWalletStatus("avalanche", "connecting")
-
+    setIsConnecting(true)
     try {
       if (typeof window.ethereum !== "undefined") {
         // Request account access
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        })
+        await window.ethereum.request({ method: "eth_requestAccounts" })
 
-        // Add Avalanche network if not already added
+        // Add Avalanche network if not present
         try {
           await window.ethereum.request({
             method: "wallet_switchEthereumChain",
-            params: [{ chainId: AVALANCHE_CONFIG.chainId }],
+            params: [{ chainId: "0xA86A" }], // Avalanche C-Chain
           })
         } catch (switchError: any) {
           // Network not added, add it
           if (switchError.code === 4902) {
             await window.ethereum.request({
               method: "wallet_addEthereumChain",
-              params: [AVALANCHE_CONFIG],
+              params: [
+                {
+                  chainId: "0xA86A",
+                  chainName: "Avalanche Network",
+                  nativeCurrency: {
+                    name: "AVAX",
+                    symbol: "AVAX",
+                    decimals: 18,
+                  },
+                  rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
+                  blockExplorerUrls: ["https://snowtrace.io/"],
+                },
+              ],
             })
           }
         }
 
-        // Update wallet status
-        updateWalletStatus("avalanche", "connected", accounts[0])
-        setConnectedWallet("avalanche")
-        setShowDashboard(true)
+        // Get account
+        const accounts = await window.ethereum.request({ method: "eth_accounts" })
+        if (accounts.length > 0) {
+          setWalletState({
+            connected: true,
+            address: accounts[0],
+            balance: 125.5, // Mock balance
+            network: "Avalanche",
+          })
+
+          if (soundEnabled) {
+            const audio = new Audio("/sounds/success.mp3")
+            audio.volume = 0.5
+            audio.play().catch(() => {})
+          }
+
+          toast({
+            title: "🏔️ Avalanche Connected!",
+            description: `Connected to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
+          })
+        }
       } else {
-        alert("MetaMask not detected! Please install MetaMask to connect to Avalanche.")
-        updateWalletStatus("avalanche", "disconnected")
+        toast({
+          title: "MetaMask Required",
+          description: "Please install MetaMask to connect to Avalanche",
+          variant: "destructive",
+        })
       }
     } catch (error) {
       console.error("Avalanche connection failed:", error)
-      updateWalletStatus("avalanche", "disconnected")
-      alert("Failed to connect to Avalanche. Please try again.")
+      toast({
+        title: "Connection Failed",
+        description: "Failed to connect to Avalanche network",
+        variant: "destructive",
+      })
     }
+    setIsConnecting(false)
   }
 
+  // Coinbase Wallet Connection
   const connectCoinbase = async () => {
-    updateWalletStatus("coinbase", "connecting")
+    setIsConnecting(true)
 
-    try {
-      // For demo purposes, simulate connection
-      setTimeout(() => {
-        const demoAddress = "0x742d35Cc6634C0532925a3b8D4C9db96590c6C87"
-        updateWalletStatus("coinbase", "connected", demoAddress)
-        setConnectedWallet("coinbase")
-        setShowDashboard(true)
-      }, 2000)
+    // Simulate connection for demo
+    setTimeout(() => {
+      setWalletState({
+        connected: true,
+        address: "0x742d35Cc6634C0532925a3b8D4C9db96590b5",
+        balance: 89.25,
+        network: "Coinbase",
+      })
 
-      // In production, use Coinbase Wallet SDK
-      // window.open('https://wallet.coinbase.com/', '_blank')
-    } catch (error) {
-      console.error("Coinbase connection failed:", error)
-      updateWalletStatus("coinbase", "disconnected")
-    }
+      if (soundEnabled) {
+        const audio = new Audio("/sounds/success.mp3")
+        audio.volume = 0.5
+        audio.play().catch(() => {})
+      }
+
+      toast({
+        title: "💙 Coinbase Connected!",
+        description: "Demo connection established",
+      })
+      setIsConnecting(false)
+    }, 2000)
+
+    // In production, use Coinbase Wallet SDK
+    // window.open('https://wallet.coinbase.com/', '_blank')
   }
 
+  // Phantom Wallet Connection
   const connectPhantom = async () => {
-    updateWalletStatus("phantom", "connecting")
+    setIsConnecting(true)
 
     try {
-      if (typeof window.solana !== "undefined" && window.solana.isPhantom) {
+      // Check if Phantom is installed
+      if (window.solana && window.solana.isPhantom) {
         const response = await window.solana.connect()
-        const address = response.publicKey.toString()
+        setWalletState({
+          connected: true,
+          address: response.publicKey.toString(),
+          balance: 45.75,
+          network: "Solana",
+        })
 
-        updateWalletStatus("phantom", "connected", address)
-        setConnectedWallet("phantom")
-        setShowDashboard(true)
+        if (soundEnabled) {
+          const audio = new Audio("/sounds/success.mp3")
+          audio.volume = 0.5
+          audio.play().catch(() => {})
+        }
+
+        toast({
+          title: "👻 Phantom Connected!",
+          description: `Connected to Solana network`,
+        })
       } else {
         // Phantom not installed, open website
         window.open("https://phantom.app/", "_blank")
-        updateWalletStatus("phantom", "disconnected")
+        toast({
+          title: "Phantom Required",
+          description: "Please install Phantom wallet for Solana",
+        })
       }
     } catch (error) {
       console.error("Phantom connection failed:", error)
-      updateWalletStatus("phantom", "disconnected")
+      toast({
+        title: "Connection Failed",
+        description: "Failed to connect to Phantom wallet",
+        variant: "destructive",
+      })
     }
-  }
-
-  const updateWalletStatus = (walletId: string, status: WalletConnection["status"], address?: string) => {
-    setWallets((prev) =>
-      prev.map((wallet) =>
-        wallet.id === walletId
-          ? { ...wallet, status, address }
-          : { ...wallet, status: wallet.status === "connected" ? "connected" : "disconnected" },
-      ),
-    )
+    setIsConnecting(false)
   }
 
   const disconnectWallet = () => {
-    setWallets((prev) => prev.map((wallet) => ({ ...wallet, status: "disconnected", address: undefined })))
-    setConnectedWallet(null)
-    setShowDashboard(false)
+    setWalletState({
+      connected: false,
+      address: "",
+      balance: 0,
+      network: "",
+    })
+    toast({
+      title: "Wallet Disconnected",
+      description: "Successfully disconnected from wallet",
+    })
   }
 
-  const getWalletConnector = (walletId: string) => {
-    switch (walletId) {
-      case "avalanche":
-        return connectAvalanche
-      case "coinbase":
-        return connectCoinbase
-      case "phantom":
-        return connectPhantom
-      default:
-        return () => {}
-    }
+  const toggleSound = () => {
+    setSoundEnabled(!soundEnabled)
   }
 
-  if (showDashboard && connectedWallet) {
-    return <FrontierTraderDashboard connectedWallet={connectedWallet} onDisconnect={disconnectWallet} />
-  }
+  // Update market data periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMarketData((prev) =>
+        prev.map((item) => ({
+          ...item,
+          price: item.price * (0.98 + Math.random() * 0.04),
+          change24h: -5 + Math.random() * 10,
+        })),
+      )
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [])
 
   return (
-    <div className="newspaper-bg min-h-screen p-6">
-      <div className="max-w-6xl mx-auto">
+    <NewspaperLayout>
+      <div className="space-y-6">
         {/* Hero Section with Poster */}
-        <Card className="border-4 border-black shadow-2xl mb-8 overflow-hidden">
-          <div className="relative">
-            <Image
-              src="/images/frontiertraderposter.jpg"
-              alt="Frontier Trader - New Era in GameFi"
-              width={1200}
-              height={600}
-              className="w-full h-96 object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-            <div className="absolute bottom-6 left-6 text-white">
-              <h1 className="text-5xl font-serif font-bold mb-2 headline-primary">Frontier Trader</h1>
-              <p className="text-xl font-serif mb-4">Where Old West Wisdom Meets Modern Trading</p>
-              <Badge className="bg-purple-600 text-white text-lg px-4 py-2">⭐ NEW ERA IN GAMEFI ⭐</Badge>
+        <div className="relative">
+          <Image
+            src="/images/frontiertraderposter.jpg"
+            alt="Frontier Trader - New Era in GameFi"
+            width={1200}
+            height={600}
+            className="w-full h-96 object-cover border-4 border-black rounded-lg"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent rounded-lg" />
+          <div className="absolute bottom-6 left-6 text-white">
+            <h1 className="text-5xl font-serif font-bold mb-2 headline-primary">FRONTIER TRADER</h1>
+            <p className="text-xl font-serif">Where Old West Trading Meets Modern GameFi</p>
+            <div className="flex gap-2 mt-4">
+              <Button variant="ghost" size="sm" onClick={toggleSound} className="text-white hover:bg-white/20">
+                {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+              </Button>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Wallet Connection Section */}
-        <Card className="border-4 border-black shadow-lg mb-8">
-          <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
-            <CardTitle className="text-3xl font-serif flex items-center gap-3">
-              <Wallet className="h-8 w-8" />
-              Connect Your Frontier Wallet
-            </CardTitle>
-            <CardDescription className="text-purple-100 text-lg font-serif">
+        <Card className="border-4 border-black newspaper-article">
+          <CardHeader className="border-b-2 border-black">
+            <CardTitle className="text-2xl font-serif headline-secondary">🔗 Connect Your Frontier Wallet</CardTitle>
+            <CardDescription className="font-serif">
               Choose your preferred wallet to start trading on the digital frontier
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {wallets.map((wallet) => (
-                <Card key={wallet.id} className="border-2 border-black hover:shadow-lg transition-all">
-                  <CardHeader className="text-center">
-                    <div className="text-6xl mb-3">{wallet.icon}</div>
-                    <CardTitle className="font-serif text-xl">{wallet.name}</CardTitle>
-                    <CardDescription className="font-serif">{wallet.description}</CardDescription>
-                    <Badge variant="outline" className="mt-2">
-                      {wallet.network}
-                    </Badge>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    {wallet.status === "connected" && wallet.address && (
-                      <div className="mb-4">
-                        <div className="flex items-center justify-center gap-2 text-green-600 mb-2">
-                          <CheckCircle className="h-4 w-4" />
-                          <span className="font-serif font-bold">Connected</span>
-                        </div>
-                        <div className="text-xs font-mono bg-gray-100 p-2 rounded border">
-                          {wallet.address.substring(0, 6)}...{wallet.address.substring(wallet.address.length - 4)}
-                        </div>
-                      </div>
-                    )}
-
-                    {wallet.status === "connecting" && (
-                      <div className="mb-4">
-                        <div className="flex items-center justify-center gap-2 text-blue-600 mb-2">
-                          <AlertCircle className="h-4 w-4 animate-spin" />
-                          <span className="font-serif">Connecting...</span>
-                        </div>
-                        <Progress value={75} className="h-2" />
-                      </div>
-                    )}
-
+          <CardContent className="p-6">
+            {!walletState.connected ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Avalanche Wallet */}
+                <Card className="border-2 border-red-500 hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardContent className="p-6 text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-red-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-xl">⛰️</span>
+                    </div>
+                    <h3 className="font-serif font-bold text-lg mb-2">Avalanche</h3>
+                    <p className="text-sm text-gray-600 mb-4">Connect via MetaMask to Avalanche C-Chain</p>
                     <Button
-                      onClick={getWalletConnector(wallet.id)}
-                      disabled={wallet.status === "connecting"}
-                      className={`w-full font-serif ${
-                        wallet.status === "connected" ? "bg-green-600 hover:bg-green-700" : "frontier-button"
-                      }`}
+                      onClick={connectAvalanche}
+                      disabled={isConnecting}
+                      className="w-full bg-red-500 hover:bg-red-600 text-white"
                     >
-                      {wallet.status === "connected"
-                        ? "✓ Connected"
-                        : wallet.status === "connecting"
-                          ? "Connecting..."
-                          : "Connect Wallet"}
+                      {isConnecting ? "Connecting..." : "Connect Avalanche"}
                     </Button>
-
-                    {wallet.id === "coinbase" && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full mt-2 font-serif"
-                        onClick={() => window.open("https://wallet.coinbase.com/", "_blank")}
-                      >
-                        <ExternalLink className="h-3 w-3 mr-1" />
-                        Get Coinbase Wallet
-                      </Button>
-                    )}
-
-                    {wallet.id === "phantom" && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full mt-2 font-serif"
-                        onClick={() => window.open("https://phantom.app/", "_blank")}
-                      >
-                        <ExternalLink className="h-3 w-3 mr-1" />
-                        Get Phantom Wallet
-                      </Button>
-                    )}
                   </CardContent>
                 </Card>
-              ))}
-            </div>
 
-            {connectedWallet && (
-              <Alert className="mt-6 border-green-500 bg-green-50">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <AlertDescription className="font-serif text-green-800">
-                  <strong>Wallet Connected!</strong> You can now access the full Frontier Trader experience.
-                  <Button onClick={() => setShowDashboard(true)} className="ml-4 frontier-button" size="sm">
-                    Enter Trading Dashboard →
+                {/* Coinbase Wallet */}
+                <Card className="border-2 border-blue-500 hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardContent className="p-6 text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-blue-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-xl">💙</span>
+                    </div>
+                    <h3 className="font-serif font-bold text-lg mb-2">Coinbase</h3>
+                    <p className="text-sm text-gray-600 mb-4">Professional trading with Coinbase Wallet</p>
+                    <Button
+                      onClick={connectCoinbase}
+                      disabled={isConnecting}
+                      className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                    >
+                      {isConnecting ? "Connecting..." : "Connect Coinbase"}
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Phantom Wallet */}
+                <Card className="border-2 border-purple-500 hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardContent className="p-6 text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-purple-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-xl">👻</span>
+                    </div>
+                    <h3 className="font-serif font-bold text-lg mb-2">Phantom</h3>
+                    <p className="text-sm text-gray-600 mb-4">Solana network trading and NFTs</p>
+                    <Button
+                      onClick={connectPhantom}
+                      disabled={isConnecting}
+                      className="w-full bg-purple-500 hover:bg-purple-600 text-white"
+                    >
+                      {isConnecting ? "Connecting..." : "Connect Phantom"}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              /* Connected Wallet Display */
+              <div className="bg-green-50 border-2 border-green-500 rounded-lg p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <div>
+                    <h3 className="font-serif font-bold text-lg text-green-800">🔗 {walletState.network} Connected</h3>
+                    <p className="text-sm text-green-600">
+                      {walletState.address.slice(0, 8)}...{walletState.address.slice(-6)}
+                    </p>
+                  </div>
+                  <Button
+                    onClick={disconnectWallet}
+                    variant="outline"
+                    size="sm"
+                    className="border-green-500 text-green-700 hover:bg-green-100"
+                  >
+                    Disconnect
                   </Button>
-                </AlertDescription>
-              </Alert>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-800">${walletState.balance.toFixed(2)}</div>
+                    <div className="text-sm text-green-600">Available Balance</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-800">{walletState.network}</div>
+                    <div className="text-sm text-green-600">Network</div>
+                  </div>
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Features Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="border-2 border-black text-center">
-            <CardContent className="p-6">
-              <TrendingUp className="h-12 w-12 mx-auto mb-4 text-green-600" />
-              <h3 className="font-serif font-bold text-lg mb-2">Smart Trading</h3>
-              <p className="font-serif text-sm">AI-powered insights from Bar Keep Bill</p>
-            </CardContent>
-          </Card>
+        {/* Trading Dashboard */}
+        {walletState.connected && (
+          <Tabs defaultValue="markets" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-3 border-2 border-black">
+              <TabsTrigger value="markets" className="font-serif">
+                Markets
+              </TabsTrigger>
+              <TabsTrigger value="portfolio" className="font-serif">
+                Portfolio
+              </TabsTrigger>
+              <TabsTrigger value="history" className="font-serif">
+                History
+              </TabsTrigger>
+            </TabsList>
 
-          <Card className="border-2 border-black text-center">
-            <CardContent className="p-6">
-              <Shield className="h-12 w-12 mx-auto mb-4 text-blue-600" />
-              <h3 className="font-serif font-bold text-lg mb-2">Secure Vaults</h3>
-              <p className="font-serif text-sm">Multi-signature protection</p>
-            </CardContent>
-          </Card>
+            <TabsContent value="markets">
+              <Card className="border-4 border-black newspaper-article">
+                <CardHeader className="border-b-2 border-black">
+                  <CardTitle className="font-serif headline-secondary">📈 Live Market Data</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    {marketData.map((asset) => (
+                      <div
+                        key={asset.symbol}
+                        className="flex items-center justify-between p-4 border-2 border-gray-200 rounded"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                            {asset.symbol[0]}
+                          </div>
+                          <div>
+                            <div className="font-bold font-serif">{asset.symbol}</div>
+                            <div className="text-sm text-gray-600">Vol: ${(asset.volume / 1000000).toFixed(1)}M</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-lg">${asset.price.toFixed(2)}</div>
+                          <div
+                            className={`text-sm flex items-center gap-1 ${
+                              asset.change24h >= 0 ? "text-green-600" : "text-red-600"
+                            }`}
+                          >
+                            {asset.change24h >= 0 ? (
+                              <TrendingUp className="h-3 w-3" />
+                            ) : (
+                              <TrendingDown className="h-3 w-3" />
+                            )}
+                            {asset.change24h.toFixed(1)}%
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                            Buy
+                          </Button>
+                          <Button size="sm" variant="outline" className="border-red-500 text-red-600">
+                            Sell
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          <Card className="border-2 border-black text-center">
-            <CardContent className="p-6">
-              <Zap className="h-12 w-12 mx-auto mb-4 text-yellow-600" />
-              <h3 className="font-serif font-bold text-lg mb-2">Lightning Fast</h3>
-              <p className="font-serif text-sm">Instant cross-chain swaps</p>
-            </CardContent>
-          </Card>
+            <TabsContent value="portfolio">
+              <Card className="border-4 border-black newspaper-article">
+                <CardHeader className="border-b-2 border-black">
+                  <CardTitle className="font-serif headline-secondary">💼 Your Frontier Portfolio</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="text-center py-8">
+                    <Wallet className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                    <h3 className="font-serif text-xl mb-2">Start Your Trading Journey</h3>
+                    <p className="text-gray-600 mb-4">Make your first trade to see your portfolio here</p>
+                    <Button className="frontier-button">
+                      <DollarSign className="h-4 w-4 mr-2" />
+                      Start Trading
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          <Card className="border-2 border-black text-center">
-            <CardContent className="p-6">
-              <Wallet className="h-12 w-12 mx-auto mb-4 text-purple-600" />
-              <h3 className="font-serif font-bold text-lg mb-2">Multi-Chain</h3>
-              <p className="font-serif text-sm">Avalanche, Solana, Ethereum</p>
-            </CardContent>
-          </Card>
-        </div>
+            <TabsContent value="history">
+              <Card className="border-4 border-black newspaper-article">
+                <CardHeader className="border-b-2 border-black">
+                  <CardTitle className="font-serif headline-secondary">📊 Trading History</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="text-center py-8">
+                    <BarChart3 className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                    <h3 className="font-serif text-xl mb-2">No Trading History</h3>
+                    <p className="text-gray-600">Your trading history will appear here once you start trading</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        )}
 
-        {/* Call to Action */}
-        <Card className="border-4 border-black bg-gradient-to-r from-purple-100 to-pink-100">
-          <CardContent className="p-8 text-center">
-            <h2 className="text-3xl font-serif font-bold mb-4 headline-secondary">
-              Ready to Trade Like a Frontier Legend?
-            </h2>
-            <p className="font-serif text-lg mb-6">
-              Connect your wallet above and let Bar Keep Bill guide you through the digital frontier
-            </p>
-            <div className="flex justify-center gap-4">
-              <Button className="frontier-button font-serif text-lg px-8 py-3">🤠 Start Trading Now</Button>
-              <Button variant="outline" className="font-serif text-lg px-8 py-3 border-2 border-black">
-                📖 Learn More
-              </Button>
+        {/* Links to Other Games */}
+        <Card className="border-4 border-black newspaper-article">
+          <CardHeader className="border-b-2 border-black">
+            <CardTitle className="font-serif headline-secondary">🎮 Explore More Frontier Adventures</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center justify-between p-4 border-2 border-gray-200 rounded">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🥊</span>
+                  <div>
+                    <div className="font-serif font-bold">Boxing Arena</div>
+                    <div className="text-sm text-gray-600">Fight for crypto rewards</div>
+                  </div>
+                </div>
+                <Button size="sm" className="frontier-button" asChild>
+                  <a href="/boxing-arena">
+                    <ExternalLink className="h-4 w-4 mr-1" />
+                    Fight
+                  </a>
+                </Button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 border-2 border-gray-200 rounded">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🍻</span>
+                  <div>
+                    <div className="font-serif font-bold">Bill's Saloon</div>
+                    <div className="text-sm text-gray-600">Chat with Bar Keep Bill</div>
+                  </div>
+                </div>
+                <Button size="sm" className="frontier-button" asChild>
+                  <a href="/saloon">
+                    <ExternalLink className="h-4 w-4 mr-1" />
+                    Visit
+                  </a>
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
-    </div>
+    </NewspaperLayout>
   )
 }

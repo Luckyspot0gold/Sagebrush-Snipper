@@ -1,212 +1,325 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { supabase } from "@/lib/supabase/client"
+import { createClient } from "@supabase/supabase-js"
 
-// Enhanced Bill AI with LangGraph integration
-export async function POST(request: NextRequest) {
-  try {
-    const { message, walletAddress, eventType = "idle", playerData } = await request.json()
+// Initialize Supabase client
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!)
 
-    // Log the interaction
-    const interactionData = {
-      event_type: eventType,
-      context: `User message: ${message}, Wallet: ${walletAddress}`,
-      player_id: playerData?.id || null,
-      executed_at: new Date().toISOString(),
+// Bill's enhanced AI personality system
+interface BillState {
+  mood: "cheerful" | "concerned" | "excited" | "wise" | "welcoming"
+  energy: number // 0-100
+  wisdom_points: number
+  last_drink_served?: string
+  market_awareness: boolean
+}
+
+interface MarketData {
+  symbol: string
+  price: number
+  change_24h: number
+  volume: number
+}
+
+class EnhancedBillAI {
+  private state: BillState
+  private personality_traits = {
+    speech_patterns: [
+      "Well partner,",
+      "I reckon",
+      "Much obliged",
+      "By thunder!",
+      "Well I'll be jiggered!",
+      "That's mighty fine",
+      "Howdy there",
+    ],
+    drink_recommendations: {
+      market_up: "How 'bout we celebrate with some Buffalo Bourbon?",
+      market_down: "Looks like you could use some Wyoverse Whiskey to steady them nerves.",
+      new_player: "Welcome! Try our famous Snipers Sarsaparilla - it's got quite the kick!",
+      default: "What'll it be today, friend?",
+    },
+    wisdom_quotes: [
+      "The market's like a wild bronco - sometimes you ride it, sometimes it throws ya.",
+      "In my years tendin' bar, I've learned that patience pays better than panic.",
+      "Every trader needs a good drink and better friends.",
+      "The frontier teaches ya that what goes down usually comes back up, given time.",
+    ],
+  }
+
+  constructor() {
+    this.state = {
+      mood: "cheerful",
+      energy: 75,
+      wisdom_points: 0,
+      market_awareness: true,
     }
+  }
 
-    // Enhanced Bill responses with LangGraph-style decision making
-    const billPersonality = {
-      greeting: [
-        "Well howdy there, partner! *tips hat and wipes down bar* Welcome to the finest digital saloon this side of the blockchain!",
-        "Pull up a stool, friend! *slides glass across bar* Name's Bill, and I've been tendin' this establishment since the great crypto rush of '52.",
-        "New face in town, eh? *polishes glass thoughtfully* What brings ya to our neck of the digital frontier?",
-      ],
-      market_boom: [
-        "Well I'll be jiggered! *polishes glass excitedly* Markets are hotter than a branding iron today! Your AVAX position's lookin' mighty fine, but remember - what goes up like a rocket can come down like a rock.",
-        "Thunderation! Haven't seen a bull run like this since the gold rush! *slides celebratory whiskey* Time to take some profits off the table, but don't get too greedy now, partner.",
-      ],
-      market_crash: [
-        "*furrows brow while cleaning shot glass* Markets are colder than a Wyoming winter, partner. But this old bartender's seen plenty of storms - they always pass.",
-        "Dagnabbit! Market's taken a tumble, but don't you go sellin' in a panic now. *pours stiff drink* This here whiskey'll help ya think clearer about them opportunities.",
-      ],
-      trading_advice: [
-        "In my 40 years tendin' this establishment, I've learned that patience and good whiskey solve most problems. Your portfolio shows promise - consider diversifyin' into land deeds for steady income.",
-        "*leans on bar thoughtfully* Back in '52, we learned that timing the market is like trying to rope a tornado. Focus on solid fundamentals instead, partner.",
-        "That trading pattern of yours reminds me of the smart prospectors from the old days. They knew when to hold and when to fold. Keep that steady approach!",
-      ],
-      general_wisdom: [
-        "*adjusts suspenders* The frontier teaches ya that fortune favors the prepared mind and the steady hand. What's your next move gonna be?",
-        "Been through more market booms and busts than a Missouri riverboat gambler. Key is knowin' when to hold and when to fold.",
-        "*wipes down another glass* This digital frontier's got its own rules, but the principles stay the same - work hard, trade smart, and always keep some powder dry.",
-      ],
-    }
-
-    // Simulate market analysis
-    const mockMarketData = {
-      avax_price: 34.21 + (Math.random() - 0.5) * 10,
-      avax_change: (Math.random() - 0.5) * 20,
-      stones_price: 2.47 + (Math.random() - 0.5) * 1,
-      volume_24h: Math.random() * 10000 + 1000,
-    }
-
-    // Decision logic (simplified LangGraph-style)
-    let responseCategory = "general_wisdom"
-    let confidence = 0.85
-
-    if (eventType === "welcome" || message.toLowerCase().includes("hello") || message.toLowerCase().includes("hi")) {
-      responseCategory = "greeting"
-      confidence = 0.95
-    } else if (mockMarketData.avax_change > 10) {
-      responseCategory = "market_boom"
-      confidence = 0.9
-    } else if (mockMarketData.avax_change < -10) {
-      responseCategory = "market_crash"
-      confidence = 0.9
-    } else if (
-      message.toLowerCase().includes("trade") ||
-      message.toLowerCase().includes("buy") ||
-      message.toLowerCase().includes("sell")
-    ) {
-      responseCategory = "trading_advice"
-      confidence = 0.88
-    }
-
-    // Select response
-    const responses = billPersonality[responseCategory as keyof typeof billPersonality]
-    const selectedResponse = responses[Math.floor(Math.random() * responses.length)]
-
-    // Enhanced wallet analysis
-    const walletAnalysis = walletAddress
-      ? {
-          address: walletAddress,
-          estimated_value: Math.random() * 5000 + 1000,
-          risk_score: Math.random() * 0.6 + 0.2,
-          recommendations: [
-            "Consider staking your AVAX for passive rewards",
-            "Diversify into STONES for mining opportunities",
-            "Land deeds provide steady rental income",
-            "Boxing NFTs can appreciate with tournament wins",
-          ].slice(0, Math.floor(Math.random() * 3) + 1),
-        }
-      : null
-
-    // Action items based on context
-    const actionItems = []
-    if (mockMarketData.avax_change > 5) {
-      actionItems.push("Consider taking some profits")
-    }
-    if (mockMarketData.avax_change < -5) {
-      actionItems.push("Look for buying opportunities")
-    }
-    actionItems.push("Check land deed opportunities")
-    actionItems.push("Visit boxing arena for upgrades")
-
-    // Store interaction in Supabase
+  async getMarketData(): Promise<MarketData | null> {
     try {
-      await supabase.from("bill_interactions").insert({
-        ...interactionData,
-        response: selectedResponse,
-        confidence: confidence,
-      })
-    } catch (dbError) {
-      console.warn("Database logging failed:", dbError)
+      // In production, this would call real market APIs
+      // For demo, return simulated data
+      const mockData: MarketData = {
+        symbol: "AVAX",
+        price: 42.5 + (Math.random() - 0.5) * 10,
+        change_24h: (Math.random() - 0.5) * 20,
+        volume: Math.floor(Math.random() * 2000000) + 500000,
+      }
+      return mockData
+    } catch (error) {
+      console.error("Market data fetch failed:", error)
+      return null
     }
+  }
 
-    // Human-in-the-loop check
-    const requiresApproval =
-      confidence < 0.7 || selectedResponse.includes("large") || selectedResponse.includes("emergency")
+  updateMoodFromMarket(marketData: MarketData | null) {
+    if (!marketData) return
 
-    if (requiresApproval) {
-      try {
-        await supabase.from("bill_responses_review").insert({
-          event_type: eventType,
-          context: interactionData.context,
-          proposed_response: selectedResponse,
-          confidence: confidence,
-          requires_approval: true,
-          status: "pending_review",
-        })
-      } catch (reviewError) {
-        console.warn("Review queue failed:", reviewError)
+    if (Math.abs(marketData.change_24h) > 10) {
+      this.state.mood = marketData.change_24h > 0 ? "excited" : "concerned"
+      this.state.energy =
+        marketData.change_24h > 0 ? Math.min(100, this.state.energy + 15) : Math.max(20, this.state.energy - 10)
+    } else if (marketData.volume > 1000000) {
+      this.state.mood = "excited"
+      this.state.energy = Math.min(100, this.state.energy + 10)
+    }
+  }
+
+  generateResponse(userMessage: string, marketData: MarketData | null): string {
+    // Update mood based on market conditions
+    this.updateMoodFromMarket(marketData)
+
+    const message = userMessage.toLowerCase()
+    let response = ""
+
+    // Greeting detection
+    if (message.includes("hello") || message.includes("hi") || message.includes("howdy")) {
+      const greeting = this.personality_traits.speech_patterns[Math.floor(Math.random() * 3)]
+      response = `${greeting} Welcome to my saloon! `
+
+      if (marketData) {
+        if (marketData.change_24h > 5) {
+          response +=
+            "Markets are lookin' mighty fine today! " + this.personality_traits.drink_recommendations.market_up
+        } else if (marketData.change_24h < -5) {
+          response +=
+            "Markets are rougher than a bronco today. " + this.personality_traits.drink_recommendations.market_down
+        } else {
+          response += this.personality_traits.drink_recommendations.default
+        }
+      } else {
+        response += this.personality_traits.drink_recommendations.default
       }
     }
 
-    return NextResponse.json({
-      success: true,
-      response: selectedResponse,
-      mood:
-        responseCategory === "market_boom" ? "bullish" : responseCategory === "market_crash" ? "bearish" : "cheerful",
-      confidence: confidence,
-      walletAnalysis,
-      actionItems,
-      marketData: mockMarketData,
-      requiresApproval,
-      eventType: eventType,
-      timestamp: new Date().toISOString(),
-      // LangGraph-style metadata
-      workflow: {
-        nodes_executed: [
-          "detect_event",
-          "analyze_context",
-          "generate_response",
-          requiresApproval ? "human_review" : "execute_action",
-        ],
-        decision_path: responseCategory,
-        confidence_threshold: 0.7,
-        human_oversight: requiresApproval,
+    // Drink orders
+    else if (
+      message.includes("drink") ||
+      message.includes("order") ||
+      message.includes("sarsaparilla") ||
+      message.includes("whiskey") ||
+      message.includes("bourbon") ||
+      message.includes("beer") ||
+      message.includes("milk")
+    ) {
+      let drink = "Snipers Sarsaparilla"
+      if (message.includes("whiskey")) drink = "Wyoverse Whiskey"
+      else if (message.includes("bourbon")) drink = "Buffalo Bourbon"
+      else if (message.includes("beer") || message.includes("pilsner")) drink = "Prairie Pilsner"
+      else if (message.includes("milk")) drink = "Fresh Frontier Milk"
+
+      this.state.last_drink_served = drink
+      this.state.energy = Math.max(10, this.state.energy - 5) // Serving drinks takes energy
+
+      const speech =
+        this.personality_traits.speech_patterns[
+          Math.floor(Math.random() * this.personality_traits.speech_patterns.length)
+        ]
+      response = `${speech} One ${drink} comin' right up! *slides glass across the bar* `
+
+      // Add drink-specific commentary
+      switch (drink) {
+        case "Wyoverse Whiskey":
+          response += "That's our finest digital-aged whiskey. Smooth as silk and twice as strong!"
+          break
+        case "Buffalo Bourbon":
+          response += "Now that's a drink with some backbone! Made from the finest prairie grains."
+          break
+        case "Snipers Sarsaparilla":
+          response += "Sharp as a tack and twice as refreshing! Perfect for keepin' your wits about ya."
+          break
+        case "Fresh Frontier Milk":
+          response += "Good choice, partner! Nothin' beats fresh milk from our frontier cows."
+          break
+        default:
+          response += "Enjoy that fine beverage!"
+      }
+    }
+
+    // Market discussion
+    else if (
+      message.includes("market") ||
+      message.includes("trading") ||
+      message.includes("price") ||
+      message.includes("crypto") ||
+      message.includes("avax")
+    ) {
+      this.state.wisdom_points += 2
+      const wisdom =
+        this.personality_traits.wisdom_quotes[Math.floor(Math.random() * this.personality_traits.wisdom_quotes.length)]
+
+      if (marketData) {
+        response = `Well partner, I've been watchin' the markets, and ${marketData.symbol} is sittin' at $${marketData.price.toFixed(2)}, `
+
+        if (marketData.change_24h > 0) {
+          response += `up ${marketData.change_24h.toFixed(1)}% today. ${wisdom} How 'bout a celebratory drink?`
+        } else {
+          response += `down ${Math.abs(marketData.change_24h).toFixed(1)}% today. ${wisdom} Maybe some whiskey to steady the nerves?`
+        }
+      } else {
+        response = `${wisdom} I always keep an ear to the ground about market happenings. What's on your mind about trading?`
+      }
+    }
+
+    // General conversation
+    else {
+      const speech =
+        this.personality_traits.speech_patterns[
+          Math.floor(Math.random() * this.personality_traits.speech_patterns.length)
+        ]
+
+      if (this.state.mood === "excited") {
+        response = `${speech} I'm feelin' mighty energetic today! The saloon's buzzin' with activity. What brings you by?`
+      } else if (this.state.mood === "concerned") {
+        response = `${speech} Times have been a bit rough lately, but that's what friends and good conversation are for. What's troublin' ya, partner?`
+      } else {
+        response = `${speech} Always happy to chat with a fellow frontier dweller. What can old Bill do for ya today?`
+      }
+    }
+
+    // Add mood indicators
+    const moodEmoji = {
+      cheerful: "😊",
+      concerned: "😟",
+      excited: "🤠",
+      wise: "🧠",
+      welcoming: "👋",
+    }
+
+    return `${moodEmoji[this.state.mood]} ${response}`
+  }
+
+  getState(): BillState {
+    return { ...this.state }
+  }
+}
+
+// Initialize Bill AI instance
+const billAI = new EnhancedBillAI()
+
+export async function POST(request: NextRequest) {
+  try {
+    const { message, playerId } = await request.json()
+
+    if (!message || !playerId) {
+      return NextResponse.json({ error: "Message and playerId are required" }, { status: 400 })
+    }
+
+    // Get current market data
+    const marketData = await billAI.getMarketData()
+
+    // Generate Bill's response
+    const response = billAI.generateResponse(message, marketData)
+    const currentState = billAI.getState()
+
+    // Save conversation to Supabase
+    const { error: dbError } = await supabase.from("bill_conversations").insert([
+      {
+        player_id: playerId,
+        message_role: "user",
+        content: message,
+        bill_mood: currentState.mood,
+        energy_level: currentState.energy,
+        wisdom_points: currentState.wisdom_points,
       },
+      {
+        player_id: playerId,
+        message_role: "assistant",
+        content: response,
+        bill_mood: currentState.mood,
+        energy_level: currentState.energy,
+        wisdom_points: currentState.wisdom_points,
+      },
+    ])
+
+    if (dbError) {
+      console.error("Database error:", dbError)
+    }
+
+    // Return enhanced response
+    return NextResponse.json({
+      response,
+      billState: {
+        mood: currentState.mood,
+        energy: currentState.energy,
+        wisdom_points: currentState.wisdom_points,
+        last_drink: currentState.last_drink_served,
+      },
+      marketData: marketData
+        ? {
+            symbol: marketData.symbol,
+            price: marketData.price,
+            change_24h: marketData.change_24h,
+          }
+        : null,
+      timestamp: new Date().toISOString(),
     })
   } catch (error) {
-    console.error("Bill AI Enhanced error:", error)
-
+    console.error("Bill AI API error:", error)
     return NextResponse.json(
       {
-        success: false,
-        error: "Bill spilled his whiskey on the telegraph machine!",
-        response:
-          "Well partner, seems my brain's a bit foggy from that last shot of whiskey. *chuckles and wipes bar* Try askin' again in a spell - this old bartender's still got plenty of wisdom to share!",
-        mood: "apologetic",
-        confidence: 0.3,
-        timestamp: new Date().toISOString(),
+        error: "Internal server error",
+        response: "Well partner, seems my brain's a bit foggy right now. How 'bout we try that again?",
       },
       { status: 500 },
     )
   }
 }
 
-// GET endpoint for Bill's current status
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Get recent interactions count
-    const { data: recentInteractions } = await supabase
-      .from("bill_interactions")
-      .select("id")
-      .gte("executed_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+    const { searchParams } = new URL(request.url)
+    const playerId = searchParams.get("playerId")
 
-    // Get pending reviews
-    const { data: pendingReviews } = await supabase
-      .from("bill_responses_review")
-      .select("id")
-      .eq("status", "pending_review")
+    if (!playerId) {
+      return NextResponse.json({ error: "PlayerId is required" }, { status: 400 })
+    }
+
+    // Get conversation history from Supabase
+    const { data: conversations, error } = await supabase
+      .from("bill_conversations")
+      .select("*")
+      .eq("player_id", playerId)
+      .order("created_at", { ascending: true })
+      .limit(20)
+
+    if (error) {
+      console.error("Database error:", error)
+      return NextResponse.json({ error: "Failed to fetch conversation history" }, { status: 500 })
+    }
+
+    // Get current Bill state
+    const currentState = billAI.getState()
+    const marketData = await billAI.getMarketData()
 
     return NextResponse.json({
-      status: "operational",
-      interactions_24h: recentInteractions?.length || 0,
-      pending_reviews: pendingReviews?.length || 0,
-      mood: "cheerful",
-      energy: Math.floor(Math.random() * 30) + 70,
-      wisdom: Math.floor(Math.random() * 20) + 80,
-      last_updated: new Date().toISOString(),
-      message: "Bar Keep Bill's AI brain is running smooth as Tennessee whiskey!",
+      conversations: conversations || [],
+      billState: currentState,
+      marketData,
+      timestamp: new Date().toISOString(),
     })
   } catch (error) {
-    return NextResponse.json(
-      {
-        status: "error",
-        message: "Bill's having some technical difficulties with his telegraph machine.",
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 },
-    )
+    console.error("Bill AI GET error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

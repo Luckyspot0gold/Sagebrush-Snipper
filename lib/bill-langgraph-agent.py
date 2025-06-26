@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-🤠 BAR KEEP BILL - LANGGRAPH AMBIENT AGENT
-Advanced AI agent with human-in-the-loop oversight for hackathon submission
+🤠 Bar Keep Bill - LangGraph AI Agent
+Advanced conversational AI with market awareness and human oversight
 """
 
 import os
@@ -12,474 +12,380 @@ from dataclasses import dataclass, asdict
 from datetime import datetime
 from enum import Enum
 
-# Core AI/Agent imports
-try:
-    from langgraph.graph import StateGraph, END
-    from langgraph.prebuilt import ToolExecutor
-    import requests
-    from supabase import create_client, Client
-    import pandas as pd
-    import numpy as np
-except ImportError:
-    print("Installing required packages...")
-    os.system("pip install langgraph supabase pandas numpy requests")
-    from langgraph.graph import StateGraph, END
-    from langgraph.prebuilt import ToolExecutor
-    import requests
-    from supabase import create_client, Client
-    import pandas as pd
-    import numpy as np
+# LangGraph and AI imports
+from langgraph.graph import StateGraph, END
+from langgraph.prebuilt import ToolExecutor
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+from langchain_core.tools import tool
+
+# Venice AI integration
+import requests
+import os
 
 class EventType(Enum):
     WELCOME = "welcome"
     MARKET_BOOM = "market_boom"
     MARKET_CRASH = "market_crash"
     HIGH_ACTIVITY = "high_activity"
-    NEW_PLAYER = "new_player"
-    LARGE_TRADE = "large_trade"
+    NEW_TRADE = "new_trade"
     IDLE = "idle"
-    GOSSIP = "gossip_event"
+    HUMAN_REVIEW = "human_review"
 
 @dataclass
 class GameState:
-    event_type: EventType
-    player_data: Dict[str, Any]
-    market_data: Dict[str, Any]
-    context: str
-    requires_approval: bool = False
-    response: str = ""
-    confidence: float = 0.0
-    timestamp: datetime = None
+    """State management for Bar Keep Bill"""
+    player_id: str
+    conversation_history: List[Dict]
+    current_event: EventType
+    market_data: Dict
+    bill_mood: str  # "cheerful", "concerned", "excited", "wise"
+    energy_level: int  # 0-100
+    wisdom_points: int
+    requires_human_review: bool = False
+    last_interaction: datetime = None
 
-    def __post_init__(self):
-        if self.timestamp is None:
-            self.timestamp = datetime.now()
-
-@dataclass
-class MarketEvent:
-    symbol: str
-    price_change: float
-    volume: float
-    timestamp: datetime
-    significance: str  # "low", "medium", "high", "critical"
-
-class BarKeepAgent:
+class BillAIAgent:
+    """
+    Bar Keep Bill - Advanced AI Agent with LangGraph
+    Features:
+    - Market-aware responses
+    - Mood system based on events
+    - Human oversight for sensitive topics
+    - Memory of player interactions
+    """
+    
     def __init__(self):
-        # Initialize Supabase connection
-        self.supabase_url = os.getenv('SUPABASE_NEXT_PUBLIC_SUPABASE_URL')
-        self.supabase_key = os.getenv('SUPABASE_SERVICE_KEY')
-        self.supabase: Client = create_client(self.supabase_url, self.supabase_key)
+        self.venice_api_key = os.getenv("VENICE_API_KEY")
+        self.wyoverse_api = os.getenv("NEXT_PUBLIC_WYOVERSE_API")
+        self.supabase_url = os.getenv("SUPABASE_URL")
+        self.supabase_key = os.getenv("SUPABASE_SERVICE_KEY")
         
-        # Initialize Venice AI (simulated for hackathon)
-        self.venice_api_key = os.getenv('VENICE_API_KEY', 'demo-key')
+        # Initialize LangGraph workflow
+        self.workflow = StateGraph(GameState)
+        self._setup_workflow()
         
-        # Initialize Avalanche listener
-        self.avalanche_rpc = os.getenv('NEXT_PUBLIC_AVALANCHE_RPC_URL')
-        
-        # Build the LangGraph workflow
-        self.workflow = self._build_workflow()
-        self.app = self.workflow.compile()
-        
-        # Event thresholds
-        self.MARKET_BOOM_THRESHOLD = 10.0  # 10% price increase
-        self.MARKET_CRASH_THRESHOLD = -10.0  # 10% price decrease
-        self.HIGH_ACTIVITY_THRESHOLD = 1000  # Transaction count
-        
-        print("🤠 Bar Keep Bill's AI brain initialized!")
+        # Bill's personality traits
+        self.personality = {
+            "base_character": "Wise frontier bartender from 1880s Wyoming",
+            "speech_patterns": ["Well partner", "I reckon", "Much obliged", "By thunder"],
+            "knowledge_areas": ["frontier_trading", "market_wisdom", "local_gossip", "survival_tips"],
+            "mood_triggers": {
+                "market_up": "cheerful",
+                "market_down": "concerned", 
+                "new_player": "welcoming",
+                "high_volume": "excited"
+            }
+        }
 
-    def _build_workflow(self) -> StateGraph:
-        """Build the LangGraph workflow for Bill's decision making"""
-        workflow = StateGraph(GameState)
+    def _setup_workflow(self):
+        """Setup LangGraph workflow nodes"""
         
-        # Add nodes
-        workflow.add_node("detect_event", self._detect_event)
-        workflow.add_node("analyze_context", self._analyze_context)
-        workflow.add_node("generate_response", self._generate_response)
-        workflow.add_node("human_review", self._human_review)
-        workflow.add_node("execute_action", self._execute_action)
+        # Add workflow nodes
+        self.workflow.add_node("detect_event", self._detect_event)
+        self.workflow.add_node("analyze_context", self._analyze_context)
+        self.workflow.add_node("generate_response", self._generate_response)
+        self.workflow.add_node("human_review", self._human_review)
+        self.workflow.add_node("update_state", self._update_state)
         
-        # Define the flow
-        workflow.set_entry_point("detect_event")
-        
-        workflow.add_edge("detect_event", "analyze_context")
-        workflow.add_edge("analyze_context", "generate_response")
-        
-        # Conditional edge for human review
-        workflow.add_conditional_edges(
-            "generate_response",
-            self._should_require_approval,
+        # Define workflow edges
+        self.workflow.set_entry_point("detect_event")
+        self.workflow.add_edge("detect_event", "analyze_context")
+        self.workflow.add_conditional_edges(
+            "analyze_context",
+            self._should_review,
             {
-                "human_review": "human_review",
-                "execute_action": "execute_action"
+                "review": "human_review",
+                "continue": "generate_response"
             }
         )
+        self.workflow.add_edge("generate_response", "update_state")
+        self.workflow.add_edge("human_review", "generate_response")
+        self.workflow.add_edge("update_state", END)
         
-        workflow.add_edge("human_review", "execute_action")
-        workflow.add_edge("execute_action", END)
-        
-        return workflow
+        # Compile the workflow
+        self.app = self.workflow.compile()
 
     async def _detect_event(self, state: GameState) -> GameState:
-        """Detect what type of event is happening"""
+        """Detect current game/market events"""
         try:
-            # Check market conditions
-            market_data = await self._get_market_data()
+            # Get market data from WyoVerse API
+            market_response = await self._fetch_market_data()
             
-            # Check for new players
-            new_players = await self._check_new_players()
-            
-            # Check trading activity
-            activity_level = await self._check_activity_level()
-            
-            # Determine event type
-            if new_players > 0:
-                state.event_type = EventType.NEW_PLAYER
-            elif market_data.get('avax_change', 0) > self.MARKET_BOOM_THRESHOLD:
-                state.event_type = EventType.MARKET_BOOM
-            elif market_data.get('avax_change', 0) < self.MARKET_CRASH_THRESHOLD:
-                state.event_type = EventType.MARKET_CRASH
-            elif activity_level > self.HIGH_ACTIVITY_THRESHOLD:
-                state.event_type = EventType.HIGH_ACTIVITY
-            else:
-                state.event_type = EventType.IDLE
-            
-            state.market_data = market_data
-            
-            print(f"🔍 Event detected: {state.event_type.value}")
-            return state
-            
+            if market_response:
+                price_change = market_response.get("change_24h", 0)
+                volume = market_response.get("volume", 0)
+                
+                # Determine event type based on market conditions
+                if abs(price_change) > 10:
+                    state.current_event = EventType.MARKET_BOOM if price_change > 0 else EventType.MARKET_CRASH
+                elif volume > 1000000:
+                    state.current_event = EventType.HIGH_ACTIVITY
+                elif not state.conversation_history:
+                    state.current_event = EventType.WELCOME
+                else:
+                    state.current_event = EventType.IDLE
+                    
+                state.market_data = market_response
+                
         except Exception as e:
-            print(f"❌ Event detection failed: {e}")
-            state.event_type = EventType.IDLE
-            return state
+            print(f"Event detection error: {e}")
+            state.current_event = EventType.IDLE
+            
+        return state
 
     async def _analyze_context(self, state: GameState) -> GameState:
-        """Analyze the context around the detected event"""
-        context_parts = []
+        """Analyze conversation context and player history"""
         
-        # Add market context
-        if state.market_data:
-            avax_change = state.market_data.get('avax_change', 0)
-            if avax_change > 5:
-                context_parts.append(f"AVAX is up {avax_change:.1f}% - bullish sentiment")
-            elif avax_change < -5:
-                context_parts.append(f"AVAX is down {avax_change:.1f}% - bearish sentiment")
-        
-        # Add player context
-        if state.event_type == EventType.NEW_PLAYER:
-            context_parts.append("New pioneer has arrived in the territory")
-        
-        # Add time context
-        hour = datetime.now().hour
-        if 6 <= hour < 12:
-            context_parts.append("Morning trading session")
-        elif 12 <= hour < 18:
-            context_parts.append("Afternoon market activity")
+        # Update Bill's mood based on events
+        if state.current_event == EventType.MARKET_BOOM:
+            state.bill_mood = "excited"
+            state.energy_level = min(100, state.energy_level + 20)
+        elif state.current_event == EventType.MARKET_CRASH:
+            state.bill_mood = "concerned"
+            state.energy_level = max(20, state.energy_level - 10)
+        elif state.current_event == EventType.WELCOME:
+            state.bill_mood = "welcoming"
+            state.energy_level = 80
         else:
-            context_parts.append("Evening saloon hours")
+            state.bill_mood = "cheerful"
+            
+        # Check if human review is needed
+        recent_messages = state.conversation_history[-5:] if state.conversation_history else []
+        sensitive_topics = ["financial_advice", "investment_recommendations", "personal_problems"]
         
-        state.context = " | ".join(context_parts)
-        print(f"📊 Context: {state.context}")
+        for msg in recent_messages:
+            if any(topic in msg.get("content", "").lower() for topic in sensitive_topics):
+                state.requires_human_review = True
+                break
+                
+        return state
+
+    def _should_review(self, state: GameState) -> str:
+        """Conditional edge: determine if human review is needed"""
+        return "review" if state.requires_human_review else "continue"
+
+    async def _human_review(self, state: GameState) -> GameState:
+        """Send to human review queue and wait for approval"""
+        
+        # Store in Supabase for human review
+        review_data = {
+            "player_id": state.player_id,
+            "conversation_context": state.conversation_history[-3:],
+            "proposed_response": "PENDING_HUMAN_REVIEW",
+            "event_type": state.current_event.value,
+            "timestamp": datetime.now().isoformat(),
+            "status": "pending"
+        }
+        
+        # In production, this would integrate with Supabase
+        print(f"🔍 Human review requested for player {state.player_id}")
+        
+        # For demo, auto-approve after short delay
+        await asyncio.sleep(2)
+        state.requires_human_review = False
         
         return state
 
     async def _generate_response(self, state: GameState) -> GameState:
-        """Generate Bill's response using Venice AI (simulated)"""
+        """Generate Bill's response using Venice AI"""
+        
         try:
-            # Build prompt for Venice AI
-            prompt = self._build_character_prompt(state)
+            # Build context for Venice AI
+            context = self._build_context(state)
             
-            # Simulate Venice AI call (replace with actual API in production)
-            response = await self._call_venice_ai(prompt)
+            # Call Venice AI
+            response = await self._call_venice_ai(context, state)
             
-            state.response = response
-            state.confidence = 0.85  # Simulated confidence score
-            
-            # Determine if human approval needed
-            sensitive_topics = ["large", "crash", "boom", "emergency"]
-            state.requires_approval = any(topic in response.lower() for topic in sensitive_topics)
-            
-            print(f"🤠 Bill says: {response[:100]}...")
-            return state
+            # Add response to conversation history
+            state.conversation_history.append({
+                "role": "assistant",
+                "content": response,
+                "timestamp": datetime.now().isoformat(),
+                "mood": state.bill_mood,
+                "event": state.current_event.value
+            })
             
         except Exception as e:
-            print(f"❌ Response generation failed: {e}")
-            state.response = "Well partner, seems my telegraph's actin' up. Try again in a spell."
-            state.confidence = 0.3
-            return state
+            print(f"Response generation error: {e}")
+            # Fallback response
+            fallback_responses = {
+                EventType.WELCOME: "Well howdy there, partner! Welcome to my saloon. What can I get ya?",
+                EventType.MARKET_BOOM: "By thunder! The markets are lookin' mighty fine today! Drinks are on the house!",
+                EventType.MARKET_CRASH: "Well partner, markets are rougher than a bronco today. How 'bout a whiskey to steady the nerves?",
+                EventType.IDLE: "What can I do ya for, friend? Got some fine drinks and even finer conversation."
+            }
+            
+            response = fallback_responses.get(state.current_event, "Howdy, partner!")
+            state.conversation_history.append({
+                "role": "assistant", 
+                "content": response,
+                "timestamp": datetime.now().isoformat()
+            })
+            
+        return state
 
-    def _build_character_prompt(self, state: GameState) -> str:
-        """Build character-appropriate prompt for Venice AI"""
-        base_personality = """
-        You are Bar Keep Bill, a wise frontier bartender from 1852 who now runs a digital saloon.
+    async def _update_state(self, state: GameState) -> GameState:
+        """Update game state and save to database"""
         
-        PERSONALITY:
-        - Use frontier/cowboy language ("partner", "dagnabbit", "well I'll be")
-        - Mix old west wisdom with modern crypto knowledge
-        - Always helpful but gruff and experienced
-        - Tell relevant stories from the frontier days
+        state.last_interaction = datetime.now()
         
-        CURRENT SITUATION:
+        # Update wisdom points based on interaction quality
+        if state.current_event in [EventType.MARKET_BOOM, EventType.MARKET_CRASH]:
+            state.wisdom_points += 5
+        else:
+            state.wisdom_points += 1
+            
+        # Save to Supabase (in production)
+        await self._save_state_to_db(state)
+        
+        return state
+
+    def _build_context(self, state: GameState) -> str:
+        """Build context prompt for Venice AI"""
+        
+        market_context = ""
+        if state.market_data:
+            price_change = state.market_data.get("change_24h", 0)
+            market_context = f"Market is {'up' if price_change > 0 else 'down'} {abs(price_change):.1f}% today. "
+        
+        mood_context = f"Bill is feeling {state.bill_mood} (energy: {state.energy_level}/100). "
+        
+        recent_conversation = ""
+        if state.conversation_history:
+            recent_msgs = state.conversation_history[-3:]
+            recent_conversation = "Recent conversation: " + " | ".join([
+                f"{msg['role']}: {msg['content'][:100]}" for msg in recent_msgs
+            ])
+        
+        context = f"""
+        You are Bar Keep Bill, a wise and friendly bartender in 1880s Wyoming frontier town.
+        
+        Character traits:
+        - Speaks with frontier dialect ("Well partner", "I reckon", "Much obliged")
+        - Knowledgeable about trading, markets, and frontier life
+        - Offers drinks and wisdom in equal measure
+        - Always helpful but never gives direct financial advice
+        
+        Current situation:
+        {market_context}
+        {mood_context}
+        Event: {state.current_event.value}
+        
+        {recent_conversation}
+        
+        Respond as Bill would, staying in character. Keep responses under 150 words.
         """
         
-        situation = f"""
-        Event: {state.event_type.value}
-        Context: {state.context}
-        Market Data: {json.dumps(state.market_data, indent=2) if state.market_data else "No data"}
-        
-        Respond as Bill would, giving appropriate advice for this situation.
-        Keep response under 200 words and stay in character.
-        """
-        
-        return base_personality + situation
+        return context
 
-    async def _call_venice_ai(self, prompt: str) -> str:
-        """Call Venice AI API (simulated for hackathon)"""
-        # In production, this would call the actual Venice AI API
-        # For hackathon demo, we'll use rule-based responses
+    async def _call_venice_ai(self, context: str, state: GameState) -> str:
+        """Call Venice AI API for response generation"""
         
-        responses_by_event = {
-            EventType.WELCOME: [
-                "Well howdy there, partner! *tips hat* Welcome to the finest digital saloon this side of the blockchain. Pull up a stool and let old Bill show ya the ropes of frontier trading!",
-                "New face in town, eh? *wipes down glass* Name's Bill, and I've been tendin' this establishment since the great crypto rush of '52. What brings ya to our neck of the digital woods?"
-            ],
-            EventType.MARKET_BOOM: [
-                "Well I'll be jiggered! *polishes glass excitedly* Markets are hotter than a branding iron today! Time to take some profits off the table, but don't get too greedy now, partner.",
-                "Thunderation! Haven't seen a bull run like this since the gold rush! *slides celebratory whiskey* But remember what old Bill always says - what goes up like a rocket can come down like a rock."
-            ],
-            EventType.MARKET_CRASH: [
-                "*furrows brow while cleaning shot glass* Markets are colder than a Wyoming winter, partner. But this old bartender's seen plenty of storms - they always pass. Time to look for bargains!",
-                "Dagnabbit! Market's taken a tumble, but don't you go sellin' in a panic now. *pours stiff drink* This here whiskey'll help ya think clearer about them opportunities."
-            ],
-            EventType.HIGH_ACTIVITY: [
-                "*looks around bustling saloon* Well ain't this place hoppin'! Trading volume's higher than a cat's back. Might be time to slow down and make sure you ain't chasin' fool's gold.",
-                "Busier than a one-legged cat in a sandbox! *chuckles* All this activity reminds me of the old cattle drives - sometimes ya gotta let the dust settle before ya can see clear."
-            ],
-            EventType.IDLE: [
-                "*leans on bar thoughtfully* Quiet evening in the territory. Perfect time for plannin' your next moves, partner. Fortune favors the prepared mind, as they say.",
-                "*adjusts suspenders* Peaceful times like these are when the smart traders do their homework. What's your strategy for the next market move, friend?"
-            ]
-        }
+        if not self.venice_api_key:
+            return "Well partner, my brain's a bit foggy today. How 'bout a drink while I gather my thoughts?"
         
-        event_responses = responses_by_event.get(state.event_type, responses_by_event[EventType.IDLE])
-        return np.random.choice(event_responses)
-
-    def _should_require_approval(self, state: GameState) -> str:
-        """Determine if response needs human approval"""
-        if state.requires_approval or state.confidence < 0.7:
-            return "human_review"
-        return "execute_action"
-
-    async def _human_review(self, state: GameState) -> GameState:
-        """Submit response for human review via Supabase"""
         try:
-            review_data = {
-                'event_type': state.event_type.value,
-                'context': state.context,
-                'proposed_response': state.response,
-                'confidence': state.confidence,
-                'requires_approval': True,
-                'status': 'pending_review',
-                'created_at': state.timestamp.isoformat()
+            headers = {
+                "Authorization": f"Bearer {self.venice_api_key}",
+                "Content-Type": "application/json"
             }
             
-            result = self.supabase.table('bill_responses_review').insert(review_data).execute()
-            
-            print(f"📋 Response submitted for human review: {result.data[0]['id']}")
-            
-            # For hackathon demo, auto-approve after short delay
-            await asyncio.sleep(2)
-            state.requires_approval = False
-            
-            return state
-            
-        except Exception as e:
-            print(f"❌ Human review submission failed: {e}")
-            return state
-
-    async def _execute_action(self, state: GameState) -> GameState:
-        """Execute Bill's response and any associated actions"""
-        try:
-            # Log the interaction
-            interaction_data = {
-                'event_type': state.event_type.value,
-                'context': state.context,
-                'response': state.response,
-                'confidence': state.confidence,
-                'executed_at': datetime.now().isoformat()
+            payload = {
+                "model": "llama-3.1-8b",
+                "messages": [
+                    {"role": "system", "content": context},
+                    {"role": "user", "content": state.conversation_history[-1]["content"] if state.conversation_history else "Hello"}
+                ],
+                "max_tokens": 150,
+                "temperature": 0.8
             }
             
-            self.supabase.table('bill_interactions').insert(interaction_data).execute()
-            
-            # Trigger any special actions based on event type
-            if state.event_type == EventType.NEW_PLAYER:
-                await self._send_welcome_brew(state.player_data)
-            elif state.event_type == EventType.MARKET_CRASH:
-                await self._offer_discount_drinks()
-            elif state.event_type == EventType.HIGH_ACTIVITY:
-                await self._start_minigame()
-            
-            print(f"✅ Action executed: {state.event_type.value}")
-            return state
-            
-        except Exception as e:
-            print(f"❌ Action execution failed: {e}")
-            return state
-
-    # Helper methods for data gathering
-    async def _get_market_data(self) -> Dict[str, Any]:
-        """Get current market data"""
-        try:
-            # Simulate market data (replace with real API calls)
-            return {
-                'avax_price': 34.21,
-                'avax_change': np.random.uniform(-15, 15),
-                'stones_price': 2.47,
-                'stones_change': np.random.uniform(-10, 10),
-                'volume_24h': np.random.uniform(1000, 10000),
-                'timestamp': datetime.now().isoformat()
-            }
-        except Exception as e:
-            print(f"❌ Market data fetch failed: {e}")
-            return {}
-
-    async def _check_new_players(self) -> int:
-        """Check for new player registrations"""
-        try:
-            # Query Supabase for recent user registrations
-            result = self.supabase.table('users').select('id').gte(
-                'created_at', 
-                (datetime.now().timestamp() - 3600)  # Last hour
-            ).execute()
-            
-            return len(result.data)
-        except Exception as e:
-            print(f"❌ New player check failed: {e}")
-            return 0
-
-    async def _check_activity_level(self) -> int:
-        """Check current trading activity level"""
-        try:
-            # Simulate activity level
-            return np.random.randint(100, 2000)
-        except Exception as e:
-            print(f"❌ Activity check failed: {e}")
-            return 0
-
-    # Action methods
-    async def _send_welcome_brew(self, player_data: Dict[str, Any]):
-        """Send welcome gift to new player"""
-        print("🍺 Sending welcome brew to new player!")
-        # Implementation would send actual in-game item
-
-    async def _offer_discount_drinks(self):
-        """Offer discounted drinks during market crashes"""
-        print("💰 Offering discount drinks during market downturn!")
-        # Implementation would update in-game prices
-
-    async def _start_minigame(self):
-        """Start a minigame during high activity"""
-        print("🎮 Starting saloon minigame due to high activity!")
-        # Implementation would trigger game event
-
-    # Main execution methods
-    async def process_event(self, initial_state: GameState = None) -> GameState:
-        """Process a single event through the workflow"""
-        if initial_state is None:
-            initial_state = GameState(
-                event_type=EventType.IDLE,
-                player_data={},
-                market_data={},
-                context=""
-            )
-        
-        try:
-            result = await self.app.ainvoke(initial_state)
-            return result
-        except Exception as e:
-            print(f"❌ Event processing failed: {e}")
-            return initial_state
-
-    async def run_ambient_loop(self, interval: int = 30):
-        """Run the ambient agent loop"""
-        print(f"🤠 Bar Keep Bill starting ambient monitoring (every {interval}s)")
-        
-        while True:
-            try:
-                # Process current state
-                result = await self.process_event()
-                
-                # Only respond if something interesting happened
-                if result.event_type != EventType.IDLE:
-                    print(f"🎯 Bill responded to {result.event_type.value}: {result.response[:50]}...")
-                
-                await asyncio.sleep(interval)
-                
-            except KeyboardInterrupt:
-                print("🤠 Bar Keep Bill signing off for the night!")
-                break
-            except Exception as e:
-                print(f"❌ Ambient loop error: {e}")
-                await asyncio.sleep(interval)
-
-# Global agent instance
-bill_agent = BarKeepAgent()
-
-# API endpoints for Next.js integration
-async def get_bill_response(event_type: str = "idle", player_data: Dict = None) -> Dict:
-    """API endpoint for getting Bill's response to events"""
-    try:
-        initial_state = GameState(
-            event_type=EventType(event_type),
-            player_data=player_data or {},
-            market_data={},
-            context=""
-        )
-        
-        result = await bill_agent.process_event(initial_state)
-        
-        return {
-            "success": True,
-            "response": result.response,
-            "confidence": result.confidence,
-            "event_type": result.event_type.value,
-            "context": result.context,
-            "timestamp": result.timestamp.isoformat()
-        }
-        
-    except Exception as e:
-        return {
-            "success": False,
-            "error": str(e),
-            "response": "Well partner, seems my telegraph's on the fritz. Try again in a spell."
-        }
-
-if __name__ == "__main__":
-    # Test the agent
-    async def test_agent():
-        print("🧪 Testing Bar Keep Bill's LangGraph Agent...")
-        
-        # Test different event types
-        test_events = [
-            EventType.WELCOME,
-            EventType.MARKET_BOOM,
-            EventType.MARKET_CRASH,
-            EventType.HIGH_ACTIVITY
-        ]
-        
-        for event in test_events:
-            print(f"\n🎯 Testing {event.value}...")
-            state = GameState(
-                event_type=event,
-                player_data={"id": "test_player"},
-                market_data={},
-                context=""
+            response = requests.post(
+                "https://api.venice.ai/v1/chat/completions",
+                headers=headers,
+                json=payload,
+                timeout=10
             )
             
-            result = await bill_agent.process_event(state)
-            print(f"🤠 Bill: {result.response}")
-            print(f"   Confidence: {result.confidence}")
-            print(f"   Required approval: {result.requires_approval}")
-    
-    # Run test
-    asyncio.run(test_agent())
+            if response.status_code == 200:
+                result = response.json()
+                return result["choices"][0]["message"]["content"]
+            else:
+                print(f"Venice AI error: {response.status_code}")
+                return self._get_fallback_response(state.current_event)
+                
+        except Exception as e:
+            print(f"Venice AI call failed: {e}")
+            return self._get_fallback_response(state.current_event)
+
+    def _get_fallback_response(self, event_type: EventType) -> str:
+        """Fallback responses when AI is unavailable"""
+        responses = {
+            EventType.WELCOME: "Well howdy there, partner! Welcome to my establishment. What brings you to these parts?",
+            EventType.MARKET_BOOM: "Hot diggity! The trading's been mighty good today! How 'bout we celebrate with a drink?",
+            EventType.MARKET_CRASH: "Well partner, looks like the markets are bumpier than a wagon trail. Let me pour you somethin' strong.",
+            EventType.HIGH_ACTIVITY: "Busier than a bee in a sunflower field around here! What can I get ya?",
+            EventType.IDLE: "Afternoon, friend. What'll it be today?"
+        }
+        return responses.get(event_type, "Howdy, partner! What can I do ya for?")
+
+    async def _fetch_market_data(self) -> Optional[Dict]:
+        """Fetch current market data from WyoVerse API"""
+        try:
+            if not self.wyoverse_api:
+                return None
+                
+            response = requests.get(f"{self.wyoverse_api}/market-data", timeout=5)
+            if response.status_code == 200:
+                return response.json()
+        except Exception as e:
+            print(f"Market data fetch error: {e}")
+        return None
+
+    async def _save_state_to_db(self, state: GameState):
+        """Save game state to Supabase"""
+        # In production, implement Supabase integration
+        print(f"💾 Saving state for player {state.player_id}")
+
+    async def process_message(self, player_id: str, message: str, current_state: Optional[GameState] = None) -> Dict:
+        """Main entry point for processing player messages"""
+        
+        # Initialize or load state
+        if current_state is None:
+            current_state = GameState(
+                player_id=player_id,
+                conversation_history=[],
+                current_event=EventType.IDLE,
+                market_data={},
+                bill_mood="cheerful",
+                energy_level=75,
+                wisdom_points=0
+            )
+        
+        # Add player message to history
+        current_state.conversation_history.append({
+            "role": "user",
+            "content": message,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+        # Process through LangGraph workflow
+        result_state = await self.app.ainvoke(current_state)
+        
+        # Return response
+        latest_response = result_state.conversation_history[-1]
+        
+        return {
+            "response": latest_response["content"],
+            "mood": result_state.bill_mood,
+            "energy": result_state.energy_level,
+            "wisdom_points": result_state.wisdom_points,
+            "event_type": result_state.current_event.value,
+            "timestamp": latest_response["timestamp"]
+        }
+
+# Initialize global agent instance
+bill_agent = BillAIAgent()
+
+# Export for use in API routes
+__all__ = ["bill_agent", "BillAIAgent", "GameState", "EventType"]
