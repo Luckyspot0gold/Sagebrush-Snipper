@@ -1,0 +1,2 @@
+# Create governance for boxer evolution
+npx @saberdao/cli create --name=BoxerGovernance
