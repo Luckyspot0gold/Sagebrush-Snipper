@@ -3,8 +3,16 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { RealTimeMarketWidget } from "@/components/real-time-market-widget"
+import { Badge } from "@/components/ui/badge"
 
 export function NewspaperFrontPage() {
+  const currentDate = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
+
   return (
     <div className="max-w-6xl mx-auto p-6 bg-amber-50 min-h-screen">
       {/* Newspaper Header */}
@@ -14,7 +22,7 @@ export function NewspaperFrontPage() {
         <div className="flex justify-between items-center text-sm">
           <div>VOL. 144, NO. 365</div>
           <div className="font-bold">DIGITAL FRONTIER EDITION</div>
-          <div>{new Date().toLocaleDateString()}</div>
+          <div>{currentDate}</div>
         </div>
       </div>
 
@@ -40,7 +48,7 @@ export function NewspaperFrontPage() {
                 </p>
               </div>
               <div className="space-y-2 text-sm">
-                <p className="font-bold">BREAKING NEWS</p>
+                <Badge className="bg-red-500 text-white">BREAKING NEWS</Badge>
                 <p>
                   In a spectacular display of frontier grit meets modern technology, legendary rider Stone dominated the
                   mechanical bull competition at this year's Cheyenne Frontier Days celebration.
