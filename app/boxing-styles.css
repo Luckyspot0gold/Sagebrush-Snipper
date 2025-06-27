@@ -1,0 +1,103 @@
+/* Enhanced Boxing Game Touch Controls */
+
+/* Larger touch targets for mobile boxing */
+.punch-btn {
+  min-width: 80px;
+  min-height: 80px;
+  margin: 10px;
+  border: 3px solid #000;
+  background: linear-gradient(145deg, #ff6b6b, #ee5a52);
+  color: white;
+  font-weight: bold;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.punch-btn:active {
+  transform: scale(0.95);
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.punch-btn:hover {
+  background: linear-gradient(145deg, #ee5a52, #ff6b6b);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Boxing ring with swipe gestures */
+#ring {
+  touch-action: pan-y;
+  position: relative;
+  background: radial-gradient(circle at center, #8b4513 2px, transparent 2px),
+    linear-gradient(45deg, #d2691e 25%, transparent 25%), linear-gradient(-45deg, #d2691e 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #d2691e 75%), linear-gradient(-45deg, transparent 75%, #d2691e 75%);
+  background-size: 20px 20px, 40px 40px, 40px 40px, 40px 40px, 40px 40px;
+  background-position: 0 0, 0 0, 0 20px, 20px -20px, -20px 0px;
+}
+
+/* Fighter positioning */
+.fighter-container {
+  position: absolute;
+  transition: transform 0.3s ease;
+}
+
+.fighter-container.punching {
+  animation: punchAnimation 0.4s ease-out;
+}
+
+@keyframes punchAnimation {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(20px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Mobile responsive boxing controls */
+@media (max-width: 768px) {
+  .punch-btn {
+    min-width: 60px;
+    min-height: 60px;
+    margin: 5px;
+    font-size: 14px;
+  }
+
+  .boxing-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+  }
+}
+
+/* Crypto-themed boxing gloves */
+.crypto-glove {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  position: absolute;
+  transition: all 0.2s ease;
+}
+
+.crypto-glove.bitcoin {
+  background: linear-gradient(145deg, #f7931a, #e8851c);
+  box-shadow: 0 2px 8px rgba(247, 147, 26, 0.4);
+}
+
+.crypto-glove.ethereum {
+  background: linear-gradient(145deg, #627eea, #4e6bd8);
+  box-shadow: 0 2px 8px rgba(98, 126, 234, 0.4);
+}
+
+.crypto-glove.punching {
+  transform: scale(1.2) rotate(15deg);
+}
