@@ -1,3 +1,5 @@
+import { ethers } from "ethers"
+
 interface AvalancheConnectionResult {
   success: boolean
   address?: string
@@ -17,6 +19,18 @@ interface NetworkConfig {
   }
   rpcUrls: string[]
   blockExplorerUrls: string[]
+}
+
+export const AVALANCHE_CONFIG: NetworkConfig = {
+  chainId: "0xa86a", // 43114 in hex
+  chainName: "Avalanche Network",
+  nativeCurrency: {
+    name: "AVAX",
+    symbol: "AVAX",
+    decimals: 18,
+  },
+  rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
+  blockExplorerUrls: ["https://snowtrace.io/"],
 }
 
 const AVALANCHE_MAINNET: NetworkConfig = {
@@ -172,10 +186,82 @@ export async function getCurrentNetwork(): Promise<{ chainId: string; isAvalanch
   }
 }
 
+// Connect to Avalanche network
+export async function connectToAvalanche() {
+  if (typeof window === "undefined" || !window.ethereum) {
+    throw new Error("MetaMask is not installed")
+  }
+
+  try {
+    // Request account access
+    await window.ethereum.request({ method: "eth_requestAccounts" })
+
+    // Add Avalanche network if not already added
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: AVALANCHE_CONFIG.chainId }],
+      })
+    } catch (switchError: any) {
+      // This error code indicates that the chain has not been added to MetaMask
+      if (switchError.code === 4902) {
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [AVALANCHE_CONFIG],
+        })
+      } else {
+        throw switchError
+      }
+    }
+
+    // Create provider and signer
+    const provider = new ethers.BrowserProvider(window.ethereum)
+    const signer = await provider.getSigner()
+
+    return { provider, signer }
+  } catch (error) {
+    console.error("Failed to connect to Avalanche:", error)
+    throw error
+  }
+}
+
+// Get AVAX balance
+export async function getAvaxBalance(address: string) {
+  try {
+    const provider = new ethers.JsonRpcProvider(AVALANCHE_CONFIG.rpcUrls[0])
+    const balance = await provider.getBalance(address)
+    return ethers.formatEther(balance)
+  } catch (error) {
+    console.error("Failed to get AVAX balance:", error)
+    throw error
+  }
+}
+
+// Get current gas price on Avalanche
+export async function getAvalancheGasPrice() {
+  try {
+    const provider = new ethers.JsonRpcProvider(AVALANCHE_CONFIG.rpcUrls[0])
+    const gasPrice = await provider.getFeeData()
+    return {
+      gasPrice: gasPrice.gasPrice ? ethers.formatUnits(gasPrice.gasPrice, "gwei") : "0",
+      maxFeePerGas: gasPrice.maxFeePerGas ? ethers.formatUnits(gasPrice.maxFeePerGas, "gwei") : "0",
+      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas
+        ? ethers.formatUnits(gasPrice.maxPriorityFeePerGas, "gwei")
+        : "0",
+    }
+  } catch (error) {
+    console.error("Failed to get Avalanche gas price:", error)
+    throw error
+  }
+}
+
 // Aggregate helpers for convenient import elsewhere in the app
 export const avalancheIntegration = {
-  connectAvalancheWallet,
-  getAvalancheBalance,
+  config: AVALANCHE_CONFIG,
+  connect: connectToAvalanche,
+  getBalance: getAvaxBalance,
+  getGasPrice: getAvalancheGasPrice,
+  connectWallet: connectAvalancheWallet,
   getCurrentNetwork,
 }
 

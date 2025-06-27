@@ -62,7 +62,7 @@
     "cmdk": "latest",
     "date-fns": "latest",
     "embla-carousel-react": "latest",
-    "ethers": "^6.8.0",
+    "ethers": "latest",
     "expo": "latest",
     "expo-asset": "latest",
     "expo-file-system": "latest",
