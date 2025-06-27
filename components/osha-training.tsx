@@ -1,624 +1,400 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { CheckCircle, XCircle, Clock, Award, AlertTriangle, HardHat, Shield, Zap } from "lucide-react"
+import { AlertTriangle, Clock, CheckCircle, XCircle, Award, HardHat } from "lucide-react"
 
 interface Question {
   id: number
   scenario: string
   question: string
   options: string[]
-  correctAnswer: number
+  correct: number
   explanation: string
   category: string
-  points: number
 }
 
-interface GameState {
-  currentQuestion: number
-  score: number
-  timeRemaining: number
-  answers: number[]
-  gameStarted: boolean
-  gameCompleted: boolean
-  showExplanation: boolean
-}
-
-const OSHA_QUESTIONS: Question[] = [
+const oshaQuestions: Question[] = [
   {
     id: 1,
-    scenario: "You're working on a construction site and notice a ladder that appears damaged with a cracked rung.",
-    question: "What should you do immediately?",
+    scenario: "You're working on a construction site and notice a ladder that appears damaged.",
+    question: "What should you do first?",
     options: [
-      "Use the ladder carefully, avoiding the cracked rung",
-      "Report the damage and tag the ladder as unsafe",
-      "Try to repair the ladder yourself",
-      "Ignore it since other workers are using it",
+      "Use the ladder carefully",
+      "Report it to your supervisor immediately",
+      "Try to fix it yourself",
+      "Find another route",
     ],
-    correctAnswer: 1,
-    explanation:
-      "Always report damaged equipment immediately and tag it as unsafe. Using damaged equipment puts you and others at serious risk of injury.",
+    correct: 1,
+    explanation: "Always report damaged equipment immediately. Using damaged equipment puts you and others at risk.",
     category: "Construction Safety",
-    points: 10,
   },
   {
     id: 2,
-    scenario: "While working in a mining operation, you hear the emergency evacuation alarm.",
-    question: "What is your first priority?",
-    options: [
-      "Finish your current task quickly",
-      "Gather your personal belongings",
-      "Immediately stop work and evacuate via the nearest exit",
-      "Wait for your supervisor's instructions",
-    ],
-    correctAnswer: 2,
-    explanation:
-      "During an emergency evacuation, immediately stop all work and evacuate using the nearest safe exit. Time is critical in emergency situations.",
-    category: "Mining Safety",
-    points: 15,
+    scenario: "You're working in a confined space and start feeling dizzy.",
+    question: "What is the most important action to take?",
+    options: ["Take a short break", "Exit the space immediately", "Drink some water", "Continue working slowly"],
+    correct: 1,
+    explanation: "Dizziness in confined spaces can indicate dangerous gas levels. Exit immediately and alert others.",
+    category: "Confined Space",
   },
   {
     id: 3,
-    scenario: "You're operating machinery and notice your safety guard is loose and vibrating.",
+    scenario: "A coworker is not wearing required safety equipment while operating machinery.",
     question: "What should you do?",
     options: [
-      "Continue working but be extra careful",
-      "Tighten the guard while the machine is running",
-      "Stop the machine immediately and report the issue",
-      "Work at a slower speed to reduce vibration",
+      "Ignore it - it's their choice",
+      "Tell them to stop and put on safety equipment",
+      "Report it later",
+      "Work somewhere else",
     ],
-    correctAnswer: 2,
-    explanation:
-      "Always stop machinery immediately when safety equipment is compromised. Never attempt repairs while equipment is running.",
-    category: "Machine Safety",
-    points: 12,
+    correct: 1,
+    explanation: "Safety is everyone's responsibility. Stop unsafe work immediately to prevent accidents.",
+    category: "Machinery Safety",
   },
   {
     id: 4,
-    scenario: "A coworker has been exposed to a chemical spill and is showing signs of skin irritation.",
-    question: "What is the most important first step?",
+    scenario: "You discover a chemical spill in your work area.",
+    question: "What is your first priority?",
     options: [
-      "Apply ointment to the affected area",
-      "Move them to fresh air and flush with water",
-      "Give them pain medication",
-      "Wait to see if symptoms worsen",
+      "Clean it up quickly",
+      "Evacuate the area and alert others",
+      "Take photos for documentation",
+      "Find the source of the spill",
     ],
-    correctAnswer: 1,
-    explanation:
-      "For chemical exposure, immediately move the person away from the source and flush the affected area with clean water for at least 15 minutes.",
+    correct: 1,
+    explanation: "Chemical spills can be hazardous. Evacuate first, then follow proper spill response procedures.",
     category: "Chemical Safety",
-    points: 15,
   },
   {
     id: 5,
-    scenario: "You're working at height and your safety harness feels loose around your waist.",
+    scenario: "You need to work at height but the safety harness feels uncomfortable.",
     question: "What should you do?",
     options: [
-      "Tighten it while continuing to work",
-      "Descend safely and adjust the harness properly",
-      "Ask a coworker to tighten it for you",
-      "Work more carefully to compensate",
+      "Work without it for speed",
+      "Adjust it properly or get a different size",
+      "Loosen it for comfort",
+      "Work quickly to minimize risk",
     ],
-    correctAnswer: 1,
-    explanation:
-      "Never work at height with improperly fitted safety equipment. Descend safely and ensure all PPE is properly adjusted before continuing.",
+    correct: 1,
+    explanation: "Proper fit is essential for fall protection. Never compromise on safety equipment fit.",
     category: "Fall Protection",
-    points: 15,
   },
   {
     id: 6,
-    scenario: "You discover an electrical panel with the cover removed and wires exposed in your work area.",
-    question: "What is your immediate action?",
+    scenario: "You notice exposed electrical wires near your work area.",
+    question: "What is the safest course of action?",
     options: [
-      "Quickly replace the cover yourself",
-      "Warn others and contact a qualified electrician",
-      "Continue working but avoid the area",
-      "Turn off the main power switch",
+      "Avoid the area and continue working",
+      "Turn off power and report immediately",
+      "Cover the wires with tape",
+      "Work around them carefully",
     ],
-    correctAnswer: 1,
-    explanation:
-      "Exposed electrical components are extremely dangerous. Warn others, secure the area, and contact qualified electrical personnel immediately.",
+    correct: 1,
+    explanation: "Exposed electrical wires are an immediate hazard. De-energize if possible and report immediately.",
     category: "Electrical Safety",
-    points: 15,
   },
   {
     id: 7,
-    scenario:
-      "During a routine inspection, you find that the fire extinguisher in your area is missing its safety pin.",
-    question: "What should you do?",
+    scenario: "The fire alarm sounds during your shift.",
+    question: "What should you do first?",
     options: [
-      "Use a paperclip as a temporary pin",
-      "Report it and request immediate replacement",
-      "Move an extinguisher from another area",
-      "Continue working since it's just one extinguisher",
+      "Finish your current task",
+      "Stop work and evacuate immediately",
+      "Look for the source of alarm",
+      "Wait for instructions",
     ],
-    correctAnswer: 1,
-    explanation:
-      "Fire safety equipment must be properly maintained and immediately replaced when defective. Report the issue and request immediate replacement.",
+    correct: 1,
+    explanation: "Fire alarms require immediate evacuation. Never delay or ignore fire safety signals.",
     category: "Fire Safety",
-    points: 10,
   },
   {
     id: 8,
-    scenario: "You witness a coworker lifting a heavy box using improper technique, bending at the waist.",
-    question: "What should you do?",
+    scenario: "You're experiencing back pain from repetitive lifting.",
+    question: "What is the best approach?",
     options: [
-      "Mind your own business",
-      "Help them lift it using the same technique",
-      "Stop them and demonstrate proper lifting technique",
-      "Report them to management",
+      "Take pain medication and continue",
+      "Report it and request ergonomic assessment",
+      "Switch to lighter tasks temporarily",
+      "Ignore it - it will go away",
     ],
-    correctAnswer: 2,
+    correct: 1,
     explanation:
-      "Preventing injury is everyone's responsibility. Politely intervene and demonstrate proper lifting technique: bend your knees, keep your back straight, and lift with your legs.",
+      "Repetitive strain injuries should be reported early. Ergonomic assessments can prevent serious injury.",
     category: "Ergonomics",
-    points: 10,
   },
 ]
 
-export function OSHATraining() {
-  const [gameState, setGameState] = useState<GameState>({
-    currentQuestion: 0,
-    score: 0,
-    timeRemaining: 30,
-    answers: [],
-    gameStarted: false,
-    gameCompleted: false,
-    showExplanation: false,
-  })
-
+export default function OSHATraining() {
+  const [currentQuestion, setCurrentQuestion] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
+  const [score, setScore] = useState(0)
+  const [timeLeft, setTimeLeft] = useState(30)
+  const [gameState, setGameState] = useState<"playing" | "answered" | "finished">("playing")
+  const [answers, setAnswers] = useState<number[]>([])
+  const [showExplanation, setShowExplanation] = useState(false)
 
-  // Timer effect
   useEffect(() => {
-    let timer: NodeJS.Timeout
-    if (
-      gameState.gameStarted &&
-      !gameState.gameCompleted &&
-      !gameState.showExplanation &&
-      gameState.timeRemaining > 0
-    ) {
-      timer = setInterval(() => {
-        setGameState((prev) => ({
-          ...prev,
-          timeRemaining: prev.timeRemaining - 1,
-        }))
-      }, 1000)
-    } else if (gameState.timeRemaining === 0 && !gameState.showExplanation) {
-      // Time's up, auto-submit with no answer
-      handleAnswerSubmit()
+    if (gameState === "playing" && timeLeft > 0) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000)
+      return () => clearTimeout(timer)
+    } else if (timeLeft === 0 && gameState === "playing") {
+      handleTimeUp()
     }
+  }, [timeLeft, gameState])
 
-    return () => clearInterval(timer)
-  }, [gameState.gameStarted, gameState.gameCompleted, gameState.showExplanation, gameState.timeRemaining])
-
-  const startGame = () => {
-    setGameState({
-      currentQuestion: 0,
-      score: 0,
-      timeRemaining: 30,
-      answers: [],
-      gameStarted: true,
-      gameCompleted: false,
-      showExplanation: false,
-    })
-    setSelectedAnswer(null)
+  const handleTimeUp = () => {
+    setSelectedAnswer(-1) // -1 indicates time ran out
+    setGameState("answered")
+    setShowExplanation(true)
+    setAnswers([...answers, -1])
   }
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (!gameState.showExplanation) {
-      setSelectedAnswer(answerIndex)
+    if (gameState !== "playing") return
+
+    setSelectedAnswer(answerIndex)
+    setGameState("answered")
+    setShowExplanation(true)
+
+    const newAnswers = [...answers, answerIndex]
+    setAnswers(newAnswers)
+
+    if (answerIndex === oshaQuestions[currentQuestion].correct) {
+      const timeBonus = Math.floor(timeLeft / 5) // Bonus points for quick answers
+      setScore(score + 10 + timeBonus)
     }
   }
 
-  const handleAnswerSubmit = () => {
-    const currentQ = OSHA_QUESTIONS[gameState.currentQuestion]
-    const isCorrect = selectedAnswer === currentQ.correctAnswer
-    const timeBonus = gameState.timeRemaining * 2 // 2 points per second remaining
-    const questionScore = isCorrect ? currentQ.points + timeBonus : 0
-
-    const newAnswers = [...gameState.answers, selectedAnswer ?? -1]
-    const newScore = gameState.score + questionScore
-
-    setGameState((prev) => ({
-      ...prev,
-      answers: newAnswers,
-      score: newScore,
-      showExplanation: true,
-    }))
-  }
-
-  const nextQuestion = () => {
-    if (gameState.currentQuestion < OSHA_QUESTIONS.length - 1) {
-      setGameState((prev) => ({
-        ...prev,
-        currentQuestion: prev.currentQuestion + 1,
-        timeRemaining: 30,
-        showExplanation: false,
-      }))
+  const handleNextQuestion = () => {
+    if (currentQuestion < oshaQuestions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1)
       setSelectedAnswer(null)
+      setGameState("playing")
+      setShowExplanation(false)
+      setTimeLeft(30)
     } else {
-      setGameState((prev) => ({
-        ...prev,
-        gameCompleted: true,
-        showExplanation: false,
-      }))
+      setGameState("finished")
     }
   }
 
   const resetGame = () => {
-    setGameState({
-      currentQuestion: 0,
-      score: 0,
-      timeRemaining: 30,
-      answers: [],
-      gameStarted: false,
-      gameCompleted: false,
-      showExplanation: false,
-    })
+    setCurrentQuestion(0)
     setSelectedAnswer(null)
+    setScore(0)
+    setTimeLeft(30)
+    setGameState("playing")
+    setAnswers([])
+    setShowExplanation(false)
   }
 
-  const getGrade = (score: number, maxScore: number) => {
-    const percentage = (score / maxScore) * 100
-    if (percentage >= 90) return { grade: "A", color: "bg-green-500", status: "Excellent" }
-    if (percentage >= 80) return { grade: "B", color: "bg-blue-500", status: "Good" }
-    if (percentage >= 70) return { grade: "C", color: "bg-yellow-500", status: "Satisfactory" }
-    if (percentage >= 60) return { grade: "D", color: "bg-orange-500", status: "Needs Improvement" }
-    return { grade: "F", color: "bg-red-500", status: "Failed" }
+  const getGrade = () => {
+    const percentage = (score / (oshaQuestions.length * 12)) * 100 // Max 12 points per question
+    if (percentage >= 90) return { grade: "A", status: "Excellent", color: "text-green-600" }
+    if (percentage >= 80) return { grade: "B", status: "Good", color: "text-blue-600" }
+    if (percentage >= 70) return { grade: "C", status: "Satisfactory", color: "text-yellow-600" }
+    if (percentage >= 60) return { grade: "D", status: "Needs Improvement", color: "text-orange-600" }
+    return { grade: "F", status: "Failed", color: "text-red-600" }
   }
 
-  const maxPossibleScore = OSHA_QUESTIONS.reduce((sum, q) => sum + q.points + 60, 0) // 60 = max time bonus per question
-  const currentQ = OSHA_QUESTIONS[gameState.currentQuestion]
-  const progress = ((gameState.currentQuestion + (gameState.showExplanation ? 1 : 0)) / OSHA_QUESTIONS.length) * 100
+  const currentQ = oshaQuestions[currentQuestion]
 
-  if (!gameState.gameStarted) {
-    return (
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
-        <Card className="border-4 border-orange-500">
-          <CardHeader className="text-center bg-orange-50">
-            <div className="flex justify-center mb-4">
-              <HardHat className="h-16 w-16 text-orange-600" />
-            </div>
-            <CardTitle className="text-3xl font-bold text-orange-800">WyoVerse OSHA Safety Training</CardTitle>
-            <CardDescription className="text-lg">Interactive Workplace Safety Certification Program</CardDescription>
-          </CardHeader>
-          <CardContent className="p-8">
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-blue-600" />
-                  What You'll Learn
-                </h3>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Construction Site Safety
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Mining Operation Protocols
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Machine Safety Guidelines
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Chemical Handling Procedures
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Fall Protection Systems
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Electrical Safety Standards
-                  </li>
-                </ul>
-              </div>
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold flex items-center gap-2">
-                  <Award className="h-5 w-5 text-yellow-600" />
-                  Game Features
-                </h3>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <Zap className="h-4 w-4 text-yellow-500" />8 Real-world Safety Scenarios
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-blue-500" />
-                    Timed Questions (30 seconds each)
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Award className="h-4 w-4 text-purple-500" />
-                    Points + Time Bonus System
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Detailed Explanations
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Badge className="h-4 w-4 text-orange-500" />
-                    Safety Certification
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <Alert className="mt-6 border-yellow-500 bg-yellow-50">
-              <AlertTriangle className="h-4 w-4 text-yellow-600" />
-              <AlertDescription className="text-yellow-800">
-                <strong>Important:</strong> This training covers critical workplace safety scenarios. Take your time to
-                read each question carefully. Your safety and the safety of others depends on this knowledge.
-              </AlertDescription>
-            </Alert>
-
-            <div className="text-center mt-8">
-              <Button
-                onClick={startGame}
-                size="lg"
-                className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 text-lg"
-              >
-                <HardHat className="mr-2 h-5 w-5" />
-                Start Safety Training
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  if (gameState.gameCompleted) {
-    const gradeInfo = getGrade(gameState.score, maxPossibleScore)
-    const percentage = Math.round((gameState.score / maxPossibleScore) * 100)
-    const passed = percentage >= 70
+  if (gameState === "finished") {
+    const gradeInfo = getGrade()
+    const percentage = Math.round((score / (oshaQuestions.length * 12)) * 100)
 
     return (
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
-        <Card className={`border-4 ${passed ? "border-green-500" : "border-red-500"}`}>
-          <CardHeader className={`text-center ${passed ? "bg-green-50" : "bg-red-50"}`}>
-            <div className="flex justify-center mb-4">
-              {passed ? <Award className="h-16 w-16 text-green-600" /> : <XCircle className="h-16 w-16 text-red-600" />}
-            </div>
-            <CardTitle className={`text-3xl font-bold ${passed ? "text-green-800" : "text-red-800"}`}>
-              {passed ? "Congratulations!" : "Training Incomplete"}
-            </CardTitle>
-            <CardDescription className="text-lg">
-              {passed
-                ? "You have successfully completed the OSHA Safety Training"
-                : "Please retake the training to improve your score"}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-8">
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
-              <div className="text-center">
-                <div
-                  className={`text-4xl font-bold ${gradeInfo.color} text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-2`}
-                >
-                  {gradeInfo.grade}
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">
+        <div className="max-w-4xl mx-auto">
+          <Card className="border-2 border-orange-200">
+            <CardHeader className="text-center bg-gradient-to-r from-orange-100 to-red-100">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Award className="h-8 w-8 text-orange-600" />
+                <CardTitle className="text-2xl font-bold text-orange-800">OSHA Safety Training Complete</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="text-center mb-8">
+                <div className={`text-6xl font-bold mb-4 ${gradeInfo.color}`}>{gradeInfo.grade}</div>
+                <div className="text-2xl font-semibold mb-2">{gradeInfo.status}</div>
+                <div className="text-lg text-gray-600">
+                  Score: {score} / {oshaQuestions.length * 12} ({percentage}%)
                 </div>
-                <div className="text-sm text-gray-600">Final Grade</div>
-                <div className="font-semibold">{gradeInfo.status}</div>
               </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-blue-600 mb-2">{gameState.score}</div>
-                <div className="text-sm text-gray-600">Total Points</div>
-                <div className="font-semibold">out of {maxPossibleScore}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-purple-600 mb-2">{percentage}%</div>
-                <div className="text-sm text-gray-600">Score Percentage</div>
-                <div className="font-semibold">{passed ? "PASSED" : "FAILED"}</div>
-              </div>
-            </div>
 
-            <div className="space-y-4 mb-8">
-              <h3 className="text-xl font-semibold">Question Review</h3>
-              {OSHA_QUESTIONS.map((question, index) => {
-                const userAnswer = gameState.answers[index]
-                const isCorrect = userAnswer === question.correctAnswer
-                return (
-                  <div
-                    key={question.id}
-                    className={`p-4 rounded-lg border-2 ${isCorrect ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}`}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      {isCorrect ? (
-                        <CheckCircle className="h-5 w-5 text-green-600" />
-                      ) : (
-                        <XCircle className="h-5 w-5 text-red-600" />
-                      )}
-                      <span className="font-semibold">
-                        Question {index + 1}: {question.category}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-700 mb-2">{question.question}</p>
-                    <div className="text-sm">
-                      <span className="font-medium">Your answer: </span>
-                      <span className={isCorrect ? "text-green-700" : "text-red-700"}>
-                        {userAnswer >= 0 ? question.options[userAnswer] : "No answer (time expired)"}
-                      </span>
-                    </div>
-                    {!isCorrect && (
-                      <div className="text-sm mt-1">
-                        <span className="font-medium">Correct answer: </span>
-                        <span className="text-green-700">{question.options[question.correctAnswer]}</span>
+              <div className="grid md:grid-cols-2 gap-6 mb-8">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Performance Summary</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>Questions Answered:</span>
+                        <span>{oshaQuestions.length}</span>
                       </div>
-                    )}
+                      <div className="flex justify-between">
+                        <span>Correct Answers:</span>
+                        <span>{answers.filter((a, i) => a === oshaQuestions[i].correct).length}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Time Bonuses:</span>
+                        <span>{score - answers.filter((a, i) => a === oshaQuestions[i].correct).length * 10}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Safety Categories</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2 text-sm">
+                      {Array.from(new Set(oshaQuestions.map((q) => q.category))).map((category) => (
+                        <Badge key={category} variant="outline" className="mr-2 mb-2">
+                          {category}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {percentage >= 70 && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <span className="font-semibold text-green-800">Certification Earned!</span>
                   </div>
-                )
-              })}
-            </div>
-
-            {passed && (
-              <Alert className="border-green-500 bg-green-50 mb-6">
-                <Award className="h-4 w-4 text-green-600" />
-                <AlertDescription className="text-green-800">
-                  <strong>Certification Earned!</strong> You have successfully demonstrated knowledge of workplace
-                  safety standards. This certification is valid for training purposes within the WyoVerse platform.
-                </AlertDescription>
-              </Alert>
-            )}
-
-            <div className="flex gap-4 justify-center">
-              <Button onClick={resetGame} variant="outline" size="lg">
-                Retake Training
-              </Button>
-              {passed && (
-                <Button onClick={() => window.print()} className="bg-green-600 hover:bg-green-700 text-white" size="lg">
-                  <Award className="mr-2 h-4 w-4" />
-                  Print Certificate
-                </Button>
+                  <p className="text-green-700">
+                    Congratulations! You have successfully completed the OSHA Safety Training and earned your safety
+                    certification.
+                  </p>
+                </div>
               )}
-            </div>
-          </CardContent>
-        </Card>
+
+              <div className="flex gap-4 justify-center">
+                <Button onClick={resetGame} className="bg-orange-600 hover:bg-orange-700">
+                  <HardHat className="h-4 w-4 mr-2" />
+                  Retake Training
+                </Button>
+                {percentage >= 70 && (
+                  <Button variant="outline" onClick={() => window.print()}>
+                    Print Certificate
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      {/* Progress Header */}
-      <Card className="border-2 border-orange-500">
-        <CardContent className="p-4">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-2">
-              <HardHat className="h-5 w-5 text-orange-600" />
-              <span className="font-semibold">
-                Question {gameState.currentQuestion + 1} of {OSHA_QUESTIONS.length}
-              </span>
-            </div>
-            <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">
+      <div className="max-w-4xl mx-auto">
+        <Card className="border-2 border-orange-200">
+          <CardHeader className="bg-gradient-to-r from-orange-100 to-red-100">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-blue-600" />
-                <span className={`font-bold ${gameState.timeRemaining <= 10 ? "text-red-600" : "text-blue-600"}`}>
-                  {gameState.timeRemaining}s
-                </span>
+                <HardHat className="h-6 w-6 text-orange-600" />
+                <CardTitle className="text-xl font-bold text-orange-800">OSHA Safety Training</CardTitle>
               </div>
-              <Badge variant="outline" className="font-semibold">
-                Score: {gameState.score}
+              <Badge variant="outline" className="text-orange-700 border-orange-300">
+                Question {currentQuestion + 1} of {oshaQuestions.length}
               </Badge>
             </div>
-          </div>
-          <Progress value={progress} className="h-2" />
-        </CardContent>
-      </Card>
+            <div className="mt-4">
+              <Progress value={(currentQuestion / oshaQuestions.length) * 100} className="h-2" />
+            </div>
+          </CardHeader>
 
-      {/* Question Card */}
-      <Card className="border-4 border-blue-500">
-        <CardHeader className="bg-blue-50">
-          <div className="flex items-center gap-2 mb-2">
-            <Badge className="bg-blue-600 text-white">{currentQ.category}</Badge>
-            <Badge variant="outline">{currentQ.points} points</Badge>
-          </div>
-          <CardTitle className="text-xl">{currentQ.scenario}</CardTitle>
-          <CardDescription className="text-lg font-semibold text-blue-800">{currentQ.question}</CardDescription>
-        </CardHeader>
-        <CardContent className="p-6">
-          {!gameState.showExplanation ? (
-            <div className="space-y-4">
-              {currentQ.options.map((option, index) => (
-                <Button
-                  key={index}
-                  variant={selectedAnswer === index ? "default" : "outline"}
-                  className={`w-full text-left justify-start p-4 h-auto ${
-                    selectedAnswer === index ? "bg-blue-600 text-white" : "hover:bg-blue-50"
-                  }`}
-                  onClick={() => handleAnswerSelect(index)}
-                >
-                  <span className="font-semibold mr-3">{String.fromCharCode(65 + index)}.</span>
-                  {option}
-                </Button>
-              ))}
-
-              <div className="flex justify-center mt-6">
-                <Button
-                  onClick={handleAnswerSubmit}
-                  disabled={selectedAnswer === null}
-                  size="lg"
-                  className="bg-green-600 hover:bg-green-700 text-white px-8"
-                >
-                  Submit Answer
-                </Button>
+          <CardContent className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <Badge variant="secondary" className="text-sm">
+                {currentQ.category}
+              </Badge>
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-orange-600" />
+                <span className={`font-bold ${timeLeft <= 10 ? "text-red-600" : "text-orange-600"}`}>{timeLeft}s</span>
               </div>
             </div>
-          ) : (
-            <div className="space-y-6">
-              {/* Answer Result */}
-              <div
-                className={`p-4 rounded-lg border-2 ${
-                  selectedAnswer === currentQ.correctAnswer
-                    ? "border-green-500 bg-green-50"
-                    : "border-red-500 bg-red-50"
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  {selectedAnswer === currentQ.correctAnswer ? (
-                    <CheckCircle className="h-6 w-6 text-green-600" />
-                  ) : (
-                    <XCircle className="h-6 w-6 text-red-600" />
-                  )}
-                  <span
-                    className={`font-bold text-lg ${
-                      selectedAnswer === currentQ.correctAnswer ? "text-green-800" : "text-red-800"
-                    }`}
-                  >
-                    {selectedAnswer === currentQ.correctAnswer ? "Correct!" : "Incorrect"}
-                  </span>
-                </div>
 
-                {selectedAnswer !== null && selectedAnswer >= 0 ? (
-                  <p className="mb-2">
-                    <strong>Your answer:</strong> {currentQ.options[selectedAnswer]}
-                  </p>
-                ) : (
-                  <p className="mb-2 text-red-700">
-                    <strong>No answer selected (time expired)</strong>
-                  </p>
-                )}
-
-                {selectedAnswer !== currentQ.correctAnswer && (
-                  <p className="text-green-700">
-                    <strong>Correct answer:</strong> {currentQ.options[currentQ.correctAnswer]}
-                  </p>
-                )}
-              </div>
-
-              {/* Explanation */}
-              <Alert className="border-blue-500 bg-blue-50">
-                <Shield className="h-4 w-4 text-blue-600" />
-                <AlertDescription className="text-blue-800">
-                  <strong>Explanation:</strong> {currentQ.explanation}
-                </AlertDescription>
-              </Alert>
-
-              {/* Score for this question */}
-              {selectedAnswer === currentQ.correctAnswer && (
-                <div className="text-center p-4 bg-yellow-50 border-2 border-yellow-500 rounded-lg">
-                  <div className="text-lg font-semibold text-yellow-800">
-                    Points Earned: {currentQ.points} + {gameState.timeRemaining * 2} time bonus ={" "}
-                    {currentQ.points + gameState.timeRemaining * 2} points
+            <div className="mb-6">
+              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <div className="flex items-start">
+                  <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-yellow-800">Scenario:</p>
+                    <p className="text-sm text-yellow-700">{currentQ.scenario}</p>
                   </div>
                 </div>
-              )}
-
-              <div className="flex justify-center">
-                <Button onClick={nextQuestion} size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8">
-                  {gameState.currentQuestion < OSHA_QUESTIONS.length - 1 ? "Next Question" : "View Results"}
-                </Button>
               </div>
+
+              <h3 className="text-lg font-semibold mb-4">{currentQ.question}</h3>
             </div>
-          )}
-        </CardContent>
-      </Card>
+
+            <div className="space-y-3 mb-6">
+              {currentQ.options.map((option, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleAnswerSelect(index)}
+                  disabled={gameState !== "playing"}
+                  className={`w-full p-4 text-left rounded-lg border-2 transition-all ${
+                    selectedAnswer === index
+                      ? index === currentQ.correct
+                        ? "border-green-500 bg-green-50 text-green-800"
+                        : "border-red-500 bg-red-50 text-red-800"
+                      : gameState === "answered" && index === currentQ.correct
+                        ? "border-green-500 bg-green-50 text-green-800"
+                        : "border-gray-200 hover:border-orange-300 hover:bg-orange-50"
+                  } ${gameState !== "playing" ? "cursor-not-allowed" : "cursor-pointer"}`}
+                >
+                  <div className="flex items-center">
+                    <span className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center mr-3 text-sm font-bold">
+                      {String.fromCharCode(65 + index)}
+                    </span>
+                    {option}
+                    {gameState === "answered" && (
+                      <span className="ml-auto">
+                        {index === currentQ.correct ? (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        ) : selectedAnswer === index ? (
+                          <XCircle className="h-5 w-5 text-red-600" />
+                        ) : null}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {showExplanation && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <h4 className="font-semibold text-blue-800 mb-2">Explanation:</h4>
+                <p className="text-blue-700">{currentQ.explanation}</p>
+              </div>
+            )}
+
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-gray-600">
+                Score: <span className="font-bold text-orange-600">{score}</span>
+              </div>
+
+              {gameState === "answered" && (
+                <Button onClick={handleNextQuestion} className="bg-orange-600 hover:bg-orange-700">
+                  {currentQuestion < oshaQuestions.length - 1 ? "Next Question" : "Finish Training"}
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
