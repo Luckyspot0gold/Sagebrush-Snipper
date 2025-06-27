@@ -1,0 +1,11 @@
+// Wallet selection component
+<WalletOption 
+  name="DESO" 
+  onClick={() => window.open('https://deso.org', '_blank')}
+  icon="/wallets/deso.png"
+/>
+<WalletOption 
+  name="Muse" 
+  onClick={() => window.open('https://muse.place', '_blank')}
+  icon="/wallets/muse.png"
+/>
