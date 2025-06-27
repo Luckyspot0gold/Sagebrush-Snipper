@@ -2,265 +2,280 @@ import { createClient } from "@supabase/supabase-js"
 
 interface QueryPerformanceResult {
   queryType: string
-  executionTimeMs: number
-  rowsExamined: number
-  indexUsed: string
-  planDetails: any
+  executionTime: number
+  planningTime: number
+  totalCost: number
+  actualRows: number
+  scanType: string
+  improvement?: number
+  status: "success" | "error" | "pending"
+  timestamp: string
 }
 
-interface OptimizationReport {
-  tableName: string
-  beforeOptimization: QueryPerformanceResult[]
-  afterOptimization: QueryPerformanceResult[]
-  improvementPercentage: number
-  recommendations: string[]
+interface ExplainAnalyzeResult {
+  "Execution Time": number
+  "Planning Time": number
+  Plan: {
+    "Total Cost": number
+    "Actual Rows": number
+    "Node Type": string
+    "Actual Total Time": number
+  }
 }
 
-class DatabasePerformanceAnalyzer {
-  private supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!)
+export class DatabasePerformanceAnalyzer {
+  private supabase
+  private results: QueryPerformanceResult[] = []
 
-  async analyzeQuery(query: string, params: any[] = []): Promise<QueryPerformanceResult> {
-    const startTime = performance.now()
+  constructor() {
+    this.supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!)
+  }
+
+  async analyzeQuery(query: string, queryType: string): Promise<QueryPerformanceResult> {
+    const startTime = Date.now()
 
     try {
       // Execute EXPLAIN ANALYZE
-      const explainQuery = `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) ${query}`
-      const { data: explainData, error: explainError } = await this.supabase.rpc("execute_sql", {
-        sql_query: explainQuery,
-        params: params,
+      const { data, error } = await this.supabase.rpc("explain_analyze_query", {
+        query_text: query,
       })
 
-      if (explainError) throw explainError
-
-      // Execute actual query for timing
-      const { data, error } = await this.supabase.rpc("execute_sql", {
-        sql_query: query,
-        params: params,
-      })
-
-      if (error) throw error
-
-      const endTime = performance.now()
-      const executionTime = endTime - startTime
-
-      // Parse explain plan
-      const plan = explainData[0]?.["QUERY PLAN"]?.[0]
-      const nodeType = plan?.["Node Type"] || "Unknown"
-      const actualRows = plan?.["Actual Rows"] || 0
-      const actualTime = plan?.["Actual Total Time"] || 0
-
-      return {
-        queryType: this.determineQueryType(query),
-        executionTimeMs: actualTime || executionTime,
-        rowsExamined: actualRows,
-        indexUsed: nodeType.includes("Index") ? "Index Scan" : "Sequential Scan",
-        planDetails: plan,
+      if (error) {
+        console.error("Database error:", error)
+        return {
+          queryType,
+          executionTime: 0,
+          planningTime: 0,
+          totalCost: 0,
+          actualRows: 0,
+          scanType: "Error",
+          status: "error",
+          timestamp: new Date().toISOString(),
+        }
       }
+
+      // Parse the EXPLAIN ANALYZE results
+      const result = data[0] as ExplainAnalyzeResult
+
+      const performanceResult: QueryPerformanceResult = {
+        queryType,
+        executionTime: result["Execution Time"],
+        planningTime: result["Planning Time"],
+        totalCost: result.Plan["Total Cost"],
+        actualRows: result.Plan["Actual Rows"],
+        scanType: result.Plan["Node Type"],
+        status: "success",
+        timestamp: new Date().toISOString(),
+      }
+
+      // Store result
+      this.results.push(performanceResult)
+
+      // Log to database
+      await this.logPerformance(performanceResult)
+
+      return performanceResult
     } catch (error) {
-      console.error("Query analysis failed:", error)
-      throw error
+      console.error("Analysis error:", error)
+      return {
+        queryType,
+        executionTime: 0,
+        planningTime: 0,
+        totalCost: 0,
+        actualRows: 0,
+        scanType: "Error",
+        status: "error",
+        timestamp: new Date().toISOString(),
+      }
     }
   }
 
-  async runPlayerStatsOptimizationTest(playerId: number): Promise<OptimizationReport> {
-    const testQueries = [
-      {
-        name: "Single Player Lookup",
-        query: "SELECT * FROM d1_player_stats WHERE player_id = $1",
-        params: [playerId],
-      },
-      {
-        name: "Player Game History",
-        query: "SELECT * FROM d1_player_stats WHERE player_id = $1 ORDER BY created_at DESC LIMIT 10",
-        params: [playerId],
-      },
-      {
-        name: "Top Scores Query",
-        query: "SELECT * FROM d1_player_stats WHERE score > 1000 ORDER BY score DESC LIMIT 20",
-        params: [],
-      },
-    ]
+  async runOptimizationTest(): Promise<{
+    before: QueryPerformanceResult
+    after: QueryPerformanceResult
+    improvement: number
+  }> {
+    console.log("🔍 Running database optimization test...")
 
-    // Test before optimization
-    console.log("Testing queries before optimization...")
-    const beforeResults: QueryPerformanceResult[] = []
-    for (const testQuery of testQueries) {
-      const result = await this.analyzeQuery(testQuery.query, testQuery.params)
-      result.queryType = testQuery.name
-      beforeResults.push(result)
-    }
+    // Test query before optimization
+    const beforeQuery = "SELECT * FROM d1_player_stats WHERE player_id = 123"
+    const before = await this.analyzeQuery(beforeQuery, "before_optimization")
 
-    // Apply optimizations
-    console.log("Applying database optimizations...")
+    // Apply optimizations (create indexes)
+    console.log("📈 Applying database optimizations...")
     await this.applyOptimizations()
 
-    // Test after optimization
-    console.log("Testing queries after optimization...")
-    const afterResults: QueryPerformanceResult[] = []
-    for (const testQuery of testQueries) {
-      const result = await this.analyzeQuery(testQuery.query, testQuery.params)
-      result.queryType = testQuery.name
-      afterResults.push(result)
-    }
+    // Test query after optimization
+    const after = await this.analyzeQuery(beforeQuery, "after_optimization")
 
-    // Calculate improvements
-    const avgBefore = beforeResults.reduce((sum, r) => sum + r.executionTimeMs, 0) / beforeResults.length
-    const avgAfter = afterResults.reduce((sum, r) => sum + r.executionTimeMs, 0) / afterResults.length
-    const improvementPercentage = ((avgBefore - avgAfter) / avgBefore) * 100
+    // Calculate improvement
+    const improvement =
+      before.executionTime > 0 ? ((before.executionTime - after.executionTime) / before.executionTime) * 100 : 0
 
-    return {
-      tableName: "d1_player_stats",
-      beforeOptimization: beforeResults,
-      afterOptimization: afterResults,
-      improvementPercentage,
-      recommendations: this.generateRecommendations(beforeResults, afterResults),
-    }
+    after.improvement = improvement
+
+    console.log(`✅ Optimization complete! ${improvement.toFixed(1)}% improvement`)
+
+    return { before, after, improvement }
   }
 
   private async applyOptimizations(): Promise<void> {
     const optimizationQueries = [
-      "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_player_stats_player_id ON d1_player_stats(player_id)",
-      "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_player_stats_score_desc ON d1_player_stats(score DESC)",
-      "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_player_stats_created_at ON d1_player_stats(created_at DESC)",
+      "CREATE INDEX IF NOT EXISTS idx_player_stats_player_id ON d1_player_stats(player_id)",
+      "CREATE INDEX IF NOT EXISTS idx_player_stats_game_date ON d1_player_stats(game_date)",
+      "CREATE INDEX IF NOT EXISTS idx_player_stats_composite ON d1_player_stats(player_id, game_date, season)",
       "ANALYZE d1_player_stats",
     ]
 
     for (const query of optimizationQueries) {
       try {
         await this.supabase.rpc("execute_sql", { sql_query: query })
-        console.log(`Applied: ${query}`)
+        console.log(`✅ Applied: ${query.substring(0, 50)}...`)
       } catch (error) {
-        console.error(`Failed to apply: ${query}`, error)
+        console.error(`❌ Failed to apply: ${query}`, error)
       }
     }
   }
 
-  private determineQueryType(query: string): string {
-    const lowerQuery = query.toLowerCase()
-    if (lowerQuery.includes("where") && lowerQuery.includes("player_id")) {
-      return "Player Lookup"
-    } else if (lowerQuery.includes("order by") && lowerQuery.includes("score")) {
-      return "Score Ranking"
-    } else if (lowerQuery.includes("order by") && lowerQuery.includes("created_at")) {
-      return "Chronological Query"
+  private async logPerformance(result: QueryPerformanceResult): Promise<void> {
+    try {
+      await this.supabase.from("query_performance_log").insert({
+        query_type: result.queryType,
+        execution_time: result.executionTime,
+        planning_time: result.planningTime,
+        total_cost: result.totalCost,
+        actual_rows: result.actualRows,
+        scan_type: result.scanType,
+      })
+    } catch (error) {
+      console.error("Failed to log performance:", error)
     }
-    return "General Query"
   }
 
-  private generateRecommendations(before: QueryPerformanceResult[], after: QueryPerformanceResult[]): string[] {
-    const recommendations: string[] = []
+  async getPerformanceHistory(): Promise<QueryPerformanceResult[]> {
+    try {
+      const { data, error } = await this.supabase
+        .from("query_performance_log")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50)
 
-    // Check for sequential scans that should use indexes
-    before.forEach((result, index) => {
-      if (result.indexUsed === "Sequential Scan" && after[index]?.indexUsed === "Index Scan") {
-        recommendations.push(`✅ Successfully optimized ${result.queryType} with index`)
-      } else if (result.indexUsed === "Sequential Scan") {
-        recommendations.push(`⚠️ ${result.queryType} still using sequential scan - consider additional indexes`)
-      }
-    })
+      if (error) throw error
 
-    // Check for performance improvements
-    before.forEach((result, index) => {
-      const afterResult = after[index]
-      if (afterResult && result.executionTimeMs > afterResult.executionTimeMs * 2) {
-        const improvement = (
-          ((result.executionTimeMs - afterResult.executionTimeMs) / result.executionTimeMs) *
-          100
-        ).toFixed(1)
-        recommendations.push(`🚀 ${result.queryType} improved by ${improvement}%`)
-      }
-    })
+      return data.map((row) => ({
+        queryType: row.query_type,
+        executionTime: row.execution_time,
+        planningTime: row.planning_time,
+        totalCost: row.total_cost,
+        actualRows: row.actual_rows,
+        scanType: row.scan_type,
+        status: "success" as const,
+        timestamp: row.created_at,
+      }))
+    } catch (error) {
+      console.error("Failed to get performance history:", error)
+      return []
+    }
+  }
 
-    // General recommendations
-    if (recommendations.length === 0) {
-      recommendations.push("Consider composite indexes for multi-column WHERE clauses")
-      recommendations.push("Monitor query patterns and add indexes for frequently used filters")
-      recommendations.push("Run ANALYZE regularly to keep statistics up to date")
+  async getIndexUsageStats(): Promise<any[]> {
+    try {
+      const { data, error } = await this.supabase.rpc("get_index_usage_stats")
+      if (error) throw error
+      return data || []
+    } catch (error) {
+      console.error("Failed to get index usage stats:", error)
+      return []
+    }
+  }
+
+  generateReport(): string {
+    if (this.results.length === 0) {
+      return "No performance data available. Run some tests first!"
     }
 
-    return recommendations
+    const latest = this.results[this.results.length - 1]
+    const improvement = latest.improvement || 0
+
+    return `
+🏆 WyoVerse Database Performance Report
+=====================================
+
+📊 Latest Query Performance:
+• Execution Time: ${latest.executionTime.toFixed(3)}ms
+• Planning Time: ${latest.planningTime.toFixed(3)}ms
+• Total Cost: ${latest.totalCost.toFixed(2)}
+• Scan Type: ${latest.scanType}
+• Rows Returned: ${latest.actualRows}
+
+${
+  improvement > 0
+    ? `
+🚀 Performance Improvement: ${improvement.toFixed(1)}%
+💡 Optimization Status: SUCCESS
+`
+    : ""
+}
+
+📈 Recommendations:
+${latest.scanType === "Seq Scan" ? "• Add index on frequently queried columns" : "• Indexes are working effectively"}
+${latest.executionTime > 1 ? "• Consider query optimization" : "• Query performance is good"}
+${latest.totalCost > 100 ? "• High cost query - review execution plan" : "• Query cost is acceptable"}
+
+Generated: ${new Date().toLocaleString()}
+    `.trim()
   }
 
-  async getTableStatistics(tableName: string): Promise<any> {
-    const { data, error } = await this.supabase.rpc("execute_sql", {
-      sql_query: `
-          SELECT 
-            schemaname,
-            tablename,
-            attname,
-            n_distinct,
-            correlation,
-            most_common_vals,
-            most_common_freqs
-          FROM pg_stats 
-          WHERE tablename = $1
-        `,
-      params: [tableName],
-    })
-
-    if (error) throw error
-    return data
+  getResults(): QueryPerformanceResult[] {
+    return [...this.results]
   }
 
-  async getIndexUsageStats(tableName: string): Promise<any> {
-    const { data, error } = await this.supabase.rpc("execute_sql", {
-      sql_query: `
-          SELECT 
-            indexname,
-            idx_scan as scans,
-            idx_tup_read as tuples_read,
-            idx_tup_fetch as tuples_fetched,
-            CASE 
-              WHEN idx_scan = 0 THEN 'UNUSED'
-              WHEN idx_scan < 100 THEN 'LOW_USAGE'
-              ELSE 'ACTIVE'
-            END as usage_status
-          FROM pg_stat_user_indexes 
-          WHERE tablename = $1
-          ORDER BY idx_scan DESC
-        `,
-      params: [tableName],
-    })
-
-    if (error) throw error
-    return data
+  clearResults(): void {
+    this.results = []
   }
 }
 
-// Export for use in components
-export const dbAnalyzer = new DatabasePerformanceAnalyzer()
+// Export singleton instance
+export const performanceAnalyzer = new DatabasePerformanceAnalyzer()
 
-// CLI usage example
-if (require.main === module) {
-  async function runAnalysis() {
-    try {
-      console.log("🔍 Starting database performance analysis...")
+// Example usage
+export async function runPerformanceTest() {
+  console.log("🎯 Starting WyoVerse database performance test...")
 
-      const report = await dbAnalyzer.runPlayerStatsOptimizationTest(123)
+  const analyzer = new DatabasePerformanceAnalyzer()
 
-      console.log("\n📊 OPTIMIZATION REPORT")
-      console.log("=".repeat(50))
-      console.log(`Table: ${report.tableName}`)
-      console.log(`Overall Improvement: ${report.improvementPercentage.toFixed(2)}%`)
+  // Test various query patterns
+  const testQueries = [
+    {
+      query: "SELECT * FROM d1_player_stats WHERE player_id = 123",
+      type: "single_player_lookup",
+    },
+    {
+      query: "SELECT * FROM d1_player_stats WHERE game_date >= '2023-01-01'",
+      type: "date_range_query",
+    },
+    {
+      query: "SELECT * FROM d1_player_stats WHERE player_id = 123 AND game_date >= '2023-01-01'",
+      type: "composite_query",
+    },
+    {
+      query: "SELECT * FROM d1_player_stats WHERE points > 20 ORDER BY points DESC LIMIT 10",
+      type: "performance_query",
+    },
+  ]
 
-      console.log("\n📈 BEFORE OPTIMIZATION:")
-      report.beforeOptimization.forEach((result) => {
-        console.log(`  ${result.queryType}: ${result.executionTimeMs.toFixed(2)}ms (${result.indexUsed})`)
-      })
+  const results = []
 
-      console.log("\n🚀 AFTER OPTIMIZATION:")
-      report.afterOptimization.forEach((result) => {
-        console.log(`  ${result.queryType}: ${result.executionTimeMs.toFixed(2)}ms (${result.indexUsed})`)
-      })
+  for (const test of testQueries) {
+    console.log(`Testing: ${test.type}`)
+    const result = await analyzer.analyzeQuery(test.query, test.type)
+    results.push(result)
 
-      console.log("\n💡 RECOMMENDATIONS:")
-      report.recommendations.forEach((rec) => {
-        console.log(`  ${rec}`)
-      })
-    } catch (error) {
-      console.error("Analysis failed:", error)
-    }
+    // Small delay between tests
+    await new Promise((resolve) => setTimeout(resolve, 500))
   }
 
-  runAnalysis()
+  console.log("\n" + analyzer.generateReport())
+
+  return results
 }

@@ -2,8 +2,219 @@
 @tailwind components;
 @tailwind utilities;
 
+/* WyoVerse CSS Variables */
+:root {
+  --wyoverse-primary: #8b4513;
+  --wyoverse-secondary: #d2691e;
+  --wyoverse-accent: #ffd700;
+  --newspaper-bg: #f5f5dc;
+  --newspaper-border: #8b4513;
+  --newspaper-text: #2f1b14;
+}
+
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Times New Roman", serif;
+  background: url("/images/wyoverse-bg.jpg") no-repeat center fixed;
+  background-size: cover;
+  background-color: var(--newspaper-bg);
+}
+
+/* Newspaper Theme Classes */
+.newspaper-bg {
+  background-color: var(--newspaper-bg);
+  background-image: radial-gradient(circle at 25px 25px, rgba(139, 69, 19, 0.1) 2px, transparent 0),
+    radial-gradient(circle at 75px 75px, rgba(139, 69, 19, 0.05) 1px, transparent 0);
+  background-size: 100px 100px;
+  min-height: 100vh;
+}
+
+.newspaper-article {
+  background: #fffef7;
+  border: 4px solid var(--newspaper-border);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.newspaper-article::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #8b4513, #d2691e);
+  z-index: -1;
+}
+
+.newspaper-article-inner {
+  padding: 1.5rem;
+  background: #fffef7;
+  border: 2px solid #8b4513;
+}
+
+.newspaper-headline {
+  font-family: "Times New Roman", serif;
+  font-weight: bold;
+  color: var(--newspaper-text);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1.2;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.newspaper-subheadline {
+  font-family: "Times New Roman", serif;
+  font-style: italic;
+  color: var(--wyoverse-secondary);
+  font-weight: 600;
+}
+
+.newspaper-section-title {
+  font-family: "Times New Roman", serif;
+  font-weight: bold;
+  color: var(--newspaper-text);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-bottom: 3px solid var(--wyoverse-primary);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.newspaper-paragraph {
+  font-family: "Times New Roman", serif;
+  line-height: 1.6;
+  color: var(--newspaper-text);
+  text-align: justify;
+  margin-bottom: 1rem;
+}
+
+.newspaper-byline {
+  font-family: "Times New Roman", serif;
+  font-size: 0.875rem;
+  color: #666;
+  font-style: italic;
+}
+
+.newspaper-dateline {
+  font-family: "Times New Roman", serif;
+  font-size: 0.875rem;
+  color: var(--wyoverse-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 0.5rem 0;
+  text-align: center;
+}
+
+.newspaper-quote {
+  border-left: 4px solid var(--wyoverse-accent);
+  background: rgba(255, 215, 0, 0.1);
+  padding: 1rem;
+  font-style: italic;
+  position: relative;
+}
+
+.newspaper-quote::before {
+  content: '"';
+  font-size: 4rem;
+  color: var(--wyoverse-accent);
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  font-family: "Times New Roman", serif;
+}
+
+.newspaper-ad {
+  border: 3px solid var(--newspaper-border);
+  background: #fffef7;
+  padding: 1rem;
+  text-align: center;
+  position: relative;
+  box-shadow: inset 0 0 10px rgba(139, 69, 19, 0.1);
+}
+
+.newspaper-ad::before {
+  content: "ADVERTISEMENT";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--wyoverse-accent);
+  color: var(--newspaper-text);
+  font-size: 0.6rem;
+  padding: 2px 8px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.newspaper-button {
+  font-family: "Times New Roman", serif;
+  background: var(--wyoverse-primary);
+  color: white;
+  border: 3px solid var(--newspaper-border);
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.newspaper-button:hover {
+  background: var(--wyoverse-secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.frontier-button {
+  font-family: "Times New Roman", serif;
+  background: linear-gradient(45deg, var(--wyoverse-primary), var(--wyoverse-secondary));
+  color: white;
+  border: 3px solid var(--wyoverse-accent);
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.frontier-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.frontier-button:hover::before {
+  left: 100%;
+}
+
+.frontier-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .newspaper-article-inner {
+    padding: 1rem;
+  }
+
+  .newspaper-headline {
+    font-size: 1.5rem;
+  }
+
+  .newspaper-section-title {
+    font-size: 1.25rem;
+  }
 }
 
 @layer utilities {

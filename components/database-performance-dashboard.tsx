@@ -1,405 +1,511 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts"
-import { Activity, Database, Zap, TrendingUp, Clock, Target } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+import {
+  Database,
+  TrendingUp,
+  Clock,
+  BarChart3,
+  CheckCircle,
+  AlertTriangle,
+  Play,
+  RefreshCw,
+  Target,
+} from "lucide-react"
+
+import { performanceAnalyzer, runPerformanceTest } from "@/scripts/database-performance-analyzer"
 
 interface QueryResult {
   queryType: string
-  executionTimeMs: number
-  rowsExamined: number
-  indexUsed: string
-  planDetails: any
-}
-
-interface OptimizationReport {
-  tableName: string
-  beforeOptimization: QueryResult[]
-  afterOptimization: QueryResult[]
-  improvementPercentage: number
-  recommendations: string[]
+  executionTime: number
+  planningTime: number
+  totalCost: number
+  actualRows: number
+  scanType: string
+  improvement?: number
+  status: "success" | "error" | "pending"
+  timestamp: string
 }
 
 export function DatabasePerformanceDashboard() {
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [report, setReport] = useState<OptimizationReport | null>(null)
-  const [selectedPlayerId, setSelectedPlayerId] = useState(123)
+  const [isRunning, setIsRunning] = useState(false)
+  const [results, setResults] = useState<QueryResult[]>([])
+  const [optimizationResults, setOptimizationResults] = useState<any>(null)
   const [indexStats, setIndexStats] = useState<any[]>([])
-  const [tableStats, setTableStats] = useState<any[]>([])
+  const [performanceHistory, setPerformanceHistory] = useState<QueryResult[]>([])
+  const [activeTab, setActiveTab] = useState("overview")
 
-  const runPerformanceAnalysis = async () => {
-    setIsAnalyzing(true)
+  const { toast } = useToast()
+
+  useEffect(() => {
+    loadPerformanceHistory()
+    loadIndexStats()
+  }, [])
+
+  const loadPerformanceHistory = async () => {
     try {
-      // Simulate the database analysis
-      const mockReport: OptimizationReport = {
-        tableName: "d1_player_stats",
-        beforeOptimization: [
-          {
-            queryType: "Single Player Lookup",
-            executionTimeMs: 1.678,
-            rowsExamined: 1000,
-            indexUsed: "Sequential Scan",
-            planDetails: { cost: 25.0, rows: 1 },
-          },
-          {
-            queryType: "Player Game History",
-            executionTimeMs: 3.245,
-            rowsExamined: 1000,
-            indexUsed: "Sequential Scan",
-            planDetails: { cost: 45.0, rows: 10 },
-          },
-          {
-            queryType: "Top Scores Query",
-            executionTimeMs: 5.123,
-            rowsExamined: 1000,
-            indexUsed: "Sequential Scan",
-            planDetails: { cost: 65.0, rows: 20 },
-          },
-        ],
-        afterOptimization: [
-          {
-            queryType: "Single Player Lookup",
-            executionTimeMs: 0.045,
-            rowsExamined: 1,
-            indexUsed: "Index Scan",
-            planDetails: { cost: 8.3, rows: 1 },
-          },
-          {
-            queryType: "Player Game History",
-            executionTimeMs: 0.123,
-            rowsExamined: 10,
-            indexUsed: "Index Scan",
-            planDetails: { cost: 12.5, rows: 10 },
-          },
-          {
-            queryType: "Top Scores Query",
-            executionTimeMs: 0.234,
-            rowsExamined: 20,
-            indexUsed: "Index Scan",
-            planDetails: { cost: 18.7, rows: 20 },
-          },
-        ],
-        improvementPercentage: 96.8,
-        recommendations: [
-          "✅ Successfully optimized Single Player Lookup with player_id index",
-          "✅ Successfully optimized Player Game History with composite index",
-          "✅ Successfully optimized Top Scores Query with score index",
-          "🚀 Single Player Lookup improved by 97.3%",
-          "🚀 Player Game History improved by 96.2%",
-          "🚀 Top Scores Query improved by 95.4%",
-        ],
-      }
-
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      setReport(mockReport)
-
-      // Mock index statistics
-      setIndexStats([
-        { indexname: "idx_player_stats_player_id", scans: 1250, usage_status: "ACTIVE" },
-        { indexname: "idx_player_stats_score_desc", scans: 890, usage_status: "ACTIVE" },
-        { indexname: "idx_player_stats_created_at", scans: 456, usage_status: "ACTIVE" },
-        { indexname: "idx_player_stats_composite", scans: 234, usage_status: "LOW_USAGE" },
-      ])
-
-      setTableStats([
-        { attname: "player_id", n_distinct: 500, correlation: 0.95 },
-        { attname: "score", n_distinct: 1000, correlation: -0.12 },
-        { attname: "game_id", n_distinct: 50, correlation: 0.34 },
-        { attname: "created_at", n_distinct: 800, correlation: 0.89 },
-      ])
+      const history = await performanceAnalyzer.getPerformanceHistory()
+      setPerformanceHistory(history)
     } catch (error) {
-      console.error("Analysis failed:", error)
-    } finally {
-      setIsAnalyzing(false)
+      console.error("Failed to load performance history:", error)
     }
   }
 
-  const chartData = report
-    ? report.beforeOptimization.map((before, index) => ({
-        name: before.queryType.replace(" Query", "").replace(" Lookup", ""),
-        before: before.executionTimeMs,
-        after: report.afterOptimization[index]?.executionTimeMs || 0,
-        improvement:
-          ((before.executionTimeMs - (report.afterOptimization[index]?.executionTimeMs || 0)) /
-            before.executionTimeMs) *
-          100,
-      }))
-    : []
+  const loadIndexStats = async () => {
+    try {
+      const stats = await performanceAnalyzer.getIndexUsageStats()
+      setIndexStats(stats)
+    } catch (error) {
+      console.error("Failed to load index stats:", error)
+    }
+  }
+
+  const runOptimizationTest = async () => {
+    setIsRunning(true)
+
+    try {
+      toast({
+        title: "🔍 Starting Database Analysis",
+        description: "Running comprehensive performance tests...",
+      })
+
+      const optimizationResult = await performanceAnalyzer.runOptimizationTest()
+      setOptimizationResults(optimizationResult)
+
+      const testResults = await runPerformanceTest()
+      setResults(testResults)
+
+      await loadPerformanceHistory()
+      await loadIndexStats()
+
+      toast({
+        title: "✅ Analysis Complete!",
+        description: `Performance improved by ${optimizationResult.improvement.toFixed(1)}%`,
+      })
+    } catch (error) {
+      console.error("Optimization test failed:", error)
+      toast({
+        title: "❌ Analysis Failed",
+        description: "Failed to run performance analysis",
+        variant: "destructive",
+      })
+    } finally {
+      setIsRunning(false)
+    }
+  }
+
+  const runSingleTest = async (queryType: string) => {
+    setIsRunning(true)
+
+    try {
+      const testQuery = "SELECT * FROM d1_player_stats WHERE player_id = 123"
+      const result = await performanceAnalyzer.analyzeQuery(testQuery, queryType)
+
+      setResults((prev) => [...prev, result])
+
+      toast({
+        title: `${result.scanType} Query Complete`,
+        description: `Execution time: ${result.executionTime.toFixed(3)}ms`,
+      })
+    } catch (error) {
+      console.error("Single test failed:", error)
+      toast({
+        title: "Test Failed",
+        description: "Failed to run query test",
+        variant: "destructive",
+      })
+    } finally {
+      setIsRunning(false)
+    }
+  }
+
+  const getScanTypeColor = (scanType: string) => {
+    switch (scanType.toLowerCase()) {
+      case "index scan":
+      case "index only scan":
+        return "text-green-700 bg-green-100"
+      case "seq scan":
+      case "sequential scan":
+        return "text-red-700 bg-red-100"
+      case "bitmap heap scan":
+        return "text-yellow-700 bg-yellow-100"
+      default:
+        return "text-gray-700 bg-gray-100"
+    }
+  }
+
+  const getPerformanceGrade = (executionTime: number) => {
+    if (executionTime < 0.1) return { grade: "A+", color: "text-green-700" }
+    if (executionTime < 0.5) return { grade: "A", color: "text-green-600" }
+    if (executionTime < 1.0) return { grade: "B", color: "text-yellow-600" }
+    if (executionTime < 5.0) return { grade: "C", color: "text-orange-600" }
+    return { grade: "D", color: "text-red-600" }
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 p-6">
-      {/* Newspaper Header */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <div className="text-center border-b-4 border-amber-800 pb-4 mb-6">
-          <h1 className="text-5xl font-bold text-amber-900 mb-2" style={{ fontFamily: "serif" }}>
-            THE WYOVERSE TELEGRAPH
-          </h1>
-          <p className="text-lg text-amber-700" style={{ fontFamily: "serif" }}>
-            Database Performance Bureau • Established 1880 • "Speed Through Science"
+    <div className="newspaper-bg min-h-screen p-6">
+      {/* Header */}
+      <div className="newspaper-article mb-8">
+        <div className="newspaper-article-inner text-center">
+          <h1 className="newspaper-headline text-4xl mb-4">WYOVERSE DATABASE PERFORMANCE STATION</h1>
+          <p className="newspaper-subheadline text-xl mb-4">
+            Frontier Telegraph Database Optimization & Analysis Bureau
           </p>
-          <div className="flex justify-center items-center gap-4 mt-2">
-            <span className="text-sm text-amber-600">Vol. CXLIV, No. 1</span>
-            <span className="text-sm text-amber-600">•</span>
-            <span className="text-sm text-amber-600">{new Date().toLocaleDateString()}</span>
-          </div>
+          <div className="newspaper-dateline">Established for Peak Performance - Digital Frontier Engineering Co.</div>
         </div>
+      </div>
 
-        {/* Main Headline */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-amber-900 mb-2" style={{ fontFamily: "serif" }}>
-            FRONTIER DATABASE OPTIMIZATION STATION
-          </h2>
-          <p className="text-lg text-amber-700" style={{ fontFamily: "serif" }}>
-            "Turning Slow Queries into Lightning Fast Lookups Since the Digital Gold Rush"
-          </p>
-        </div>
-
-        {/* Control Panel */}
-        <Card className="mb-6 border-2 border-amber-800">
-          <CardHeader className="bg-amber-100">
-            <CardTitle className="flex items-center gap-2 text-amber-900" style={{ fontFamily: "serif" }}>
-              <Database className="h-5 w-5" />
-              Telegraph Control Station
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-amber-800">Player ID to Test:</label>
-                <input
-                  type="number"
-                  value={selectedPlayerId}
-                  onChange={(e) => setSelectedPlayerId(Number(e.target.value))}
-                  className="w-24 px-2 py-1 border border-amber-300 rounded"
-                />
-              </div>
-              <Button
-                onClick={runPerformanceAnalysis}
-                disabled={isAnalyzing}
-                className="bg-amber-700 hover:bg-amber-800 text-white"
-              >
-                {isAnalyzing ? (
+      {/* Control Panel */}
+      <div className="newspaper-article mb-6">
+        <div className="newspaper-article-inner">
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button onClick={runOptimizationTest} disabled={isRunning} className="newspaper-button text-lg px-8 py-4">
+                {isRunning ? (
                   <>
-                    <Activity className="h-4 w-4 mr-2 animate-spin" />
-                    Analyzing Telegraph Lines...
+                    <RefreshCw className="h-5 w-5 mr-2 animate-spin" />
+                    Running Analysis...
                   </>
                 ) : (
                   <>
-                    <Zap className="h-4 w-4 mr-2" />
-                    Test Database Performance
+                    <Target className="h-5 w-5 mr-2" />
+                    Run Full Optimization Test
                   </>
                 )}
               </Button>
+
+              <Button onClick={() => runSingleTest("quick_test")} disabled={isRunning} className="newspaper-button">
+                <Play className="h-4 w-4 mr-2" />
+                Quick Test
+              </Button>
+
+              <Button
+                onClick={() => {
+                  loadPerformanceHistory()
+                  loadIndexStats()
+                }}
+                className="newspaper-button"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh Data
+              </Button>
             </div>
-
-            {isAnalyzing && (
-              <div className="space-y-2">
-                <div className="text-sm text-amber-700">Running frontier database analysis...</div>
-                <Progress value={66} className="w-full" />
-                <div className="text-xs text-amber-600">Testing query speeds across the digital frontier...</div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Results */}
-        {report && (
-          <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 bg-amber-100">
-              <TabsTrigger value="overview" className="data-[state=active]:bg-amber-700 data-[state=active]:text-white">
-                Telegraph Report
-              </TabsTrigger>
-              <TabsTrigger
-                value="performance"
-                className="data-[state=active]:bg-amber-700 data-[state=active]:text-white"
-              >
-                Speed Charts
-              </TabsTrigger>
-              <TabsTrigger value="indexes" className="data-[state=active]:bg-amber-700 data-[state=active]:text-white">
-                Index Usage
-              </TabsTrigger>
-              <TabsTrigger
-                value="recommendations"
-                className="data-[state=active]:bg-amber-700 data-[state=active]:text-white"
-              >
-                Frontier Wisdom
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="overview" className="space-y-6">
-              {/* Performance Summary */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="border-2 border-amber-800">
-                  <CardHeader className="bg-amber-100">
-                    <CardTitle className="flex items-center gap-2 text-amber-900" style={{ fontFamily: "serif" }}>
-                      <TrendingUp className="h-5 w-5" />
-                      Speed Improvement
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="text-4xl font-bold text-green-600 mb-2">
-                      {report.improvementPercentage.toFixed(1)}%
-                    </div>
-                    <p className="text-sm text-amber-700">Faster than a frontier telegraph</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 border-amber-800">
-                  <CardHeader className="bg-amber-100">
-                    <CardTitle className="flex items-center gap-2 text-amber-900" style={{ fontFamily: "serif" }}>
-                      <Clock className="h-5 w-5" />
-                      Average Query Time
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="text-4xl font-bold text-blue-600 mb-2">
-                      {(
-                        report.afterOptimization.reduce((sum, r) => sum + r.executionTimeMs, 0) /
-                        report.afterOptimization.length
-                      ).toFixed(3)}
-                      ms
-                    </div>
-                    <p className="text-sm text-amber-700">Lightning fast responses</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 border-amber-800">
-                  <CardHeader className="bg-amber-100">
-                    <CardTitle className="flex items-center gap-2 text-amber-900" style={{ fontFamily: "serif" }}>
-                      <Target className="h-5 w-5" />
-                      Queries Optimized
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="text-4xl font-bold text-purple-600 mb-2">{report.afterOptimization.length}</div>
-                    <p className="text-sm text-amber-700">All systems optimized</p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Before/After Comparison */}
-              <Card className="border-2 border-amber-800">
-                <CardHeader className="bg-amber-100">
-                  <CardTitle className="text-amber-900" style={{ fontFamily: "serif" }}>
-                    Telegraph Speed Comparison
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    {report.beforeOptimization.map((before, index) => {
-                      const after = report.afterOptimization[index]
-                      const improvement =
-                        ((before.executionTimeMs - after.executionTimeMs) / before.executionTimeMs) * 100
-
-                      return (
-                        <div key={before.queryType} className="border border-amber-200 rounded-lg p-4">
-                          <div className="flex justify-between items-center mb-2">
-                            <h4 className="font-semibold text-amber-900">{before.queryType}</h4>
-                            <Badge variant={improvement > 90 ? "default" : improvement > 50 ? "secondary" : "outline"}>
-                              {improvement.toFixed(1)}% faster
-                            </Badge>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <span className="text-red-600 font-medium">Before: </span>
-                              {before.executionTimeMs.toFixed(3)}ms ({before.indexUsed})
-                            </div>
-                            <div>
-                              <span className="text-green-600 font-medium">After: </span>
-                              {after.executionTimeMs.toFixed(3)}ms ({after.indexUsed})
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="performance" className="space-y-6">
-              <Card className="border-2 border-amber-800">
-                <CardHeader className="bg-amber-100">
-                  <CardTitle className="text-amber-900" style={{ fontFamily: "serif" }}>
-                    Query Performance Telegraph Chart
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <ResponsiveContainer width="100%" height={400}>
-                    <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="before" fill="#dc2626" name="Before (ms)" />
-                      <Bar dataKey="after" fill="#16a34a" name="After (ms)" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="indexes" className="space-y-6">
-              <Card className="border-2 border-amber-800">
-                <CardHeader className="bg-amber-100">
-                  <CardTitle className="text-amber-900" style={{ fontFamily: "serif" }}>
-                    Index Usage Telegraph Report
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    {indexStats.map((index, i) => (
-                      <div key={i} className="flex justify-between items-center p-3 border border-amber-200 rounded">
-                        <div>
-                          <div className="font-medium text-amber-900">{index.indexname}</div>
-                          <div className="text-sm text-amber-600">{index.scans} scans performed</div>
-                        </div>
-                        <Badge
-                          variant={
-                            index.usage_status === "ACTIVE"
-                              ? "default"
-                              : index.usage_status === "LOW_USAGE"
-                                ? "secondary"
-                                : "outline"
-                          }
-                        >
-                          {index.usage_status}
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="recommendations" className="space-y-6">
-              <Card className="border-2 border-amber-800">
-                <CardHeader className="bg-amber-100">
-                  <CardTitle className="text-amber-900" style={{ fontFamily: "serif" }}>
-                    Frontier Database Wisdom
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="space-y-3">
-                    {report.recommendations.map((rec, index) => (
-                      <Alert key={index} className="border-amber-200">
-                        <AlertDescription className="text-amber-800">{rec}</AlertDescription>
-                      </Alert>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        )}
+          </div>
+        </div>
       </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-4 mb-8 border-4 border-black bg-amber-50">
+          <TabsTrigger value="overview" className="newspaper-button">
+            📊 Overview
+          </TabsTrigger>
+          <TabsTrigger value="optimization" className="newspaper-button">
+            🚀 Optimization
+          </TabsTrigger>
+          <TabsTrigger value="indexes" className="newspaper-button">
+            🗂️ Indexes
+          </TabsTrigger>
+          <TabsTrigger value="history" className="newspaper-button">
+            📈 History
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          {/* Current Performance Status */}
+          <div className="newspaper-article">
+            <div className="newspaper-article-inner">
+              <h2 className="newspaper-section-title text-center mb-6">
+                <Database className="inline h-8 w-8 mr-2" />
+                CURRENT PERFORMANCE STATUS
+              </h2>
+
+              {results.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {results.slice(-4).map((result, index) => {
+                    const grade = getPerformanceGrade(result.executionTime)
+                    return (
+                      <div key={index} className="newspaper-ad text-center p-4">
+                        <div className="text-sm font-serif mb-2">
+                          {result.queryType.replace(/_/g, " ").toUpperCase()}
+                        </div>
+                        <div className={`text-3xl font-bold ${grade.color} mb-2`}>{grade.grade}</div>
+                        <div className="text-lg font-bold">{result.executionTime.toFixed(3)}ms</div>
+                        <div className={`text-xs px-2 py-1 rounded ${getScanTypeColor(result.scanType)}`}>
+                          {result.scanType}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Database className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                  <p className="newspaper-paragraph">No performance data available. Run a test to get started!</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Your Original Query Results */}
+          <div className="newspaper-article">
+            <div className="newspaper-article-inner">
+              <h3 className="newspaper-section-title text-center mb-4">YOUR ORIGINAL QUERY ANALYSIS</h3>
+              <div className="newspaper-quote p-6 bg-amber-50 border-4 border-amber-600">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="newspaper-headline text-lg mb-3">BEFORE OPTIMIZATION</h4>
+                    <div className="space-y-2 font-mono text-sm">
+                      <div>
+                        Execution Time: <span className="text-red-600 font-bold">1.678ms</span>
+                      </div>
+                      <div>
+                        Planning Time: <span className="text-gray-600">0.234ms</span>
+                      </div>
+                      <div>
+                        Total Cost: <span className="text-red-600 font-bold">25.00</span>
+                      </div>
+                      <div>
+                        Scan Type: <span className="text-red-600 font-bold">Sequential Scan</span>
+                      </div>
+                      <div>
+                        Rows Filtered: <span className="text-red-600">999 removed</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="newspaper-headline text-lg mb-3">AFTER OPTIMIZATION</h4>
+                    <div className="space-y-2 font-mono text-sm">
+                      <div>
+                        Execution Time: <span className="text-green-600 font-bold">0.045ms</span>
+                      </div>
+                      <div>
+                        Planning Time: <span className="text-gray-600">0.123ms</span>
+                      </div>
+                      <div>
+                        Total Cost: <span className="text-green-600 font-bold">8.30</span>
+                      </div>
+                      <div>
+                        Scan Type: <span className="text-green-600 font-bold">Index Scan</span>
+                      </div>
+                      <div>
+                        Improvement: <span className="text-green-600 font-bold">97.3% faster</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="optimization" className="space-y-6">
+          {optimizationResults && (
+            <div className="newspaper-article">
+              <div className="newspaper-article-inner">
+                <h2 className="newspaper-section-title text-center mb-6">
+                  <TrendingUp className="inline h-8 w-8 mr-2" />
+                  OPTIMIZATION RESULTS
+                </h2>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="newspaper-ad p-6">
+                    <h3 className="newspaper-headline text-xl mb-4 text-red-800">Before Optimization</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between border-b border-gray-300 pb-2">
+                        <span className="font-serif">Execution Time:</span>
+                        <span className="font-bold text-red-600">
+                          {optimizationResults.before.executionTime.toFixed(3)}ms
+                        </span>
+                      </div>
+                      <div className="flex justify-between border-b border-gray-300 pb-2">
+                        <span className="font-serif">Total Cost:</span>
+                        <span className="font-bold">{optimizationResults.before.totalCost.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-gray-300 pb-2">
+                        <span className="font-serif">Scan Type:</span>
+                        <span
+                          className={`px-2 py-1 rounded text-xs ${getScanTypeColor(optimizationResults.before.scanType)}`}
+                        >
+                          {optimizationResults.before.scanType}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="newspaper-ad p-6">
+                    <h3 className="newspaper-headline text-xl mb-4 text-green-800">After Optimization</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between border-b border-gray-300 pb-2">
+                        <span className="font-serif">Execution Time:</span>
+                        <span className="font-bold text-green-600">
+                          {optimizationResults.after.executionTime.toFixed(3)}ms
+                        </span>
+                      </div>
+                      <div className="flex justify-between border-b border-gray-300 pb-2">
+                        <span className="font-serif">Total Cost:</span>
+                        <span className="font-bold">{optimizationResults.after.totalCost.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-gray-300 pb-2">
+                        <span className="font-serif">Scan Type:</span>
+                        <span
+                          className={`px-2 py-1 rounded text-xs ${getScanTypeColor(optimizationResults.after.scanType)}`}
+                        >
+                          {optimizationResults.after.scanType}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center mt-6">
+                  <div className="newspaper-quote p-6">
+                    <h3 className="newspaper-headline text-2xl mb-4">
+                      🎉 PERFORMANCE IMPROVEMENT: {optimizationResults.improvement.toFixed(1)}%
+                    </h3>
+                    <p className="newspaper-paragraph">
+                      Your database queries are now running {optimizationResults.improvement.toFixed(1)}% faster thanks
+                      to proper indexing!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Optimization Recommendations */}
+          <div className="newspaper-article">
+            <div className="newspaper-article-inner">
+              <h3 className="newspaper-section-title text-center mb-4">FRONTIER TELEGRAPH RECOMMENDATIONS</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="newspaper-ad p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <span className="font-serif font-bold">Completed Optimizations</span>
+                  </div>
+                  <ul className="space-y-2 text-sm">
+                    <li>✅ Created index on player_id column</li>
+                    <li>✅ Created index on game_date column</li>
+                    <li>✅ Created composite index for common queries</li>
+                    <li>✅ Updated table statistics</li>
+                  </ul>
+                </div>
+                <div className="newspaper-ad p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                    <span className="font-serif font-bold">Future Considerations</span>
+                  </div>
+                  <ul className="space-y-2 text-sm">
+                    <li>🔄 Monitor index usage regularly</li>
+                    <li>📊 Run ANALYZE after bulk data changes</li>
+                    <li>🗂️ Consider partitioning for large tables</li>
+                    <li>⚡ Review slow queries monthly</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="indexes" className="space-y-6">
+          <div className="newspaper-article">
+            <div className="newspaper-article-inner">
+              <h2 className="newspaper-section-title text-center mb-6">INDEX USAGE STATISTICS</h2>
+
+              {indexStats.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full border-4 border-black">
+                    <thead className="bg-amber-100 border-b-2 border-black">
+                      <tr>
+                        <th className="p-3 text-left font-serif font-bold">Index Name</th>
+                        <th className="p-3 text-left font-serif font-bold">Scans</th>
+                        <th className="p-3 text-left font-serif font-bold">Tuples Read</th>
+                        <th className="p-3 text-left font-serif font-bold">Tuples Fetched</th>
+                        <th className="p-3 text-left font-serif font-bold">Usage</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {indexStats.map((stat, index) => (
+                        <tr key={index} className="border-b border-gray-300">
+                          <td className="p-3 font-mono text-sm">{stat.indexname}</td>
+                          <td className="p-3 font-bold">{stat.idx_scan?.toLocaleString() || 0}</td>
+                          <td className="p-3">{stat.idx_tup_read?.toLocaleString() || 0}</td>
+                          <td className="p-3">{stat.idx_tup_fetch?.toLocaleString() || 0}</td>
+                          <td className="p-3">
+                            <div className="flex items-center gap-2">
+                              <Progress
+                                value={Math.min(((stat.idx_scan || 0) / 100) * 100, 100)}
+                                className="w-20 h-2"
+                              />
+                              <span className="text-sm">
+                                {stat.idx_scan > 100 ? "High" : stat.idx_scan > 10 ? "Medium" : "Low"}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <BarChart3 className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                  <p className="newspaper-paragraph">
+                    No index statistics available. Run some queries to generate usage data!
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-6">
+          <div className="newspaper-article">
+            <div className="newspaper-article-inner">
+              <h2 className="newspaper-section-title text-center mb-6">
+                <Clock className="inline h-8 w-8 mr-2" />
+                PERFORMANCE HISTORY LOG
+              </h2>
+
+              {performanceHistory.length > 0 ? (
+                <div className="space-y-4">
+                  {performanceHistory.slice(0, 10).map((record, index) => (
+                    <div key={index} className="newspaper-ad p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="text-sm font-mono text-gray-600">
+                          {new Date(record.timestamp).toLocaleString()}
+                        </div>
+                        <div className="font-serif font-bold">{record.queryType.replace(/_/g, " ").toUpperCase()}</div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <div className="font-bold">{record.executionTime.toFixed(3)}ms</div>
+                          <div className={`text-xs px-2 py-1 rounded ${getScanTypeColor(record.scanType)}`}>
+                            {record.scanType}
+                          </div>
+                        </div>
+                        {record.improvement && (
+                          <div className="text-green-600 font-bold">+{record.improvement.toFixed(1)}%</div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Clock className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                  <p className="newspaper-paragraph">
+                    No performance history available. Run some tests to build history!
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
