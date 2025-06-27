@@ -5,19 +5,20 @@
   min-width: 80px;
   min-height: 80px;
   margin: 10px;
-  border: 3px solid #000;
-  background: linear-gradient(145deg, #ff6b6b, #ee5a52);
-  color: white;
-  font-weight: bold;
-  border-radius: 50%;
-  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem; /* bigger label text */
+  border-radius: 9999px; /* pill / round buttons */
+  background: #dc2626; /* red gloves theme */
+  color: #fff;
+  transition: transform 0.1s ease;
   touch-action: manipulation;
   user-select: none;
 }
 
 .punch-btn:active {
-  transform: scale(0.95);
-  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: scale(0.94);
 }
 
 .punch-btn:hover {
