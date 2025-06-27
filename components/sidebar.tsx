@@ -1,68 +1,69 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   ChevronLeft,
   ChevronRight,
   Home,
   Gamepad2,
-  TrendingUp,
-  Palette,
-  Users,
-  Calendar,
-  ShoppingBag,
+  Store,
   MapPin,
+  Calendar,
+  Users,
+  BookOpen,
   Zap,
+  Briefcase,
   GraduationCap,
-  Building,
-  Mountain,
-  Pickaxe,
+  Heart,
   Shield,
   TreePine,
   FileText,
-  Plane,
+  Building,
   Trophy,
   Gem,
-  Store,
-  Activity,
-  Heart,
-  BookOpen,
+  Camera,
   Pyramid,
   Archive,
+  Activity,
+  Palette,
+  TrendingUp,
+  Pickaxe,
+  Landmark,
+  Search,
 } from "lucide-react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
 
 const navigationItems = [
-  { name: "Home", href: "/", icon: Home },
-  { name: "Games", href: "/games", icon: Gamepad2 },
-  { name: "Market", href: "/market", icon: TrendingUp },
-  { name: "Art Gallery", href: "/art", icon: Palette },
-  { name: "Community", href: "/community", icon: Users },
-  { name: "Calendar", href: "/calendar", icon: Calendar },
-  { name: "Classifieds", href: "/classifieds", icon: ShoppingBag },
-  { name: "Explore", href: "/explore", icon: MapPin },
-  { name: "Energy", href: "/energy", icon: Zap },
-  { name: "Education", href: "/education", icon: GraduationCap },
-  { name: "Business", href: "/business", icon: Building },
-  { name: "Land Deeds", href: "/land-deeds", icon: Mountain },
-  { name: "Mining", href: "/mining", icon: Pickaxe },
-  { name: "OSHA", href: "/osha", icon: Shield },
-  { name: "Parks", href: "/parks", icon: TreePine },
-  { name: "Patents", href: "/patents", icon: FileText },
-  { name: "Tourism", href: "/tourism", icon: Plane },
-  { name: "Sports", href: "/sports", icon: Trophy },
-  { name: "Stones & NFTs", href: "/stones", icon: Gem },
-  { name: "Store", href: "/store", icon: Store },
-  { name: "System Status", href: "/system-status", icon: Activity },
-  { name: "Lifestyle", href: "/lifestyle", icon: Heart },
-  { name: "Native History", href: "/native-history", icon: BookOpen },
-  { name: "Wyoming Pyramid", href: "/wyoming-pyramid", icon: Pyramid },
-  { name: "Wyoming Records", href: "/wyoming-records", icon: Archive },
+  { href: "/", label: "Home", icon: Home },
+  { href: "/games", label: "Games", icon: Gamepad2 },
+  { href: "/store", label: "Store", icon: Store },
+  { href: "/explore", label: "Explore", icon: MapPin },
+  { href: "/calendar", label: "Calendar", icon: Calendar },
+  { href: "/community", label: "Community", icon: Users },
+  { href: "/education", label: "Education", icon: GraduationCap },
+  { href: "/energy", label: "Energy", icon: Zap },
+  { href: "/mining", label: "Mining", icon: Pickaxe },
+  { href: "/business", label: "Business", icon: Briefcase },
+  { href: "/lifestyle", label: "Lifestyle", icon: Heart },
+  { href: "/sports", label: "Sports", icon: Trophy },
+  { href: "/tourism", label: "Tourism", icon: Camera },
+  { href: "/parks", label: "Parks", icon: TreePine },
+  { href: "/osha", label: "OSHA", icon: Shield },
+  { href: "/patents", label: "Patents", icon: FileText },
+  { href: "/property", label: "Property", icon: Building },
+  { href: "/stones", label: "Stones & NFTs", icon: Gem },
+  { href: "/land-deeds", label: "Land Deeds", icon: Landmark },
+  { href: "/classifieds", label: "Classifieds", icon: Search },
+  { href: "/native-history", label: "Native History", icon: BookOpen },
+  { href: "/wyoming-pyramid", label: "Wyoming Pyramid", icon: Pyramid },
+  { href: "/wyoming-records", label: "Wyoming Records", icon: Archive },
+  { href: "/system-status", label: "System Status", icon: Activity },
+  { href: "/art", label: "Art Gallery", icon: Palette },
+  { href: "/market", label: "Market", icon: TrendingUp },
 ]
 
 export function Sidebar() {
@@ -71,18 +72,20 @@ export function Sidebar() {
 
   return (
     <div
-      className={`${isCollapsed ? "w-16" : "w-64"} transition-all duration-300 bg-amber-100 border-r-2 border-black`}
+      className={`fixed left-0 top-0 h-full bg-gradient-to-b from-amber-50 to-yellow-100 border-r border-amber-200 transition-all duration-300 z-40 ${
+        isCollapsed ? "w-16" : "w-64"
+      }`}
     >
       <div className="flex flex-col h-full">
         {/* Header */}
-        <div className="p-4 border-b-2 border-black">
+        <div className="p-4 border-b border-amber-200">
           <div className="flex items-center justify-between">
-            {!isCollapsed && <div className="text-lg font-bold font-serif">WYOVERSE</div>}
+            {!isCollapsed && <h2 className="text-lg font-bold text-amber-900">WyoVerse</h2>}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="hover:bg-amber-200"
+              className="text-amber-700 hover:text-amber-900 hover:bg-amber-200"
             >
               {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
             </Button>
@@ -90,47 +93,50 @@ export function Sidebar() {
         </div>
 
         {/* Navigation */}
-        <ScrollArea className="flex-1 p-2">
-          <div className="space-y-1">
+        <div className="flex-1 overflow-y-auto p-2">
+          <nav className="space-y-1">
             {navigationItems.map((item) => {
-              const isActive = pathname === item.href
               const Icon = item.icon
+              const isActive = pathname === item.href
 
               return (
-                <Link key={item.name} href={item.href}>
+                <Link key={item.href} href={item.href}>
                   <Button
                     variant={isActive ? "default" : "ghost"}
-                    className={`w-full justify-start hover:bg-amber-200 ${
-                      isActive ? "bg-amber-300 text-black" : ""
+                    className={`w-full justify-start text-left ${
+                      isActive
+                        ? "bg-amber-600 text-white hover:bg-amber-700"
+                        : "text-amber-700 hover:text-amber-900 hover:bg-amber-200"
                     } ${isCollapsed ? "px-2" : "px-3"}`}
                     size="sm"
                   >
-                    <Icon className="h-4 w-4" />
-                    {!isCollapsed && <span className="ml-2 text-xs">{item.name}</span>}
+                    <Icon className={`h-4 w-4 ${isCollapsed ? "" : "mr-2"}`} />
+                    {!isCollapsed && <span className="truncate">{item.label}</span>}
                   </Button>
                 </Link>
               )
             })}
-          </div>
-        </ScrollArea>
+          </nav>
+        </div>
 
-        {/* Wanted Board Section */}
+        {/* Wanted Board */}
         {!isCollapsed && (
-          <div className="p-4 border-t-2 border-black">
-            <Card className="border-2 border-black bg-red-100">
-              <CardContent className="p-3">
-                <div className="text-center">
-                  <h4 className="font-bold text-sm mb-2">⚠️ WANTED ⚠️</h4>
-                  <img
-                    src="/images/wyoversestonewanted.png"
-                    alt="Wanted Poster"
-                    className="w-full h-20 object-cover border border-black mb-2"
-                  />
-                  <div className="text-xs">
-                    <div className="font-bold">DIGITAL OUTLAWS</div>
-                    <div>Reward: 1000 WYO Tokens</div>
-                    <Badge className="mt-1 bg-red-500 text-white text-xs">ACTIVE</Badge>
-                  </div>
+          <div className="p-4 border-t border-amber-200">
+            <Card className="bg-gradient-to-br from-red-100 to-orange-100 border-red-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-bold text-red-800 flex items-center gap-2">
+                  🤠 WANTED BOARD
+                  <Badge variant="destructive" className="text-xs">
+                    $10K Reward
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="text-xs text-red-700 space-y-1">
+                  <div className="font-semibold">Stone "The Mechanic"</div>
+                  <div>Last seen: Cyberpunk Garage</div>
+                  <div>Crime: Excessive Bull Riding</div>
+                  <div className="text-red-600 font-medium">Approach with caution - armed with wrenches</div>
                 </div>
               </CardContent>
             </Card>
@@ -139,10 +145,14 @@ export function Sidebar() {
 
         {/* Social Good Indicator */}
         {!isCollapsed && (
-          <div className="p-4 border-t border-black">
-            <div className="text-center">
-              <Badge className="bg-green-500 text-white text-xs">💚 Social Good Active</Badge>
-              <div className="text-xs mt-1 text-gray-600">$1,247.85 donated</div>
+          <div className="p-4 border-t border-amber-200">
+            <div className="text-xs text-center text-amber-700">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="font-semibold">Social Good Active</span>
+              </div>
+              <div>💚 $2,847 donated today</div>
+              <div>🌍 1,234 lives impacted</div>
             </div>
           </div>
         )}

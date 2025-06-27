@@ -11,8 +11,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "WyoVerse - Digital Frontier Experience",
   description:
-    "Explore the digital frontier with real-time crypto markets, social good initiatives, and frontier adventures",
-  keywords: "Wyoming, crypto, blockchain, frontier, games, social good, NFT, digital art",
+    "Explore the digital frontier of Wyoming with real-time crypto markets, social good initiatives, and frontier gaming.",
     generator: 'v0.dev'
 }
 
@@ -25,12 +24,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <div className="flex min-h-screen bg-amber-50">
-            {/* Sidebar */}
+          <div className="flex min-h-screen">
             <Sidebar />
-
-            {/* Main Content */}
-            <main className="flex-1 overflow-auto">{children}</main>
+            <main className="flex-1 ml-64 transition-all duration-300">{children}</main>
           </div>
           <Toaster />
         </ThemeProvider>
