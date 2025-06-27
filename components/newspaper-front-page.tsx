@@ -1,40 +1,94 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Image from "next/image"
 import Link from "next/link"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import {
-  TrendingUp,
-  TrendingDown,
-  Users,
-  DollarSign,
-  Activity,
-  Calendar,
-  MapPin,
-  Trophy,
-  Heart,
-  Gamepad2,
-  ExternalLink,
-} from "lucide-react"
+import { TrendingUp, TrendingDown, Users, MapPin, ExternalLink, Clock, Trophy, Mountain } from "lucide-react"
+
+interface MarketData {
+  symbol: string
+  price: number
+  change24h: number
+  volume: number
+}
+
+interface CommunityStats {
+  activeUsers: number
+  totalStones: number
+  activeFights: number
+  landClaimed: number
+  newMembers: number
+}
+
+interface WeatherData {
+  temperature: number
+  condition: string
+  windSpeed: number
+  humidity: number
+}
 
 export function NewspaperFrontPage() {
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [marketData, setMarketData] = useState({
-    bitcoin: { price: 43250, change: 2.4 },
-    ethereum: { price: 2680, change: -1.2 },
-    avalanche: { price: 38.5, change: 5.7 },
+  const [marketData, setMarketData] = useState<MarketData[]>([
+    { symbol: "AVAX", price: 42.85, change24h: 5.2, volume: 1250000 },
+    { symbol: "BTC", price: 67420, change24h: -2.1, volume: 28500000 },
+    { symbol: "ETH", price: 3845, change24h: 3.7, volume: 15200000 },
+    { symbol: "STONES", price: 0.0012, change24h: 12.5, volume: 89000 },
+  ])
+
+  const [communityStats, setCommunityStats] = useState<CommunityStats>({
+    activeUsers: 1247,
+    totalStones: 89432,
+    activeFights: 23,
+    landClaimed: 156,
+    newMembers: 34,
   })
 
+  const [weather, setWeather] = useState<WeatherData>({
+    temperature: 72,
+    condition: "Partly Cloudy",
+    windSpeed: 8,
+    humidity: 45,
+  })
+
+  // Update time every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date())
     }, 1000)
-
     return () => clearInterval(timer)
+  }, [])
+
+  // Update market data every 10 seconds
+  useEffect(() => {
+    const marketTimer = setInterval(() => {
+      setMarketData((prev) =>
+        prev.map((coin) => ({
+          ...coin,
+          price: coin.price * (1 + (Math.random() - 0.5) * 0.02),
+          change24h: coin.change24h + (Math.random() - 0.5) * 2,
+          volume: coin.volume * (1 + (Math.random() - 0.5) * 0.1),
+        })),
+      )
+    }, 10000)
+    return () => clearInterval(marketTimer)
+  }, [])
+
+  // Update community stats every 30 seconds
+  useEffect(() => {
+    const statsTimer = setInterval(() => {
+      setCommunityStats((prev) => ({
+        activeUsers: Math.max(1000, prev.activeUsers + Math.floor(Math.random() * 20 - 10)),
+        totalStones: prev.totalStones + Math.floor(Math.random() * 200),
+        activeFights: Math.max(0, prev.activeFights + Math.floor(Math.random() * 6 - 3)),
+        landClaimed: prev.landClaimed + Math.floor(Math.random() * 3),
+        newMembers: Math.max(0, prev.newMembers + Math.floor(Math.random() * 4 - 2)),
+      }))
+    }, 30000)
+    return () => clearInterval(statsTimer)
   }, [])
 
   const formatDate = (date: Date) => {
@@ -54,382 +108,353 @@ export function NewspaperFrontPage() {
     })
   }
 
+  const breakingNews = [
+    "🥊 Epic Bull vs Bear Championship Tonight at Digital Colosseum!",
+    "⛏️ New Gold Vein Discovered in Thunder Peak Mine - Stones Surge 12%",
+    "🤠 Bar Keep Bill Introduces New AI-Powered Trading Advice System",
+    "🏆 Crypto Clashers Racing Circuit Opens with $10,000 Prize Pool",
+    "🏔️ Wyoming Pyramid Mystery Deepens - Ancient Blockchain Discovered",
+  ]
+
+  const [currentNewsIndex, setCurrentNewsIndex] = useState(0)
+
+  useEffect(() => {
+    const newsTimer = setInterval(() => {
+      setCurrentNewsIndex((prev) => (prev + 1) % breakingNews.length)
+    }, 8000)
+    return () => clearInterval(newsTimer)
+  }, [])
+
   return (
-    <div className="min-h-screen newspaper-bg p-4">
+    <div className="min-h-screen bg-yellow-50 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Newspaper Header */}
-        <div className="text-center mb-8 border-8 border-black p-6 bg-white">
-          <div className="border-4 border-black p-4">
-            <h1 className="newspaper-headline text-6xl mb-2">WYOVERSE PIONEER</h1>
-            <div className="flex justify-between items-center text-sm font-bold">
-              <span>EST. 2024</span>
-              <span>{formatDate(currentTime)}</span>
-              <span>PRICE: FREE</span>
+        <div className="border-8 border-black bg-white p-6 mb-6">
+          <div className="text-center border-b-4 border-black pb-4 mb-4">
+            <div className="flex justify-between items-start mb-2">
+              <div className="text-left">
+                <div className="text-sm font-bold">EST. 1880</div>
+                <div className="text-xs">DIGITAL FRONTIER EDITION</div>
+              </div>
+              <div className="text-center flex-1">
+                <h1 className="text-6xl font-bold font-serif tracking-wider">THE WYOVERSE PIONEER</h1>
+                <div className="text-lg font-semibold mt-2">"ALL THE NEWS THAT'S FIT TO MINE"</div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm font-bold">VOL. 145, NO. 27</div>
+                <div className="text-xs">PRICE: 5 STONES</div>
+              </div>
             </div>
-            <div className="text-center mt-2">
-              <span className="text-lg font-bold">LIVE: {formatTime(currentTime)}</span>
+
+            <div className="flex justify-between items-center text-sm border-t-2 border-black pt-2">
+              <div className="font-bold">{formatDate(currentTime)}</div>
+              <div className="flex items-center space-x-2">
+                <Clock className="h-4 w-4" />
+                <span className="font-mono">{formatTime(currentTime)}</span>
+              </div>
+              <div className="font-bold">CHEYENNE, WYOMING TERRITORY</div>
             </div>
-            <Separator className="my-4 bg-black h-1" />
-            <p className="newspaper-subheadline text-xl">"Pioneering the Digital Frontier of Wyoming"</p>
           </div>
-        </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Left Column - Main Stories */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Lead Story */}
-            <div className="newspaper-article">
-              <div className="newspaper-article-inner">
-                <h2 className="newspaper-section-title">BREAKING NEWS</h2>
-                <h3 className="text-3xl font-bold mb-4 uppercase">Digital Rodeo Championships Begin Today</h3>
-                <div className="newspaper-byline">By Sarah "Frontier" Johnson, Sports Editor</div>
-                <div className="newspaper-dateline">CHEYENNE, WY - {formatDate(currentTime)}</div>
+          {/* Breaking News Ticker */}
+          <div className="bg-red-600 text-white p-2 mb-4">
+            <div className="flex items-center">
+              <div className="bg-white text-red-600 px-2 py-1 font-bold text-sm mr-4">BREAKING NEWS</div>
+              <div className="flex-1 overflow-hidden">
+                <div className="animate-pulse font-semibold">{breakingNews[currentNewsIndex]}</div>
+              </div>
+            </div>
+          </div>
 
-                <div className="relative mb-4">
-                  <Image
-                    src="/images/arialcheyennerodeo.png"
-                    alt="Cheyenne Digital Rodeo Arena"
-                    width={600}
-                    height={300}
-                    className="w-full h-64 object-cover border-2 border-black"
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Main Story */}
+            <div className="lg:col-span-2">
+              <Card className="border-4 border-black">
+                <CardHeader>
+                  <CardTitle className="text-2xl font-bold font-serif">
+                    🏆 CRYPTO CLASHERS CHAMPIONSHIP DRAWS RECORD CROWD
+                  </CardTitle>
+                  <div className="text-sm text-gray-600">By Staff Reporter | Sports Desk</div>
+                </CardHeader>
+                <CardContent>
+                  <div className="mb-4">
+                    <img
+                      src="/images/bears-boxing-arena-crowd.jpeg"
+                      alt="Boxing Arena Championship"
+                      className="w-full h-48 object-cover border-2 border-black"
+                    />
+                    <div className="text-xs text-center mt-1 italic">
+                      Thousands gather at the Digital Colosseum for tonight's championship bout
+                    </div>
+                  </div>
+                  <p className="text-justify leading-relaxed mb-4">
+                    The Digital Colosseum was packed to capacity last evening as spectators from across the blockchain
+                    gathered to witness the most anticipated boxing match of the season. The legendary Bull fighter,
+                    known for his aggressive market-moving punches, faced off against the cunning Bear, whose defensive
+                    strategies have made him a crowd favorite.
+                  </p>
+                  <p className="text-justify leading-relaxed mb-4">
+                    "This ain't just about the fight," commented Bar Keep Bill from his saloon overlooking the arena.
+                    "This here's about the future of digital entertainment and the power of community-driven gaming."
+                  </p>
+                  <div className="flex justify-between items-center">
+                    <Link href="/boxing-arena">
+                      <Button className="bg-red-600 hover:bg-red-700 text-white">
+                        Enter the Arena <Trophy className="h-4 w-4 ml-2" />
+                      </Button>
+                    </Link>
+                    <div className="text-sm text-gray-600">Continued on Page 3</div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Market Data */}
+            <div className="lg:col-span-1">
+              <Card className="border-4 border-black">
+                <CardHeader>
+                  <CardTitle className="text-lg font-bold font-serif">📈 MARKET TELEGRAPH</CardTitle>
+                  <div className="text-xs">Live from the Trading Post</div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {marketData.map((coin) => (
+                      <div key={coin.symbol} className="border-b border-gray-300 pb-2">
+                        <div className="flex justify-between items-center">
+                          <span className="font-bold">{coin.symbol}</span>
+                          <span className="font-mono text-sm">
+                            ${coin.price.toFixed(coin.symbol === "STONES" ? 4 : 2)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-600">24h Change</span>
+                          <div
+                            className={`flex items-center text-xs ${
+                              coin.change24h >= 0 ? "text-green-600" : "text-red-600"
+                            }`}
+                          >
+                            {coin.change24h >= 0 ? (
+                              <TrendingUp className="h-3 w-3 mr-1" />
+                            ) : (
+                              <TrendingDown className="h-3 w-3 mr-1" />
+                            )}
+                            {coin.change24h.toFixed(1)}%
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <Link href="/market">
+                    <Button size="sm" className="w-full mt-3 bg-green-600 hover:bg-green-700">
+                      Full Market Report
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Community Pulse */}
+            <div className="lg:col-span-1">
+              <Card className="border-4 border-black">
+                <CardHeader>
+                  <CardTitle className="text-lg font-bold font-serif">🏘️ COMMUNITY PULSE</CardTitle>
+                  <div className="text-xs">Pioneer Population Report</div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <Users className="h-4 w-4 mr-2" />
+                        <span className="text-sm">Active Pioneers</span>
+                      </div>
+                      <Badge className="bg-green-100 text-green-800">
+                        {communityStats.activeUsers.toLocaleString()}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <Mountain className="h-4 w-4 mr-2" />
+                        <span className="text-sm">Stones Mined</span>
+                      </div>
+                      <Badge className="bg-blue-100 text-blue-800">{communityStats.totalStones.toLocaleString()}</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <Trophy className="h-4 w-4 mr-2" />
+                        <span className="text-sm">Active Fights</span>
+                      </div>
+                      <Badge className="bg-red-100 text-red-800">{communityStats.activeFights}</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <MapPin className="h-4 w-4 mr-2" />
+                        <span className="text-sm">Land Claimed</span>
+                      </div>
+                      <Badge className="bg-purple-100 text-purple-800">{communityStats.landClaimed}</Badge>
+                    </div>
+                  </div>
+                  <Link href="/community">
+                    <Button size="sm" className="w-full mt-3 bg-blue-600 hover:bg-blue-700">
+                      Join Community
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Featured Games Section */}
+          <Separator className="my-6 border-2 border-black" />
+
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold font-serif text-center mb-4 border-b-2 border-black pb-2">
+              🎮 FEATURED GAMES FROM LUCKYSPOTONLINE
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="border-4 border-black">
+                <CardContent className="p-4">
+                  <img
+                    src="/images/cryptoclasherboxingposter.jpg"
+                    alt="Crypto Clashers Boxing"
+                    className="w-full h-32 object-cover border-2 border-black mb-3"
                   />
-                  <div className="newspaper-image-caption">
-                    Aerial view of the Cheyenne Digital Rodeo Arena where champions will be crowned
-                  </div>
-                </div>
+                  <h3 className="font-bold text-lg mb-2">🥊 CRYPTO CLASHERS BOXING</h3>
+                  <p className="text-sm mb-3">Epic blockchain boxing battles with Bull vs Bear champions!</p>
+                  <Link href="https://github.com/LuckyspotOgold/Crypto" target="_blank" rel="noopener noreferrer">
+                    <Button className="w-full bg-red-600 hover:bg-red-700">
+                      Play Now <ExternalLink className="h-4 w-4 ml-2" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
 
-                <div className="newspaper-paragraph">
-                  The most anticipated event of the digital frontier season kicks off today as cowboys and cowgirls from
-                  across the virtual Wyoming territory gather to compete in the first-ever WyoVerse Digital Rodeo
-                  Championships. With over $100,000 in cryptocurrency prizes at stake, this three-day event promises to
-                  be the most exciting competition in frontier gaming history.
-                </div>
+              <Card className="border-4 border-black">
+                <CardContent className="p-4">
+                  <img
+                    src="/images/cryptoclasherwcarsposter.jpg"
+                    alt="Crypto Clashers Racing"
+                    className="w-full h-32 object-cover border-2 border-black mb-3"
+                  />
+                  <h3 className="font-bold text-lg mb-2">🏎️ CRYPTO CLASHERS RACING</h3>
+                  <p className="text-sm mb-3">High-speed crypto circuit racing with massive prize pools!</p>
+                  <Link href="https://github.com/LuckyspotOgold/Crypto" target="_blank" rel="noopener noreferrer">
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                      Race Now <ExternalLink className="h-4 w-4 ml-2" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
 
-                <div className="newspaper-paragraph">
-                  "We've got riders coming from as far as the digital Tetons and the virtual Powder River Basin," said
-                  Championship Director Buck "Lightning" Thompson. "The level of skill we're seeing this year is
-                  unprecedented. These digital cowboys have been training in our advanced simulation systems, and
-                  they're ready to show what frontier spirit really means."
-                </div>
-
-                <Link href="/digital-rodeo">
-                  <Button className="newspaper-button mt-4">Join the Rodeo →</Button>
-                </Link>
-              </div>
-            </div>
-
-            {/* Crypto Market Story */}
-            <div className="newspaper-article">
-              <div className="newspaper-article-inner">
-                <h2 className="newspaper-section-title">MARKET REPORT</h2>
-                <h3 className="text-2xl font-bold mb-4 uppercase">Frontier Trading Post Sees Record Volume</h3>
-                <div className="newspaper-byline">By "Bar Keep" Bill, Market Analyst</div>
-
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <Card className="text-center">
-                    <CardContent className="p-3">
-                      <div className="font-bold text-lg">BTC</div>
-                      <div className="text-2xl font-bold">${marketData.bitcoin.price.toLocaleString()}</div>
-                      <div
-                        className={`flex items-center justify-center gap-1 ${marketData.bitcoin.change > 0 ? "text-green-600" : "text-red-600"}`}
-                      >
-                        {marketData.bitcoin.change > 0 ? (
-                          <TrendingUp className="h-4 w-4" />
-                        ) : (
-                          <TrendingDown className="h-4 w-4" />
-                        )}
-                        {Math.abs(marketData.bitcoin.change)}%
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card className="text-center">
-                    <CardContent className="p-3">
-                      <div className="font-bold text-lg">ETH</div>
-                      <div className="text-2xl font-bold">${marketData.ethereum.price.toLocaleString()}</div>
-                      <div
-                        className={`flex items-center justify-center gap-1 ${marketData.ethereum.change > 0 ? "text-green-600" : "text-red-600"}`}
-                      >
-                        {marketData.ethereum.change > 0 ? (
-                          <TrendingUp className="h-4 w-4" />
-                        ) : (
-                          <TrendingDown className="h-4 w-4" />
-                        )}
-                        {Math.abs(marketData.ethereum.change)}%
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card className="text-center">
-                    <CardContent className="p-3">
-                      <div className="font-bold text-lg">AVAX</div>
-                      <div className="text-2xl font-bold">${marketData.avalanche.price}</div>
-                      <div
-                        className={`flex items-center justify-center gap-1 ${marketData.avalanche.change > 0 ? "text-green-600" : "text-red-600"}`}
-                      >
-                        {marketData.avalanche.change > 0 ? (
-                          <TrendingUp className="h-4 w-4" />
-                        ) : (
-                          <TrendingDown className="h-4 w-4" />
-                        )}
-                        {Math.abs(marketData.avalanche.change)}%
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <div className="newspaper-paragraph">
-                  Trading volume at the WyoVerse Frontier Trading Post reached an all-time high yesterday, with over
-                  $2.3 million in cryptocurrency transactions processed. The surge comes as more pioneers discover the
-                  benefits of decentralized trading in the digital frontier economy.
-                </div>
-
-                <Link href="/cryptopia">
-                  <Button className="newspaper-button mt-4">Visit Trading Post →</Button>
-                </Link>
-              </div>
+              <Card className="border-4 border-black">
+                <CardContent className="p-4">
+                  <img
+                    src="/images/frontiertraderposter.jpg"
+                    alt="Frontier Trader"
+                    className="w-full h-32 object-cover border-2 border-black mb-3"
+                  />
+                  <h3 className="font-bold text-lg mb-2">📈 FRONTIER TRADER</h3>
+                  <p className="text-sm mb-3">Wild West trading post with AI-powered market insights!</p>
+                  <Link href="https://github.com/LuckyspotOgold/Crypto" target="_blank" rel="noopener noreferrer">
+                    <Button className="w-full bg-green-600 hover:bg-green-700">
+                      Trade Now <ExternalLink className="h-4 w-4 ml-2" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
             </div>
           </div>
 
-          {/* Middle Column - Featured Games */}
-          <div className="space-y-6">
-            {/* Games Section */}
-            <div className="newspaper-article">
-              <div className="newspaper-article-inner">
-                <h2 className="newspaper-section-title">FRONTIER GAMES</h2>
-
-                {/* Crypto Clashers Boxing */}
-                <div className="mb-6">
-                  <h3 className="text-xl font-bold mb-2">CRYPTO CLASHERS BOXING</h3>
-                  <div className="relative mb-2">
-                    <Image
-                      src="/images/cryptoclasherboxingposter.jpg"
-                      alt="Crypto Clashers Boxing"
-                      width={300}
-                      height={200}
-                      className="w-full h-32 object-cover border-2 border-black"
-                    />
-                    <Badge className="absolute top-2 right-2 bg-red-600 text-white">LIVE NOW</Badge>
-                  </div>
-                  <p className="text-sm mb-2">
-                    Epic battles in the digital colosseum! Watch as crypto-powered fighters duke it out for glory and
-                    prizes.
-                  </p>
-                  <Link href="https://github.com/LuckyspotOgold/Crypto" target="_blank" rel="noopener noreferrer">
-                    <Button size="sm" className="w-full bg-red-600 hover:bg-red-700">
-                      <Gamepad2 className="mr-2 h-4 w-4" />
-                      Play Boxing <ExternalLink className="ml-1 h-3 w-3" />
-                    </Button>
-                  </Link>
-                </div>
-
-                <Separator className="my-4" />
-
-                {/* Crypto Clashers Racing */}
-                <div className="mb-6">
-                  <h3 className="text-xl font-bold mb-2">CRYPTO CLASHERS RACING</h3>
-                  <div className="relative mb-2">
-                    <Image
-                      src="/images/cryptoclasherwcarsposter.jpg"
-                      alt="Crypto Clashers Racing"
-                      width={300}
-                      height={200}
-                      className="w-full h-32 object-cover border-2 border-black"
-                    />
-                    <Badge className="absolute top-2 right-2 bg-blue-600 text-white">RACE NOW</Badge>
-                  </div>
-                  <p className="text-sm mb-2">
-                    High-speed crypto-powered racing through the digital frontier! Compete for the championship title.
-                  </p>
-                  <Link href="https://github.com/LuckyspotOgold/Crypto" target="_blank" rel="noopener noreferrer">
-                    <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700">
-                      <Trophy className="mr-2 h-4 w-4" />
-                      Start Racing <ExternalLink className="ml-1 h-3 w-3" />
-                    </Button>
-                  </Link>
-                </div>
-
-                <Separator className="my-4" />
-
-                {/* Frontier Trader */}
-                <div>
-                  <h3 className="text-xl font-bold mb-2">FRONTIER TRADER</h3>
-                  <div className="relative mb-2">
-                    <Image
-                      src="/images/frontiertraderposter.jpg"
-                      alt="Frontier Trader"
-                      width={300}
-                      height={200}
-                      className="w-full h-32 object-cover border-2 border-black"
-                    />
-                    <Badge className="absolute top-2 right-2 bg-green-600 text-white">TRADE NOW</Badge>
-                  </div>
-                  <p className="text-sm mb-2">
-                    Master the art of frontier commerce! Build your trading empire across the digital Wyoming territory.
-                  </p>
-                  <Link href="https://github.com/LuckyspotOgold/Crypto" target="_blank" rel="noopener noreferrer">
-                    <Button size="sm" className="w-full bg-green-600 hover:bg-green-700">
-                      <DollarSign className="mr-2 h-4 w-4" />
-                      Start Trading <ExternalLink className="ml-1 h-3 w-3" />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {/* Community Stats */}
-            <div className="newspaper-article">
-              <div className="newspaper-article-inner">
-                <h2 className="newspaper-section-title">COMMUNITY PULSE</h2>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      <span className="text-sm">Active Pioneers</span>
-                    </div>
-                    <span className="font-bold">1,247</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      <span className="text-sm">Land Claims</span>
-                    </div>
-                    <span className="font-bold">892</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Activity className="h-4 w-4" />
-                      <span className="text-sm">Active Trades</span>
-                    </div>
-                    <span className="font-bold">156</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <Heart className="h-4 w-4 text-red-500" />
-                      <span className="text-sm">Social Good</span>
-                    </div>
-                    <span className="font-bold text-green-600">$12,450</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column - Sidebar Content */}
-          <div className="space-y-6">
+          {/* Bottom Section */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Weather */}
-            <div className="newspaper-article">
-              <div className="newspaper-article-inner">
-                <h2 className="newspaper-section-title">FRONTIER WEATHER</h2>
+            <Card className="border-2 border-black">
+              <CardHeader>
+                <CardTitle className="text-sm font-bold">🌤️ WEATHER</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="text-center">
-                  <div className="text-3xl mb-2">☀️</div>
-                  <div className="text-2xl font-bold">72°F</div>
-                  <div className="text-sm">Sunny & Clear</div>
-                  <div className="text-xs mt-2">Perfect weather for digital prospecting!</div>
+                  <div className="text-2xl font-bold">{weather.temperature}°F</div>
+                  <div className="text-sm">{weather.condition}</div>
+                  <div className="flex justify-between text-xs mt-2">
+                    <span>Wind: {weather.windSpeed}mph</span>
+                    <span>Humidity: {weather.humidity}%</span>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Wanted Poster */}
-            <div className="newspaper-article bg-gradient-to-b from-amber-100 to-amber-200">
-              <div className="newspaper-article-inner text-center">
-                <h2 className="text-red-800 font-bold text-xl mb-4">WANTED</h2>
-                <Image
-                  src="/images/wyoverse-stone-wanted-poster.png"
-                  alt="Stone The Enforcer Wanted Poster"
-                  width={200}
-                  height={250}
-                  className="w-full h-48 object-cover border-2 border-black mb-2"
-                />
-                <h3 className="font-bold text-lg">STONE "THE ENFORCER"</h3>
-                <p className="text-red-600 font-bold">$50,000 BOUNTY</p>
-                <p className="text-sm mt-2">
-                  Wanted for illegal mining operations in protected digital wilderness areas
-                </p>
-              </div>
-            </div>
+            <Card className="border-2 border-black">
+              <CardHeader>
+                <CardTitle className="text-sm font-bold">📋 WANTED</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center">
+                  <img
+                    src="/images/wyoverse-stone-wanted-poster.png"
+                    alt="Wanted Poster"
+                    className="w-full h-16 object-cover border border-black mb-2"
+                  />
+                  <div className="text-xs">
+                    <div className="font-bold">STONE COLLECTOR</div>
+                    <div>REWARD: 1000 STONES</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Classified Ads */}
-            <div className="newspaper-article">
-              <div className="newspaper-article-inner">
-                <h2 className="newspaper-section-title">CLASSIFIEDS</h2>
-                <div className="space-y-3 text-sm">
-                  <div className="border-b pb-2">
-                    <strong>LAND FOR SALE:</strong> Prime digital real estate near Yellowstone. 50 acres, mineral rights
-                    included. Contact Bill at the Saloon.
-                  </div>
-                  <div className="border-b pb-2">
-                    <strong>MINING EQUIPMENT:</strong> Crypto mining rigs for sale. High efficiency, low power
-                    consumption. Perfect for frontier operations.
-                  </div>
-                  <div className="border-b pb-2">
-                    <strong>TRADING LESSONS:</strong> Learn from the best! Bar Keep Bill offers private trading
-                    tutorials. All skill levels welcome.
-                  </div>
-                  <div>
-                    <strong>WANTED:</strong> Experienced ranch hands for digital cattle operation. Must have blockchain
-                    experience. Good pay + benefits.
-                  </div>
+            {/* Classifieds */}
+            <Card className="border-2 border-black">
+              <CardHeader>
+                <CardTitle className="text-sm font-bold">📰 CLASSIFIEDS</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-xs space-y-1">
+                  <div>• Mining Equipment for Sale</div>
+                  <div>• Saloon Seeking Bartender</div>
+                  <div>• Land Deeds Available</div>
+                  <div>• Boxing Lessons Offered</div>
                 </div>
                 <Link href="/classifieds">
-                  <Button size="sm" className="w-full mt-4">
-                    View All Classifieds →
+                  <Button size="sm" className="w-full mt-2">
+                    View All
                   </Button>
                 </Link>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
-            {/* Events Calendar */}
-            <div className="newspaper-article">
-              <div className="newspaper-article-inner">
-                <h2 className="newspaper-section-title">UPCOMING EVENTS</h2>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-start gap-2">
-                    <Calendar className="h-4 w-4 mt-0.5" />
-                    <div>
-                      <strong>Today:</strong> Digital Rodeo Championships begin
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Calendar className="h-4 w-4 mt-0.5" />
-                    <div>
-                      <strong>Tomorrow:</strong> Crypto Trading Workshop at Bill's Saloon
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Calendar className="h-4 w-4 mt-0.5" />
-                    <div>
-                      <strong>This Weekend:</strong> Land Auction - Premium plots available
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Calendar className="h-4 w-4 mt-0.5" />
-                    <div>
-                      <strong>Next Week:</strong> Mining Safety Training (OSHA Certified)
-                    </div>
-                  </div>
+            {/* Events */}
+            <Card className="border-2 border-black">
+              <CardHeader>
+                <CardTitle className="text-sm font-bold">📅 EVENTS</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-xs space-y-1">
+                  <div>• Tonight: Boxing Championship</div>
+                  <div>• Tomorrow: Mining Competition</div>
+                  <div>• Weekend: Rodeo Festival</div>
+                  <div>• Next Week: Land Auction</div>
                 </div>
                 <Link href="/calendar">
-                  <Button size="sm" className="w-full mt-4">
-                    View Full Calendar →
+                  <Button size="sm" className="w-full mt-2">
+                    Full Calendar
                   </Button>
                 </Link>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
 
-        {/* Footer */}
-        <div className="mt-8 text-center border-4 border-black p-4 bg-white">
-          <div className="border-2 border-black p-3">
-            <p className="font-bold text-lg mb-2">"Where Digital Meets Frontier Spirit"</p>
-            <div className="flex justify-center items-center gap-4 text-sm">
-              <span>📧 news@wyoverse.com</span>
-              <span>📞 1-800-WYOVERSE</span>
-              <span>🌐 wyoverse.com</span>
+          {/* Footer */}
+          <div className="border-t-4 border-black mt-6 pt-4 text-center">
+            <div className="text-sm font-bold mb-2">
+              THE WYOVERSE PIONEER - ESTABLISHED 1880 - DIGITAL FRONTIER EDITION
             </div>
-            <div className="mt-2 text-xs">
-              <p>Published daily in the WyoVerse Digital Territory</p>
-              <p>© 2024 WyoVerse Pioneer. All rights reserved.</p>
+            <div className="text-xs text-gray-600">
+              Published by the WyoVerse Community | All Rights Reserved |
+              <Link href="/contact" className="underline ml-1">
+                Contact the Editor
+              </Link>
             </div>
           </div>
         </div>

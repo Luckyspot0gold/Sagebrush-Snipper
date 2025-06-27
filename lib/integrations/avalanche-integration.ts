@@ -1,269 +1,246 @@
 import { ethers } from "ethers"
 
-interface AvalancheConnectionResult {
-  success: boolean
-  address?: string
-  balance?: string
-  error?: string
-  chainId?: string
-  networkName?: string
-}
-
-interface NetworkConfig {
-  chainId: string
-  chainName: string
-  nativeCurrency: {
-    name: string
-    symbol: string
-    decimals: number
-  }
-  rpcUrls: string[]
-  blockExplorerUrls: string[]
-}
-
-export const AVALANCHE_CONFIG: NetworkConfig = {
-  chainId: "0xa86a", // 43114 in hex
-  chainName: "Avalanche Network",
+// Avalanche C-Chain configuration
+export const AVALANCHE_CONFIG = {
+  chainId: "0xA86A", // 43114 in hex
+  chainName: "Avalanche C-Chain",
   nativeCurrency: {
     name: "AVAX",
     symbol: "AVAX",
     decimals: 18,
   },
-  rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
+  rpcUrls: ["https://api.avax.network/ext/bc/C/rpc", "https://rpc.ankr.com/avalanche"],
   blockExplorerUrls: ["https://snowtrace.io/"],
 }
 
-const AVALANCHE_MAINNET: NetworkConfig = {
-  chainId: "0xA86A", // 43114 in hex
-  chainName: "Avalanche C-Chain",
-  nativeCurrency: {
-    name: "Avalanche",
-    symbol: "AVAX",
-    decimals: 18,
-  },
-  rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
-  blockExplorerUrls: ["https://snowtrace.io/"],
-}
-
-export async function connectAvalancheWallet(): Promise<AvalancheConnectionResult> {
-  try {
-    // Check if MetaMask or compatible wallet is installed
-    if (typeof window === "undefined" || !(window as any).ethereum) {
-      return {
-        success: false,
-        error: "No Ethereum wallet detected. Please install MetaMask or Core Wallet.",
-      }
-    }
-
-    const ethereum = (window as any).ethereum
-
-    try {
-      // Request account access
-      const accounts = await ethereum.request({
-        method: "eth_requestAccounts",
-      })
-
-      if (!accounts || accounts.length === 0) {
-        return {
-          success: false,
-          error: "No accounts found. Please unlock your wallet.",
-        }
-      }
-
-      // Check current network
-      const currentChainId = await ethereum.request({
-        method: "eth_chainId",
-      })
-
-      // Switch to Avalanche if not already connected
-      if (currentChainId !== AVALANCHE_MAINNET.chainId) {
-        try {
-          await ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: AVALANCHE_MAINNET.chainId }],
-          })
-        } catch (switchError: any) {
-          // If network doesn't exist, add it
-          if (switchError.code === 4902) {
-            try {
-              await ethereum.request({
-                method: "wallet_addEthereumChain",
-                params: [AVALANCHE_MAINNET],
-              })
-            } catch (addError: any) {
-              return {
-                success: false,
-                error: `Failed to add Avalanche network: ${addError.message}`,
-              }
-            }
-          } else if (switchError.code === 4001) {
-            return {
-              success: false,
-              error: "User rejected network switch request.",
-            }
-          } else {
-            return {
-              success: false,
-              error: `Failed to switch to Avalanche network: ${switchError.message}`,
-            }
-          }
-        }
-      }
-
-      // Get balance
-      const balance = await ethereum.request({
-        method: "eth_getBalance",
-        params: [accounts[0], "latest"],
-      })
-
-      const avaxBalance = (Number.parseInt(balance, 16) / 1e18).toFixed(4)
-
-      return {
-        success: true,
-        address: accounts[0],
-        balance: avaxBalance,
-        chainId: AVALANCHE_MAINNET.chainId,
-        networkName: AVALANCHE_MAINNET.chainName,
-      }
-    } catch (requestError: any) {
-      // Handle user rejection (code 4001)
-      if (requestError.code === 4001) {
-        return {
-          success: false,
-          error: "User rejected the connection request.",
-        }
-      }
-
-      return {
-        success: false,
-        error: `Connection failed: ${requestError.message}`,
-      }
-    }
-  } catch (error: any) {
-    console.error("Avalanche wallet connection error:", error)
-    return {
-      success: false,
-      error: `Unexpected error: ${error.message}`,
-    }
-  }
-}
-
-export async function getAvalancheBalance(address: string): Promise<string> {
-  try {
-    if (typeof window === "undefined" || !(window as any).ethereum) {
-      throw new Error("No Ethereum wallet detected")
-    }
-
-    const balance = await (window as any).ethereum.request({
-      method: "eth_getBalance",
-      params: [address, "latest"],
-    })
-
-    return (Number.parseInt(balance, 16) / 1e18).toFixed(4)
-  } catch (error: any) {
-    console.error("Failed to get balance:", error)
-    throw error
-  }
-}
-
-export async function getCurrentNetwork(): Promise<{ chainId: string; isAvalanche: boolean }> {
-  try {
-    if (typeof window === "undefined" || !(window as any).ethereum) {
-      throw new Error("No Ethereum wallet detected")
-    }
-
-    const chainId = await (window as any).ethereum.request({
-      method: "eth_chainId",
-    })
-
-    return {
-      chainId,
-      isAvalanche: chainId === AVALANCHE_MAINNET.chainId,
-    }
-  } catch (error: any) {
-    console.error("Failed to get current network:", error)
-    throw error
-  }
+// WyoVerse token contract addresses on Avalanche
+export const WYOVERSE_CONTRACTS = {
+  STONES_TOKEN: "0x1234567890123456789012345678901234567890",
+  LAND_DEEDS_NFT: "0x2345678901234567890123456789012345678901",
+  BOXING_ARENA: "0x3456789012345678901234567890123456789012",
+  STAKING_POOL: "0x4567890123456789012345678901234567890123",
 }
 
 // Connect to Avalanche network
-export async function connectToAvalanche() {
-  if (typeof window === "undefined" || !window.ethereum) {
-    throw new Error("MetaMask is not installed")
-  }
-
+export async function connectToAvalanche(): Promise<ethers.providers.Web3Provider | null> {
   try {
-    // Request account access
-    await window.ethereum.request({ method: "eth_requestAccounts" })
+    if (typeof window !== "undefined" && window.ethereum) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
 
-    // Add Avalanche network if not already added
-    try {
+      // Request account access
+      await window.ethereum.request({ method: "eth_requestAccounts" })
+
+      // Check if we're on the right network
+      const network = await provider.getNetwork()
+      if (network.chainId !== 43114) {
+        await switchToAvalanche()
+      }
+
+      return provider
+    }
+    return null
+  } catch (error) {
+    console.error("Failed to connect to Avalanche:", error)
+    return null
+  }
+}
+
+// Switch to Avalanche network
+export async function switchToAvalanche(): Promise<boolean> {
+  try {
+    if (typeof window !== "undefined" && window.ethereum) {
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: AVALANCHE_CONFIG.chainId }],
       })
-    } catch (switchError: any) {
-      // This error code indicates that the chain has not been added to MetaMask
-      if (switchError.code === 4902) {
+      return true
+    }
+    return false
+  } catch (switchError: any) {
+    // This error code indicates that the chain has not been added to MetaMask
+    if (switchError.code === 4902) {
+      try {
         await window.ethereum.request({
           method: "wallet_addEthereumChain",
           params: [AVALANCHE_CONFIG],
         })
-      } else {
-        throw switchError
+        return true
+      } catch (addError) {
+        console.error("Failed to add Avalanche network:", addError)
+        return false
       }
     }
-
-    // Create provider and signer
-    const provider = new ethers.BrowserProvider(window.ethereum)
-    const signer = await provider.getSigner()
-
-    return { provider, signer }
-  } catch (error) {
-    console.error("Failed to connect to Avalanche:", error)
-    throw error
+    console.error("Failed to switch to Avalanche network:", switchError)
+    return false
   }
 }
 
 // Get AVAX balance
-export async function getAvaxBalance(address: string) {
+export async function getAvaxBalance(address: string): Promise<string> {
   try {
-    const provider = new ethers.JsonRpcProvider(AVALANCHE_CONFIG.rpcUrls[0])
+    const provider = new ethers.providers.JsonRpcProvider(AVALANCHE_CONFIG.rpcUrls[0])
     const balance = await provider.getBalance(address)
-    return ethers.formatEther(balance)
+    return ethers.utils.formatEther(balance)
   } catch (error) {
     console.error("Failed to get AVAX balance:", error)
-    throw error
+    return "0"
   }
 }
 
-// Get current gas price on Avalanche
-export async function getAvalancheGasPrice() {
+// Get STONES token balance
+export async function getStonesBalance(address: string): Promise<string> {
   try {
-    const provider = new ethers.JsonRpcProvider(AVALANCHE_CONFIG.rpcUrls[0])
-    const gasPrice = await provider.getFeeData()
-    return {
-      gasPrice: gasPrice.gasPrice ? ethers.formatUnits(gasPrice.gasPrice, "gwei") : "0",
-      maxFeePerGas: gasPrice.maxFeePerGas ? ethers.formatUnits(gasPrice.maxFeePerGas, "gwei") : "0",
-      maxPriorityFeePerGas: gasPrice.maxPriorityFeePerGas
-        ? ethers.formatUnits(gasPrice.maxPriorityFeePerGas, "gwei")
-        : "0",
-    }
+    const provider = new ethers.providers.JsonRpcProvider(AVALANCHE_CONFIG.rpcUrls[0])
+
+    // ERC-20 ABI for balanceOf function
+    const erc20Abi = [
+      "function balanceOf(address owner) view returns (uint256)",
+      "function decimals() view returns (uint8)",
+    ]
+
+    const contract = new ethers.Contract(WYOVERSE_CONTRACTS.STONES_TOKEN, erc20Abi, provider)
+    const balance = await contract.balanceOf(address)
+    const decimals = await contract.decimals()
+
+    return ethers.utils.formatUnits(balance, decimals)
   } catch (error) {
-    console.error("Failed to get Avalanche gas price:", error)
-    throw error
+    console.error("Failed to get STONES balance:", error)
+    return "0"
   }
 }
 
-// Aggregate helpers for convenient import elsewhere in the app
-export const avalancheIntegration = {
-  config: AVALANCHE_CONFIG,
-  connect: connectToAvalanche,
-  getBalance: getAvaxBalance,
-  getGasPrice: getAvalancheGasPrice,
-  connectWallet: connectAvalancheWallet,
-  getCurrentNetwork,
+// Check if user owns land deeds
+export async function getLandDeeds(address: string): Promise<number[]> {
+  try {
+    const provider = new ethers.providers.JsonRpcProvider(AVALANCHE_CONFIG.rpcUrls[0])
+
+    // ERC-721 ABI for NFT functions
+    const erc721Abi = [
+      "function balanceOf(address owner) view returns (uint256)",
+      "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)",
+    ]
+
+    const contract = new ethers.Contract(WYOVERSE_CONTRACTS.LAND_DEEDS_NFT, erc721Abi, provider)
+    const balance = await contract.balanceOf(address)
+
+    const tokenIds: number[] = []
+    for (let i = 0; i < balance.toNumber(); i++) {
+      const tokenId = await contract.tokenOfOwnerByIndex(address, i)
+      tokenIds.push(tokenId.toNumber())
+    }
+
+    return tokenIds
+  } catch (error) {
+    console.error("Failed to get land deeds:", error)
+    return []
+  }
 }
 
-// Optional default export (covers both named & default import styles)
+// Mint STONES tokens (for testing/demo purposes)
+export async function mintStones(amount: string): Promise<boolean> {
+  try {
+    const provider = await connectToAvalanche()
+    if (!provider) return false
+
+    const signer = provider.getSigner()
+
+    // Mock minting function - in production this would be a real contract call
+    console.log(`Minting ${amount} STONES tokens...`)
+
+    // Simulate transaction delay
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+
+    return true
+  } catch (error) {
+    console.error("Failed to mint STONES:", error)
+    return false
+  }
+}
+
+// Place a bet in the boxing arena
+export async function placeBet(fightId: number, amount: string, fighter: "bull" | "bear"): Promise<boolean> {
+  try {
+    const provider = await connectToAvalanche()
+    if (!provider) return false
+
+    const signer = provider.getSigner()
+
+    // Boxing arena contract ABI
+    const boxingAbi = ["function placeBet(uint256 fightId, uint8 fighter) payable"]
+
+    const contract = new ethers.Contract(WYOVERSE_CONTRACTS.BOXING_ARENA, boxingAbi, signer)
+
+    const tx = await contract.placeBet(fightId, fighter === "bull" ? 0 : 1, {
+      value: ethers.utils.parseEther(amount),
+    })
+
+    await tx.wait()
+    return true
+  } catch (error) {
+    console.error("Failed to place bet:", error)
+    return false
+  }
+}
+
+// Stake STONES tokens
+export async function stakeStones(amount: string): Promise<boolean> {
+  try {
+    const provider = await connectToAvalanche()
+    if (!provider) return false
+
+    const signer = provider.getSigner()
+
+    // Staking contract ABI
+    const stakingAbi = ["function stake(uint256 amount)", "function approve(address spender, uint256 amount)"]
+
+    // First approve the staking contract to spend STONES
+    const stonesContract = new ethers.Contract(WYOVERSE_CONTRACTS.STONES_TOKEN, stakingAbi, signer)
+    const approveTx = await stonesContract.approve(WYOVERSE_CONTRACTS.STAKING_POOL, ethers.utils.parseEther(amount))
+    await approveTx.wait()
+
+    // Then stake the tokens
+    const stakingContract = new ethers.Contract(WYOVERSE_CONTRACTS.STAKING_POOL, stakingAbi, signer)
+    const stakeTx = await stakingContract.stake(ethers.utils.parseEther(amount))
+    await stakeTx.wait()
+
+    return true
+  } catch (error) {
+    console.error("Failed to stake STONES:", error)
+    return false
+  }
+}
+
+// Get staking rewards
+export async function getStakingRewards(address: string): Promise<string> {
+  try {
+    const provider = new ethers.providers.JsonRpcProvider(AVALANCHE_CONFIG.rpcUrls[0])
+
+    const stakingAbi = ["function earned(address account) view returns (uint256)"]
+
+    const contract = new ethers.Contract(WYOVERSE_CONTRACTS.STAKING_POOL, stakingAbi, provider)
+    const rewards = await contract.earned(address)
+
+    return ethers.utils.formatEther(rewards)
+  } catch (error) {
+    console.error("Failed to get staking rewards:", error)
+    return "0"
+  }
+}
+
+// Export aggregated integration object
+export const avalancheIntegration = {
+  connectToAvalanche,
+  switchToAvalanche,
+  getAvaxBalance,
+  getStonesBalance,
+  getLandDeeds,
+  mintStones,
+  placeBet,
+  stakeStones,
+  getStakingRewards,
+  AVALANCHE_CONFIG,
+  WYOVERSE_CONTRACTS,
+}
+
+// Default export
 export default avalancheIntegration

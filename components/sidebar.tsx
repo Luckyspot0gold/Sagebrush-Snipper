@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import Image from "next/image"
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import {
   Home,
   Map,
@@ -15,306 +15,338 @@ import {
   Users,
   Calendar,
   BookOpen,
-  Zap,
   Mountain,
-  Briefcase,
-  Heart,
+  Zap,
   Trophy,
-  Coins,
+  Briefcase,
   Shield,
-  Camera,
-  FileText,
-  Settings,
-  Star,
-  Target,
-  Compass,
-  Pickaxe,
   TreePine,
+  FileText,
   Building,
+  Plane,
   GraduationCap,
+  Heart,
+  Newspaper,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  Star,
+  Clock,
+  TrendingUp,
   Activity,
 } from "lucide-react"
 
 const navigationItems = [
-  { href: "/", icon: Home, label: "WyoVerse Pioneer", badge: "NEW" },
-  { href: "/explore", icon: Compass, label: "Explore Wyoming" },
-  { href: "/games", icon: Gamepad2, label: "Frontier Games", badge: "HOT" },
-  { href: "/cryptopia", icon: Coins, label: "Cryptopia Market" },
-  { href: "/digital-rodeo", icon: Target, label: "Digital Rodeo" },
-  { href: "/boxing-arena", icon: Trophy, label: "Boxing Arena" },
-  { href: "/racing-circuit", icon: Activity, label: "Racing Circuit" },
-  { href: "/saloon", icon: Users, label: "Bill's Saloon" },
-  { href: "/community", icon: Users, label: "Community Hub" },
-  { href: "/classifieds", icon: FileText, label: "Classifieds" },
-  { href: "/store", icon: Store, label: "Trading Post" },
-  { href: "/land-deeds", icon: Map, label: "Land Deeds" },
-  { href: "/mining", icon: Pickaxe, label: "Mining Claims" },
-  { href: "/energy", icon: Zap, label: "Energy Markets" },
-  { href: "/business", icon: Briefcase, label: "Business Hub" },
-  { href: "/education", icon: GraduationCap, label: "Education Portal" },
-  { href: "/tourism", icon: Camera, label: "Tourism Board" },
-  { href: "/parks", icon: TreePine, label: "Parks & Recreation" },
-  { href: "/lifestyle", icon: Heart, label: "Lifestyle" },
-  { href: "/sports", icon: Trophy, label: "Sports Central" },
-  { href: "/calendar", icon: Calendar, label: "Events Calendar" },
-  { href: "/native-history", icon: BookOpen, label: "Native History" },
-  { href: "/wyoming-pyramid", icon: Mountain, label: "Wyoming Pyramid" },
-  { href: "/wyoming-records", icon: FileText, label: "Wyoming Records" },
-  { href: "/stones", icon: Star, label: "Stones & NFTs" },
-  { href: "/patents", icon: Shield, label: "Patent Office" },
-  { href: "/property", icon: Building, label: "Property Connect" },
-  { href: "/osha", icon: Shield, label: "OSHA Training" },
-  { href: "/system-status", icon: Settings, label: "System Status" },
+  { name: "Home", href: "/", icon: Home },
+  { name: "Explore", href: "/explore", icon: Map },
+  { name: "Games", href: "/games", icon: Gamepad2 },
+  { name: "Boxing Arena", href: "/boxing-arena", icon: Trophy },
+  { name: "Racing Circuit", href: "/racing-circuit", icon: Activity },
+  { name: "Bar Keep Bill's Saloon", href: "/saloon", icon: Heart },
+  { name: "Store", href: "/store", icon: Store },
+  { name: "Community", href: "/community", icon: Users },
+  { name: "Calendar", href: "/calendar", icon: Calendar },
+  { name: "Education", href: "/education", icon: BookOpen },
+  { name: "OSHA Training", href: "/osha", icon: Shield },
+  { name: "Mining", href: "/mining", icon: Mountain },
+  { name: "Energy", href: "/energy", icon: Zap },
+  { name: "Business", href: "/business", icon: Briefcase },
+  { name: "Parks & Recreation", href: "/parks", icon: TreePine },
+  { name: "Land Deeds", href: "/land-deeds", icon: FileText },
+  { name: "Property", href: "/property", icon: Building },
+  { name: "Tourism", href: "/tourism", icon: Plane },
+  { name: "Lifestyle", href: "/lifestyle", icon: GraduationCap },
+  { name: "Sports", href: "/sports", icon: Trophy },
+  { name: "Classifieds", href: "/classifieds", icon: Newspaper },
+  { name: "Wyoming Pyramid", href: "/wyoming-pyramid", icon: Mountain },
+  { name: "Wyoming Records", href: "/wyoming-records", icon: FileText },
+  { name: "Native History", href: "/native-history", icon: BookOpen },
+  { name: "Stones & NFTs", href: "/stones", icon: Star },
+  { name: "Patents", href: "/patents", icon: FileText },
+  { name: "System Status", href: "/system-status", icon: Activity },
+  { name: "Market Dashboard", href: "/market", icon: TrendingUp },
+  { name: "Art Gallery", href: "/art", icon: Star },
 ]
 
 const wantedPosters = [
   {
-    name: "Stone 'The Enforcer'",
-    bounty: "$50,000",
-    crime: "Illegal Mining Operations",
+    id: "stone",
+    title: "WANTED: STONE COLLECTOR",
     image: "/images/wyoverse-stone-wanted-poster.png",
-    description: "Wanted for unauthorized cryptocurrency mining in protected wilderness areas",
+    reward: "1000 STONES",
+    description: "For outstanding mining achievements in the digital frontier",
   },
   {
-    name: "Crypto Clasher Champion",
-    bounty: "$25,000",
-    crime: "Underground Boxing",
+    id: "crypto-clasher",
+    title: "WANTED: CRYPTO CLASHER",
     image: "/images/crypto-clashers-fighter.png",
-    description: "Organizing illegal crypto-betting boxing matches",
+    reward: "0.5 AVAX",
+    description: "Champion boxer of the digital colosseum",
   },
   {
-    name: "Bar Keep Bill",
-    bounty: "$10,000 REWARD",
-    crime: "Information Broker",
+    id: "bill",
+    title: "WANTED: BAR KEEP BILL",
     image: "/images/bar-keep-bill-poster.png",
-    description: "Wanted for questioning about frontier trading activities",
+    reward: "FREE DRINKS",
+    description: "Best bartender this side of the blockchain",
   },
 ]
 
-const gameAdvertisements = [
+const gameAds = [
   {
-    title: "Crypto Clashers Boxing",
-    description: "Epic battles in the digital colosseum",
+    title: "🥊 CRYPTO CLASHERS BOXING",
+    subtitle: "Bull vs Bear Championship",
     image: "/images/cryptoclasherboxingposter.jpg",
     link: "https://github.com/LuckyspotOgold/Crypto",
-    badge: "PLAY NOW",
+    description: "Epic blockchain boxing battles",
   },
   {
-    title: "Crypto Clashers Racing",
-    description: "High-speed crypto-powered racing",
+    title: "🏎️ CRYPTO CLASHERS RACING",
+    subtitle: "High-Speed Crypto Circuit",
     image: "/images/cryptoclasherwcarsposter.jpg",
     link: "https://github.com/LuckyspotOgold/Crypto",
-    badge: "RACE NOW",
+    description: "Race for digital glory",
   },
   {
-    title: "Frontier Trader",
-    description: "Master the art of frontier commerce",
+    title: "📈 FRONTIER TRADER",
+    subtitle: "Wild West Trading Post",
     image: "/images/frontiertraderposter.jpg",
     link: "https://github.com/LuckyspotOgold/Crypto",
-    badge: "TRADE NOW",
+    description: "Trade like a frontier pioneer",
   },
 ]
 
 export function Sidebar() {
+  const pathname = usePathname()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [currentPoster, setCurrentPoster] = useState(0)
   const [currentAd, setCurrentAd] = useState(0)
+  const [communityStats, setCommunityStats] = useState({
+    activeUsers: 1247,
+    totalStones: 89432,
+    activeFights: 23,
+    landClaimed: 156,
+  })
 
+  // Rotate wanted posters every 5 seconds
   useEffect(() => {
     const posterInterval = setInterval(() => {
       setCurrentPoster((prev) => (prev + 1) % wantedPosters.length)
     }, 5000)
 
-    const adInterval = setInterval(() => {
-      setCurrentAd((prev) => (prev + 1) % gameAdvertisements.length)
-    }, 7000)
-
-    return () => {
-      clearInterval(posterInterval)
-      clearInterval(adInterval)
-    }
+    return () => clearInterval(posterInterval)
   }, [])
 
-  if (isCollapsed) {
-    return (
-      <div className="fixed left-0 top-0 h-full w-16 bg-gradient-to-b from-amber-50 to-amber-100 border-r-4 border-amber-800 z-40 flex flex-col items-center py-4">
+  // Rotate game ads every 7 seconds
+  useEffect(() => {
+    const adInterval = setInterval(() => {
+      setCurrentAd((prev) => (prev + 1) % gameAds.length)
+    }, 7000)
+
+    return () => clearInterval(adInterval)
+  }, [])
+
+  // Update community stats every 30 seconds
+  useEffect(() => {
+    const statsInterval = setInterval(() => {
+      setCommunityStats((prev) => ({
+        activeUsers: prev.activeUsers + Math.floor(Math.random() * 10 - 5),
+        totalStones: prev.totalStones + Math.floor(Math.random() * 100),
+        activeFights: Math.max(0, prev.activeFights + Math.floor(Math.random() * 6 - 3)),
+        landClaimed: prev.landClaimed + Math.floor(Math.random() * 3),
+      }))
+    }, 30000)
+
+    return () => clearInterval(statsInterval)
+  }, [])
+
+  const currentPosterData = wantedPosters[currentPoster]
+  const currentAdData = gameAds[currentAd]
+
+  return (
+    <div
+      className={cn(
+        "flex flex-col h-full bg-gradient-to-b from-amber-50 to-orange-100 border-r-4 border-amber-800 transition-all duration-300",
+        isCollapsed ? "w-16" : "w-80",
+      )}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b-2 border-amber-800">
+        {!isCollapsed && (
+          <div className="flex items-center space-x-2">
+            <div className="text-2xl">🤠</div>
+            <div>
+              <h2 className="text-lg font-bold text-amber-900">WyoVerse</h2>
+              <p className="text-xs text-amber-700">Digital Frontier</p>
+            </div>
+          </div>
+        )}
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setIsCollapsed(false)}
-          className="mb-4 text-amber-800 hover:bg-amber-200"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="text-amber-800 hover:bg-amber-200"
         >
-          <Compass className="h-6 w-6" />
+          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>
-        <div className="flex flex-col gap-2">
-          {navigationItems.slice(0, 8).map((item) => (
-            <Link key={item.href} href={item.href}>
-              <Button variant="ghost" size="sm" className="w-12 h-12 text-amber-800 hover:bg-amber-200">
-                <item.icon className="h-5 w-5" />
-              </Button>
-            </Link>
-          ))}
-        </div>
       </div>
-    )
-  }
 
-  return (
-    <div className="fixed left-0 top-0 h-full w-64 bg-gradient-to-b from-amber-50 to-amber-100 border-r-4 border-amber-800 overflow-y-auto z-40">
-      <div className="p-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <Image src="/placeholder-logo.png" alt="WyoVerse Logo" width={32} height={32} className="rounded-full" />
-            <h1 className="font-bold text-amber-900 text-lg">WyoVerse</h1>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsCollapsed(true)}
-            className="text-amber-800 hover:bg-amber-200"
-          >
-            <Compass className="h-4 w-4" />
-          </Button>
-        </div>
-
+      <ScrollArea className="flex-1">
         {/* Navigation */}
-        <nav className="space-y-1 mb-6">
-          {navigationItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-amber-900 hover:bg-amber-200 hover:text-amber-950"
-              >
-                <item.icon className="mr-3 h-4 w-4" />
-                {item.label}
-                {item.badge && (
-                  <Badge variant="secondary" className="ml-auto bg-red-600 text-white">
-                    {item.badge}
-                  </Badge>
-                )}
-              </Button>
-            </Link>
-          ))}
-        </nav>
-
-        <Separator className="my-4 bg-amber-300" />
-
-        {/* Wanted Posters */}
-        <Card className="mb-4 bg-gradient-to-b from-amber-100 to-amber-200 border-2 border-amber-800">
-          <CardContent className="p-3">
-            <div className="text-center mb-2">
-              <h3 className="font-bold text-red-800 text-lg uppercase tracking-wide">WANTED</h3>
-              <div className="w-full h-1 bg-red-800 mb-2"></div>
-            </div>
-
-            <div className="relative">
-              <Image
-                src={wantedPosters[currentPoster].image || "/placeholder.svg"}
-                alt={wantedPosters[currentPoster].name}
-                width={200}
-                height={150}
-                className="w-full h-32 object-cover rounded border-2 border-amber-800"
-              />
-              <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">
-                {wantedPosters[currentPoster].bounty}
-              </div>
-            </div>
-
-            <div className="mt-2 text-center">
-              <h4 className="font-bold text-amber-900 text-sm">{wantedPosters[currentPoster].name}</h4>
-              <p className="text-xs text-red-700 font-semibold">{wantedPosters[currentPoster].crime}</p>
-              <p className="text-xs text-amber-800 mt-1">{wantedPosters[currentPoster].description}</p>
-            </div>
-
-            <div className="flex justify-center mt-2 gap-1">
-              {wantedPosters.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full ${index === currentPoster ? "bg-red-600" : "bg-amber-400"}`}
-                />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Game Advertisements */}
-        <Card className="mb-4 bg-gradient-to-b from-green-100 to-green-200 border-2 border-green-800">
-          <CardContent className="p-3">
-            <div className="text-center mb-2">
-              <h3 className="font-bold text-green-800 text-sm uppercase tracking-wide">Featured Games</h3>
-              <div className="w-full h-1 bg-green-800 mb-2"></div>
-            </div>
-
-            <div className="relative">
-              <Image
-                src={gameAdvertisements[currentAd].image || "/placeholder.svg"}
-                alt={gameAdvertisements[currentAd].title}
-                width={200}
-                height={120}
-                className="w-full h-24 object-cover rounded border-2 border-green-800"
-              />
-              <div className="absolute top-2 right-2 bg-green-600 text-white px-2 py-1 rounded text-xs font-bold">
-                {gameAdvertisements[currentAd].badge}
-              </div>
-            </div>
-
-            <div className="mt-2 text-center">
-              <h4 className="font-bold text-green-900 text-sm">{gameAdvertisements[currentAd].title}</h4>
-              <p className="text-xs text-green-700 mb-2">{gameAdvertisements[currentAd].description}</p>
-              <Link href={gameAdvertisements[currentAd].link} target="_blank" rel="noopener noreferrer">
-                <Button size="sm" className="w-full bg-green-600 hover:bg-green-700 text-white">
-                  Play Now
-                </Button>
-              </Link>
-            </div>
-
-            <div className="flex justify-center mt-2 gap-1">
-              {gameAdvertisements.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full ${index === currentAd ? "bg-green-600" : "bg-green-400"}`}
-                />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Stats */}
-        <Card className="bg-gradient-to-b from-blue-100 to-blue-200 border-2 border-blue-800">
-          <CardContent className="p-3">
-            <h3 className="font-bold text-blue-800 text-sm mb-2 text-center">Frontier Stats</h3>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-blue-700">Active Pioneers:</span>
-                <span className="font-bold text-blue-900">1,247</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-blue-700">Land Claims:</span>
-                <span className="font-bold text-blue-900">892</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-blue-700">Active Trades:</span>
-                <span className="font-bold text-blue-900">156</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-blue-700">Social Good:</span>
-                <span className="font-bold text-green-600">$12,450</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Footer */}
-        <div className="mt-4 text-center text-xs text-amber-700">
-          <p>© 2024 WyoVerse</p>
-          <p>Digital Frontier Experience</p>
-          <div className="flex justify-center gap-2 mt-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span>Live</span>
-          </div>
+        <div className="p-2">
+          {!isCollapsed && <h3 className="text-sm font-semibold text-amber-900 mb-2 px-2">Navigation</h3>}
+          <nav className="space-y-1">
+            {navigationItems.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link key={item.href} href={item.href}>
+                  <Button
+                    variant={isActive ? "default" : "ghost"}
+                    className={cn(
+                      "w-full justify-start text-left",
+                      isActive ? "bg-amber-800 text-white hover:bg-amber-700" : "text-amber-800 hover:bg-amber-200",
+                      isCollapsed && "px-2",
+                    )}
+                  >
+                    <item.icon className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
+                    {!isCollapsed && item.name}
+                  </Button>
+                </Link>
+              )
+            })}
+          </nav>
         </div>
-      </div>
+
+        {!isCollapsed && (
+          <>
+            {/* Community Stats */}
+            <div className="p-4 border-t-2 border-amber-800">
+              <h3 className="text-sm font-semibold text-amber-900 mb-3">🏘️ Community Pulse</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-amber-700">Active Pioneers</span>
+                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                    {communityStats.activeUsers.toLocaleString()}
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-amber-700">Stones Mined</span>
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                    {communityStats.totalStones.toLocaleString()}
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-amber-700">Active Fights</span>
+                  <Badge variant="secondary" className="bg-red-100 text-red-800">
+                    {communityStats.activeFights}
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-amber-700">Land Claimed</span>
+                  <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                    {communityStats.landClaimed}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+
+            {/* Rotating Wanted Poster */}
+            <div className="p-4 border-t-2 border-amber-800">
+              <h3 className="text-sm font-semibold text-amber-900 mb-3">📋 Wanted Poster</h3>
+              <div className="bg-yellow-100 border-4 border-amber-800 p-3 rounded-lg transform rotate-1 shadow-lg">
+                <div className="text-center">
+                  <h4 className="font-bold text-red-800 text-xs mb-2">{currentPosterData.title}</h4>
+                  <div className="relative h-24 mb-2">
+                    <img
+                      src={currentPosterData.image || "/placeholder.svg"}
+                      alt={currentPosterData.title}
+                      className="w-full h-full object-cover rounded border-2 border-amber-600"
+                    />
+                  </div>
+                  <div className="text-xs text-amber-900">
+                    <p className="font-semibold">REWARD: {currentPosterData.reward}</p>
+                    <p className="mt-1">{currentPosterData.description}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-center mt-2 space-x-1">
+                {wantedPosters.map((_, index) => (
+                  <div
+                    key={index}
+                    className={cn("w-2 h-2 rounded-full", index === currentPoster ? "bg-amber-800" : "bg-amber-300")}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Rotating Game Ads */}
+            <div className="p-4 border-t-2 border-amber-800">
+              <h3 className="text-sm font-semibold text-amber-900 mb-3">🎮 Featured Games</h3>
+              <div className="bg-gradient-to-br from-blue-100 to-purple-100 border-2 border-blue-400 p-3 rounded-lg shadow-lg">
+                <div className="text-center">
+                  <h4 className="font-bold text-blue-800 text-xs mb-2">{currentAdData.title}</h4>
+                  <p className="text-xs text-blue-700 mb-2">{currentAdData.subtitle}</p>
+                  <div className="relative h-20 mb-2">
+                    <img
+                      src={currentAdData.image || "/placeholder.svg"}
+                      alt={currentAdData.title}
+                      className="w-full h-full object-cover rounded border border-blue-300"
+                    />
+                  </div>
+                  <p className="text-xs text-blue-800 mb-2">{currentAdData.description}</p>
+                  <Link
+                    href={currentAdData.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-xs text-blue-600 hover:text-blue-800 font-semibold"
+                  >
+                    Play Now <ExternalLink className="h-3 w-3 ml-1" />
+                  </Link>
+                </div>
+              </div>
+              <div className="flex justify-center mt-2 space-x-1">
+                {gameAds.map((_, index) => (
+                  <div
+                    key={index}
+                    className={cn("w-2 h-2 rounded-full", index === currentAd ? "bg-blue-600" : "bg-blue-300")}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="p-4 border-t-2 border-amber-800">
+              <h3 className="text-sm font-semibold text-amber-900 mb-3">⚡ Quick Actions</h3>
+              <div className="space-y-2">
+                <Link href="/boxing-arena">
+                  <Button size="sm" className="w-full bg-red-600 hover:bg-red-700 text-white">
+                    🥊 Enter Boxing Arena
+                  </Button>
+                </Link>
+                <Link href="/saloon">
+                  <Button size="sm" className="w-full bg-amber-600 hover:bg-amber-700 text-white">
+                    🍺 Visit Bill's Saloon
+                  </Button>
+                </Link>
+                <Link href="/mining">
+                  <Button size="sm" className="w-full bg-gray-600 hover:bg-gray-700 text-white">
+                    ⛏️ Start Mining
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t-2 border-amber-800 text-center">
+              <div className="flex items-center justify-center space-x-1 text-xs text-amber-700">
+                <Clock className="h-3 w-3" />
+                <span>Last updated: {new Date().toLocaleTimeString()}</span>
+              </div>
+              <p className="text-xs text-amber-600 mt-1">Welcome to the Digital Frontier! 🤠</p>
+            </div>
+          </>
+        )}
+      </ScrollArea>
     </div>
   )
 }
