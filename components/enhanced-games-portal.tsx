@@ -14,7 +14,7 @@ import Image from "next/image"
 
 // Import your existing API integrations
 import { AvalancheIntegration } from "@/lib/integrations/avalanche-integration"
-import { CoinbaseAPI } from "@/lib/coinbase-api-enhanced"
+import { coinbaseAPI } from "@/lib/coinbase-api-enhanced"
 
 interface WalletConnection {
   name: string
@@ -58,7 +58,6 @@ export function EnhancedGamesPortal() {
 
   // Initialize APIs
   const avalancheIntegration = new AvalancheIntegration()
-  const coinbaseAPI = new CoinbaseAPI()
 
   useEffect(() => {
     // Load crypto prices on component mount
@@ -67,8 +66,11 @@ export function EnhancedGamesPortal() {
 
   const loadCryptoPrices = async () => {
     try {
-      const prices = await coinbaseAPI.getSpotPrices(["BTC-USD", "ETH-USD", "AVAX-USD"])
-      setCryptoPrices(prices)
+      // getMultiplePrices returns an array of { symbol, price, ... }
+      const prices = await coinbaseAPI.getMultiplePrices(["BTC", "ETH", "AVAX"])
+      const priceMap: Record<string, number> = {}
+      prices.forEach((p) => (priceMap[p.symbol] = p.price))
+      setCryptoPrices(priceMap)
     } catch (error) {
       console.error("Failed to load crypto prices:", error)
     }
@@ -362,10 +364,10 @@ export function EnhancedGamesPortal() {
               </CardHeader>
               <CardContent className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {Object.entries(cryptoPrices).map(([pair, price]: [string, any]) => (
-                    <div key={pair} className="text-center p-4 border-2 border-black rounded-lg">
-                      <div className="font-serif font-bold text-lg">{pair}</div>
-                      <div className="text-2xl font-bold text-green-600">${price.amount}</div>
+                  {Object.entries(cryptoPrices).map(([symbol, price]) => (
+                    <div key={symbol} className="text-center p-4 border-2 border-black rounded-lg">
+                      <div className="font-serif font-bold text-lg">{symbol}/USD</div>
+                      <div className="text-2xl font-bold text-green-600">${price.toLocaleString()}</div>
                     </div>
                   ))}
                 </div>
