@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast"
 import { Trophy, Coins, Zap, Play, Wallet, ExternalLink, Eye, EyeOff, Sparkles } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { Connection, clusterApiUrl, type PublicKey } from "@solana/web3.js"
 
 // Import your existing API integrations
 import { avalancheIntegration } from "@/lib/integrations/avalanche-integration"
@@ -117,32 +116,29 @@ export function EnhancedGamesPortal() {
             }
           } catch (error) {
             console.error("Coinbase connection error:", error)
+            if (error?.code === 4001) {
+              toast({
+                title: `${walletName} Connection Cancelled`,
+                description: "You rejected the connection request.",
+                variant: "destructive",
+              })
+              setIsConnecting(null)
+              return
+            }
             throw error
           }
           break
 
         case "Phantom":
-          if (typeof window !== "undefined" && (window as any).solana?.isPhantom) {
-            const provider = (window as any).solana
+          try {
+            if (typeof window !== "undefined" && (window as any).solana?.isPhantom) {
+              const response = await (window as any).solana.connect()
+              const publicKey = response.publicKey.toString()
 
-            try {
-              /* 
-                First try a silent connect so we don’t annoy users who
-                previously denied the request.
-              */
-              await provider.connect({ onlyIfTrusted: true })
-            } catch (_) {
-              /* ignore – we’ll fall back to explicit request */
-            }
-
-            try {
-              const resp = await provider.connect() // explicit permission request
-              const publicKey: string = (resp.publicKey as PublicKey).toString()
-
-              // Fetch SOL balance using official web-3 connection
-              const connectionInstance = new Connection(clusterApiUrl("mainnet-beta"), "confirmed")
-              const lamports = await connectionInstance.getBalance(resp.publicKey, "confirmed")
-              const solBalance = (lamports / 1e9).toFixed(4)
+              // Get SOL balance
+              const solanaConnection = new (window as any).solanaWeb3.Connection("https://api.mainnet-beta.solana.com")
+              const balance = await solanaConnection.getBalance(response.publicKey)
+              const solBalance = (balance / 1e9).toFixed(4)
 
               connection = {
                 connected: true,
@@ -152,61 +148,54 @@ export function EnhancedGamesPortal() {
 
               toast({
                 title: "👻 Phantom Wallet Connected!",
-                description: `Address: ${publicKey.slice(0, 6)}...${publicKey.slice(-4)} | Balance: ${solBalance} SOL`,
+                description: `Connected to Solana network | Balance: ${solBalance} SOL`,
               })
-            } catch (err: any) {
-              /*
-                Error code 4001 = User rejected the request.
-                We simply inform the user instead of throwing a hard error.
-              */
-              if (err?.code === 4001) {
-                toast({
-                  title: "Phantom Connection Cancelled",
-                  description: "You cancelled the connection request.",
-                  variant: "destructive",
-                })
-              } else {
-                console.error("Phantom connection error:", err)
-                toast({
-                  title: "Phantom Connection Failed",
-                  description: "Unable to connect to Phantom wallet. Please try again.",
-                  variant: "destructive",
-                })
-              }
-              // stop further processing for Phantom
-              setIsConnecting(null)
-              return
-            }
-          } else {
-            window.open("https://phantom.app/", "_blank")
-            toast({
-              title: "Phantom Wallet Required",
-              description: "Please install Phantom wallet for Solana",
-            })
-          }
-          break
-
-        case "Avalanche":
-          try {
-            const result = await avalancheIntegration.connectWallet()
-
-            if (result.isConnected) {
-              connection = {
-                connected: true,
-                address: result.address,
-                balance: `${result.balance} AVAX`,
-              }
-
+            } else {
+              window.open("https://phantom.app/", "_blank")
               toast({
-                title: "🔺 Avalanche Network Connected!",
-                description: `Connected to C-Chain | Address: ${result.address?.slice(0, 6)}...${result.address?.slice(-4)}`,
+                title: "Phantom Wallet Required",
+                description: "Please install Phantom wallet for Solana",
               })
             }
           } catch (error) {
-            console.error("Avalanche connection error:", error)
+            console.error("Phantom connection error:", error)
+            if (error?.code === 4001) {
+              toast({
+                title: `${walletName} Connection Cancelled`,
+                description: "You rejected the connection request.",
+                variant: "destructive",
+              })
+              setIsConnecting(null)
+              return
+            }
             throw error
           }
           break
+
+        case "Avalanche": {
+          const result = await avalancheIntegration.connectWallet()
+          if (result.isConnected) {
+            connection = {
+              connected: true,
+              address: result.address,
+              balance: `${result.balance} AVAX`,
+            }
+            toast({
+              title: "🔺 Avalanche Connected!",
+              description: `Connected to ${result.address?.slice(0, 6)}…${result.address?.slice(-4)}`,
+            })
+          } else {
+            toast({
+              title: "Avalanche Connection Cancelled",
+              description: result.error ?? "Connection was not completed.",
+              variant: "destructive",
+            })
+            // stop further state updates
+            setIsConnecting(null)
+            return
+          }
+          break
+        }
 
         case "MetaMask":
           try {
@@ -248,6 +237,15 @@ export function EnhancedGamesPortal() {
             }
           } catch (error) {
             console.error("MetaMask connection error:", error)
+            if (error?.code === 4001) {
+              toast({
+                title: `${walletName} Connection Cancelled`,
+                description: "You rejected the connection request.",
+                variant: "destructive",
+              })
+              setIsConnecting(null)
+              return
+            }
             throw error
           }
           break

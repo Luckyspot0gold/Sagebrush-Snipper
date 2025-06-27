@@ -1,22 +1,28 @@
-export interface AvalancheConnectionResult {
+interface AvalancheNetworkConfig {
+  chainId: string
+  chainName: string
+  nativeCurrency: {
+    name: string
+    symbol: string
+    decimals: number
+  }
+  rpcUrls: string[]
+  blockExplorerUrls: string[]
+}
+
+interface AvalancheConnectionResult {
   isConnected: boolean
   address?: string
   balance?: string
-  chainId?: string
   error?: string
-}
-
-export interface NetworkInfo {
-  chainId: string
-  networkName: string
-  rpcUrl: string
-  blockExplorerUrl: string
+  chainId?: string
+  networkName?: string
 }
 
 export class AvalancheIntegration {
-  private readonly AVALANCHE_MAINNET_PARAMS = {
+  private readonly avalancheMainnet: AvalancheNetworkConfig = {
     chainId: "0xA86A", // 43114 in hex
-    chainName: "Avalanche Mainnet C-Chain",
+    chainName: "Avalanche C-Chain",
     nativeCurrency: {
       name: "Avalanche",
       symbol: "AVAX",
@@ -31,112 +37,132 @@ export class AvalancheIntegration {
       if (typeof window === "undefined" || !(window as any).ethereum) {
         return {
           isConnected: false,
-          error: "No Web3 wallet detected. Please install MetaMask or another Web3 wallet.",
+          error: "No Ethereum wallet detected. Please install MetaMask or Core Wallet.",
         }
       }
 
       const ethereum = (window as any).ethereum
 
-      // Check if already connected to Avalanche
-      const chainId = await ethereum.request({ method: "eth_chainId" })
+      // Request account access
+      try {
+        const accounts = await ethereum.request({
+          method: "eth_requestAccounts",
+        })
 
-      // If not on Avalanche, try to switch
-      if (chainId !== this.AVALANCHE_MAINNET_PARAMS.chainId) {
-        try {
-          await ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: this.AVALANCHE_MAINNET_PARAMS.chainId }],
-          })
-        } catch (switchError: any) {
-          // If the chain hasn't been added to the wallet, add it
-          if (switchError.code === 4902) {
-            await ethereum.request({
-              method: "wallet_addEthereumChain",
-              params: [this.AVALANCHE_MAINNET_PARAMS],
-            })
-          } else {
-            throw switchError
+        if (!accounts || accounts.length === 0) {
+          return {
+            isConnected: false,
+            error: "No accounts found. Please unlock your wallet.",
           }
         }
-      }
 
-      // Request account access
-      const accounts = await ethereum.request({
-        method: "eth_requestAccounts",
-      })
+        // Check current network
+        const currentChainId = await ethereum.request({
+          method: "eth_chainId",
+        })
 
-      if (accounts.length === 0) {
+        // Switch to Avalanche if not already connected
+        if (currentChainId !== this.avalancheMainnet.chainId) {
+          try {
+            await ethereum.request({
+              method: "wallet_switchEthereumChain",
+              params: [{ chainId: this.avalancheMainnet.chainId }],
+            })
+          } catch (switchError: any) {
+            // If network doesn't exist, add it
+            if (switchError.code === 4902) {
+              try {
+                await ethereum.request({
+                  method: "wallet_addEthereumChain",
+                  params: [this.avalancheMainnet],
+                })
+              } catch (addError: any) {
+                return {
+                  isConnected: false,
+                  error: `Failed to add Avalanche network: ${addError.message}`,
+                }
+              }
+            } else {
+              return {
+                isConnected: false,
+                error: `Failed to switch to Avalanche network: ${switchError.message}`,
+              }
+            }
+          }
+        }
+
+        // Get balance
+        const balance = await ethereum.request({
+          method: "eth_getBalance",
+          params: [accounts[0], "latest"],
+        })
+
+        const avaxBalance = (Number.parseInt(balance, 16) / 1e18).toFixed(4)
+
+        return {
+          isConnected: true,
+          address: accounts[0],
+          balance: avaxBalance,
+          chainId: this.avalancheMainnet.chainId,
+          networkName: this.avalancheMainnet.chainName,
+        }
+      } catch (requestError: any) {
+        // Handle user rejection (code 4001)
+        if (requestError.code === 4001) {
+          return {
+            isConnected: false,
+            error: "User rejected the connection request.",
+          }
+        }
+
         return {
           isConnected: false,
-          error: "No accounts found. Please connect your wallet.",
+          error: `Connection failed: ${requestError.message}`,
         }
       }
-
-      // Get balance
-      const balance = await ethereum.request({
-        method: "eth_getBalance",
-        params: [accounts[0], "latest"],
-      })
-
-      const avaxBalance = (Number.parseInt(balance, 16) / 1e18).toFixed(4)
-
-      return {
-        isConnected: true,
-        address: accounts[0],
-        balance: avaxBalance,
-        chainId: this.AVALANCHE_MAINNET_PARAMS.chainId,
-      }
     } catch (error: any) {
-      console.error("Avalanche connection error:", error)
+      console.error("Avalanche integration error:", error)
       return {
         isConnected: false,
-        error: error.message || "Failed to connect to Avalanche network",
+        error: `Unexpected error: ${error.message}`,
       }
-    }
-  }
-
-  async getNetworkInfo(): Promise<NetworkInfo> {
-    return {
-      chainId: this.AVALANCHE_MAINNET_PARAMS.chainId,
-      networkName: this.AVALANCHE_MAINNET_PARAMS.chainName,
-      rpcUrl: this.AVALANCHE_MAINNET_PARAMS.rpcUrls[0],
-      blockExplorerUrl: this.AVALANCHE_MAINNET_PARAMS.blockExplorerUrls[0],
     }
   }
 
   async getBalance(address: string): Promise<string> {
     try {
       if (typeof window === "undefined" || !(window as any).ethereum) {
-        throw new Error("No Web3 wallet detected")
+        throw new Error("No Ethereum wallet detected")
       }
 
-      const ethereum = (window as any).ethereum
-      const balance = await ethereum.request({
+      const balance = await (window as any).ethereum.request({
         method: "eth_getBalance",
         params: [address, "latest"],
       })
 
       return (Number.parseInt(balance, 16) / 1e18).toFixed(4)
     } catch (error: any) {
-      console.error("Error getting balance:", error)
+      console.error("Failed to get balance:", error)
       throw error
     }
   }
 
-  async getCurrentNetwork(): Promise<string> {
+  async getCurrentNetwork(): Promise<{ chainId: string; isAvalanche: boolean }> {
     try {
       if (typeof window === "undefined" || !(window as any).ethereum) {
-        throw new Error("No Web3 wallet detected")
+        throw new Error("No Ethereum wallet detected")
       }
 
-      const ethereum = (window as any).ethereum
-      const chainId = await ethereum.request({ method: "eth_chainId" })
+      const chainId = await (window as any).ethereum.request({
+        method: "eth_chainId",
+      })
 
-      return chainId === this.AVALANCHE_MAINNET_PARAMS.chainId
-        ? "Avalanche Mainnet C-Chain"
-        : `Unknown Network (${chainId})`
+      return {
+        chainId,
+        isAvalanche: chainId === this.avalancheMainnet.chainId,
+      }
     } catch (error: any) {
-      console.error("Error getting network:", error)
+      console.error("Failed to get current network:", error)
       throw error
     }
   }
