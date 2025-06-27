@@ -1,15 +1,37 @@
-import type React from "react"
-import { Sidebar } from "@/components/sidebar"
-import { Header } from "@/components/header"
+import { Grip, ListChecks, Plus, Settings, User, Activity } from "lucide-react"
 
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      <Sidebar />
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-auto">{children}</main>
-      </div>
-    </div>
-  )
+export const dashboardConfig = {
+  sidebarNav: [
+    {
+      title: "Account",
+      href: "/dashboard/account",
+      icon: User,
+    },
+    {
+      title: "Servers",
+      href: "/dashboard/servers",
+      icon: Grip,
+    },
+    {
+      title: "Billing",
+      href: "/dashboard/billing",
+      icon: ListChecks,
+    },
+    {
+      title: "Settings",
+      href: "/dashboard/settings",
+      icon: Settings,
+    },
+    {
+      title: "Create",
+      href: "/dashboard/create",
+      icon: Plus,
+    },
+    {
+      title: "Live Data Verification",
+      href: "/live-data-verification",
+      icon: Activity,
+      description: "Monitor real-time data feeds and system health",
+    },
+  ],
 }
