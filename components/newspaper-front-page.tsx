@@ -1,389 +1,350 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Calendar, TrendingUp, Users, MapPin, ExternalLink, Newspaper, Clock } from "lucide-react"
+import { ExternalLink, TrendingUp, Users, Calendar, MapPin, Star } from "lucide-react"
 
-export default function NewspaperFrontPage() {
+interface NewsArticle {
+  id: string
+  headline: string
+  subheading: string
+  content: string
+  author: string
+  date: string
+  category: "BREAKING" | "MARKETS" | "COMMUNITY" | "GAMES" | "TERRITORY"
+  priority: number
+}
+
+interface MarketData {
+  symbol: string
+  price: number
+  change: number
+  volume: string
+}
+
+interface CommunityStats {
+  activeUsers: number
+  totalTransactions: number
+  landClaimed: number
+  gamesPlayed: number
+}
+
+const BREAKING_NEWS: NewsArticle[] = [
+  {
+    id: "1",
+    headline: "MASSIVE GOLD STRIKE DISCOVERED IN DIGITAL MOUNTAINS",
+    subheading: "Prospectors Rush to Stake Claims as STONES Prices Soar 45%",
+    content:
+      "In what mining experts are calling the largest digital gold discovery since the Great Crypto Rush of '21, prospectors have uncovered a massive vein of STONES tokens in the northern territories of WyoVerse. The discovery has triggered a modern-day gold rush, with land deeds selling faster than hotcakes at the county fair.",
+    author: "Frontier Pete",
+    date: "December 27, 2024",
+    category: "BREAKING",
+    priority: 1,
+  },
+  {
+    id: "2",
+    headline: "BAR KEEP BILL'S SALOON INTRODUCES AI BARTENDER",
+    subheading: "Revolutionary Technology Brings Personalized Trading Advice to the Frontier",
+    content:
+      "The famous Bar Keep Bill has unveiled his latest innovation - an AI-powered bartender that provides personalized market insights while serving up the finest whiskey in the territory. Early reports suggest the AI can predict market movements with uncanny accuracy.",
+    author: "Technology Tribune",
+    date: "December 27, 2024",
+    category: "COMMUNITY",
+    priority: 2,
+  },
+  {
+    id: "3",
+    headline: "CRYPTO CLASHERS CHAMPIONSHIP DRAWS RECORD CROWD",
+    subheading: "Boxing Arena Packed as Bull vs Bear Rivalry Reaches New Heights",
+    content:
+      "The Crypto Clashers Boxing Arena witnessed its largest crowd ever as the legendary Bull vs Bear championship match drew spectators from across the digital frontier. Betting reached record volumes with over 50,000 STONES wagered on the outcome.",
+    author: "Sports Correspondent",
+    date: "December 26, 2024",
+    category: "GAMES",
+    priority: 3,
+  },
+]
+
+const MARKET_DATA: MarketData[] = [
+  { symbol: "STONES", price: 2.45, change: 12.3, volume: "1.2M" },
+  { symbol: "AVAX", price: 42.18, change: -2.1, volume: "890K" },
+  { symbol: "TATONKA", price: 0.89, change: 8.7, volume: "456K" },
+  { symbol: "LAND", price: 125.5, change: 5.2, volume: "234K" },
+]
+
+export function NewspaperFrontPage() {
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [marketData, setMarketData] = useState({
-    bitcoin: { price: 45000, change: 2.5 },
-    ethereum: { price: 3200, change: -1.2 },
-    avalanche: { price: 38, change: 4.1 },
+  const [communityStats, setCommunityStats] = useState<CommunityStats>({
+    activeUsers: 1247,
+    totalTransactions: 8934,
+    landClaimed: 342,
+    gamesPlayed: 5678,
   })
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
+    const timer = setInterval(() => {
+      setCurrentTime(new Date())
+      // Simulate real-time stats updates
+      setCommunityStats((prev) => ({
+        activeUsers: prev.activeUsers + Math.floor(Math.random() * 3),
+        totalTransactions: prev.totalTransactions + Math.floor(Math.random() * 5),
+        landClaimed: prev.landClaimed + (Math.random() > 0.9 ? 1 : 0),
+        gamesPlayed: prev.gamesPlayed + Math.floor(Math.random() * 8),
+      }))
+    }, 30000)
+
     return () => clearInterval(timer)
   }, [])
 
-  const frontPageNews = [
-    {
-      headline: "WyoVerse Pioneer Discovers New Digital Territory",
-      subheading: "Local prospector strikes gold in the metaverse mining district",
-      content:
-        "A pioneering spirit has led to the discovery of untapped digital resources in the northern sectors of WyoVerse. The find promises to bring new opportunities for settlers and entrepreneurs alike.",
-      category: "Mining & Exploration",
-    },
-    {
-      headline: "Bar Keep Bill's Saloon Opens for Business",
-      subheading: "AI-powered bartender serves wisdom with every drink",
-      content:
-        "The newest establishment in WyoVerse features an artificial intelligence bartender who dispenses both beverages and sage advice to weary travelers and local residents.",
-      category: "Business & Commerce",
-    },
-    {
-      headline: "Crypto Clashers Championship Announced",
-      subheading: "Boxing and racing tournaments to determine territorial champions",
-      content:
-        "The annual Crypto Clashers tournament will feature both boxing matches and high-speed racing competitions, with substantial prize pools for the victorious competitors.",
-      category: "Sports & Entertainment",
-    },
-  ]
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  }
 
-  const wantedPosters = [
-    {
-      name: "Stone the Outlaw",
-      crime: "Claim Jumping & Digital Rustling",
-      reward: "500 STONES",
-      description: "Last seen near the Wyoming Pyramid. Approach with caution.",
-    },
-    {
-      name: "The Phantom Trader",
-      crime: "Market Manipulation",
-      reward: "1000 TATONKA",
-      description: "Known for mysterious trading patterns. Identity unknown.",
-    },
-  ]
-
-  const upcomingEvents = [
-    {
-      date: "Dec 28",
-      event: "Digital Rodeo Championship",
-      location: "Central Arena",
-    },
-    {
-      date: "Dec 30",
-      event: "New Year's Frontier Celebration",
-      location: "Main Street",
-    },
-    {
-      date: "Jan 2",
-      event: "Land Deed Auction",
-      location: "Town Hall",
-    },
-  ]
-
-  const communityStats = {
-    activeUsers: 1247,
-    landClaims: 892,
-    dailyTransactions: 3456,
-    totalStones: 125000,
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    })
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 bg-gradient-to-br from-amber-50 to-orange-50 min-h-screen">
+    <div className="max-w-7xl mx-auto p-4 bg-amber-50 min-h-screen">
       {/* Newspaper Header */}
-      <div className="text-center mb-8 border-b-4 border-amber-800 pb-6">
-        <div className="flex items-center justify-center mb-4">
-          <Newspaper className="h-12 w-12 text-amber-800 mr-4" />
-          <div>
-            <h1 className="text-6xl font-bold text-amber-900 font-serif tracking-wider">THE WYOVERSE PIONEER</h1>
-            <p className="text-xl text-amber-700 font-serif italic">"All the News That's Fit to Mine"</p>
-          </div>
-        </div>
-
-        <div className="flex justify-between items-center text-sm text-amber-600 font-serif">
-          <div className="flex items-center">
-            <Clock className="h-4 w-4 mr-1" />
-            {currentTime.toLocaleDateString("en-US", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </div>
+      <div className="border-8 border-black bg-white shadow-2xl">
+        <div className="border-b-4 border-black p-6 bg-gradient-to-r from-amber-100 to-yellow-100">
           <div className="text-center">
-            <div className="font-bold">ESTABLISHED 2024</div>
-            <div>Digital Frontier Edition</div>
-          </div>
-          <div className="text-right">
-            <div>Volume 1, Issue {Math.floor(Date.now() / 86400000) - 19700}</div>
-            <div>Price: 1 STONE</div>
+            <h1 className="text-6xl font-serif font-black tracking-wider mb-2">THE WYOVERSE PIONEER</h1>
+            <div className="flex justify-between items-center text-sm font-serif">
+              <div>EST. 1852 • DIGITAL FRONTIER EDITION</div>
+              <div className="text-center">
+                <div className="font-bold">{formatDate(currentTime)}</div>
+                <div className="text-xs">LIVE: {formatTime(currentTime)}</div>
+              </div>
+              <div>VOL. 172 • NO. 361 • PRICE: 5¢</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content Column */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Lead Story */}
-          <Card className="border-2 border-amber-300 bg-white shadow-lg">
-            <CardHeader className="bg-amber-100">
-              <div className="flex items-center justify-between">
-                <Badge variant="secondary" className="bg-amber-200 text-amber-800">
-                  BREAKING NEWS
-                </Badge>
-                <div className="text-sm text-amber-600 font-serif">{currentTime.toLocaleTimeString()}</div>
-              </div>
-              <CardTitle className="text-3xl font-bold text-amber-900 font-serif leading-tight">
-                {frontPageNews[0].headline}
-              </CardTitle>
-              <p className="text-lg text-amber-700 font-serif italic">{frontPageNews[0].subheading}</p>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <p className="text-gray-700 font-serif leading-relaxed text-lg">{frontPageNews[0].content}</p>
-              <div className="mt-4 flex items-center justify-between">
-                <Badge variant="outline" className="font-serif">
-                  {frontPageNews[0].category}
-                </Badge>
-                <Button variant="link" className="text-amber-600 font-serif">
-                  Read Full Story →
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Breaking News Banner */}
+        <div className="bg-red-600 text-white p-2 text-center">
+          <div className="flex items-center justify-center gap-2">
+            <Star className="h-4 w-4 animate-pulse" />
+            <span className="font-bold text-lg">BREAKING: {BREAKING_NEWS[0].headline}</span>
+            <Star className="h-4 w-4 animate-pulse" />
+          </div>
+        </div>
 
-          {/* Secondary Stories */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {frontPageNews.slice(1).map((story, index) => (
-              <Card key={index} className="border border-amber-200 bg-white shadow">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-xl font-bold text-amber-900 font-serif leading-tight">
-                    {story.headline}
-                  </CardTitle>
-                  <p className="text-sm text-amber-600 font-serif italic">{story.subheading}</p>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700 font-serif text-sm leading-relaxed">{story.content}</p>
-                  <div className="mt-3 flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs font-serif">
-                      {story.category}
+        <div className="p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Main Story Column */}
+            <div className="lg:col-span-3">
+              <Card className="border-4 border-black">
+                <CardHeader className="bg-gray-100">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge variant="destructive" className="text-lg px-3 py-1">
+                      {BREAKING_NEWS[0].category}
                     </Badge>
-                    <Button variant="link" size="sm" className="text-amber-600 font-serif">
-                      Continue →
-                    </Button>
+                    <span className="text-sm text-gray-600">{BREAKING_NEWS[0].date}</span>
+                  </div>
+                  <CardTitle className="text-3xl font-serif leading-tight">{BREAKING_NEWS[0].headline}</CardTitle>
+                  <CardDescription className="text-xl font-serif text-gray-700">
+                    {BREAKING_NEWS[0].subheading}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="text-lg leading-relaxed font-serif mb-4">{BREAKING_NEWS[0].content}</div>
+                  <div className="text-sm text-gray-600 italic">
+                    By {BREAKING_NEWS[0].author}, Frontier Correspondent
                   </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
 
-          {/* Market Report */}
-          <Card className="border border-green-300 bg-green-50">
-            <CardHeader className="bg-green-100">
-              <CardTitle className="text-2xl font-bold text-green-800 font-serif flex items-center">
-                <TrendingUp className="h-6 w-6 mr-2" />
-                Market Report
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {Object.entries(marketData).map(([coin, data]) => (
-                  <div key={coin} className="text-center p-3 bg-white rounded border">
-                    <div className="font-bold text-lg font-serif capitalize">{coin}</div>
-                    <div className="text-2xl font-bold text-gray-800">${data.price.toLocaleString()}</div>
-                    <div className={`text-sm font-semibold ${data.change >= 0 ? "text-green-600" : "text-red-600"}`}>
-                      {data.change >= 0 ? "+" : ""}
-                      {data.change}%
-                    </div>
-                  </div>
+              {/* Secondary Stories */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                {BREAKING_NEWS.slice(1).map((article) => (
+                  <Card key={article.id} className="border-2 border-black">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Badge variant="outline" className="text-xs">
+                          {article.category}
+                        </Badge>
+                        <span className="text-xs text-gray-500">{article.date}</span>
+                      </div>
+                      <CardTitle className="text-lg font-serif leading-tight">{article.headline}</CardTitle>
+                      <CardDescription className="text-sm">{article.subheading}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <p className="text-sm leading-relaxed">{article.content.substring(0, 150)}...</p>
+                      <div className="text-xs text-gray-600 italic mt-2">By {article.author}</div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Games Advertisement */}
-          <Card className="border-2 border-purple-400 bg-gradient-to-r from-purple-100 to-pink-100">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-bold text-purple-800 font-serif">
-                🎮 Featured Games from Luckyspotonline
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-white rounded-lg border-2 border-purple-300">
-                  <h3 className="text-xl font-bold text-purple-700 font-serif mb-2">Crypto Clashers</h3>
-                  <p className="text-gray-600 font-serif mb-3">Epic boxing and racing battles in the digital arena</p>
-                  <Button
-                    className="bg-purple-600 hover:bg-purple-700"
-                    onClick={() => window.open("https://github.com/Luckyspotonline", "_blank")}
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Play Now
-                  </Button>
-                </div>
-                <div className="text-center p-4 bg-white rounded-lg border-2 border-blue-300">
-                  <h3 className="text-xl font-bold text-blue-700 font-serif mb-2">Digital Frontier</h3>
-                  <p className="text-gray-600 font-serif mb-3">
-                    Explore, mine, and build in the vast digital wilderness
-                  </p>
-                  <Button
-                    className="bg-blue-600 hover:bg-blue-700"
-                    onClick={() => window.open("https://github.com/Luckyspotonline", "_blank")}
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Explore
-                  </Button>
-                </div>
-              </div>
-              <div className="text-center mt-4">
-                <p className="text-sm text-gray-600 font-serif">
-                  Visit our complete game collection at{" "}
-                  <Button
-                    variant="link"
-                    className="text-purple-600 font-serif p-0 h-auto"
-                    onClick={() => window.open("https://github.com/Luckyspotonline", "_blank")}
-                  >
-                    github.com/Luckyspotonline
-                  </Button>
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Market Ticker */}
+              <Card className="border-4 border-black">
+                <CardHeader className="bg-green-100">
+                  <CardTitle className="text-lg font-serif flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Market Ticker
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    {MARKET_DATA.map((market) => (
+                      <div key={market.symbol} className="flex justify-between items-center">
+                        <div>
+                          <div className="font-bold">{market.symbol}</div>
+                          <div className="text-xs text-gray-600">Vol: {market.volume}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold">${market.price}</div>
+                          <div className={`text-xs ${market.change > 0 ? "text-green-600" : "text-red-600"}`}>
+                            {market.change > 0 ? "+" : ""}
+                            {market.change}%
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Community Stats */}
-          <Card className="border border-blue-300 bg-blue-50">
-            <CardHeader className="bg-blue-100">
-              <CardTitle className="text-xl font-bold text-blue-800 font-serif flex items-center">
-                <Users className="h-5 w-5 mr-2" />
-                Community Stats
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="font-serif text-gray-700">Active Pioneers:</span>
-                  <span className="font-bold text-blue-800">{communityStats.activeUsers.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-serif text-gray-700">Land Claims:</span>
-                  <span className="font-bold text-blue-800">{communityStats.landClaims.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-serif text-gray-700">Daily Trades:</span>
-                  <span className="font-bold text-blue-800">{communityStats.dailyTransactions.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-serif text-gray-700">Total Stones:</span>
-                  <span className="font-bold text-blue-800">{communityStats.totalStones.toLocaleString()}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Wanted Posters */}
-          <Card className="border-2 border-red-400 bg-red-50">
-            <CardHeader className="bg-red-100">
-              <CardTitle className="text-xl font-bold text-red-800 font-serif">🚨 WANTED</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="space-y-4">
-                {wantedPosters.map((poster, index) => (
-                  <div key={index} className="border-2 border-red-300 p-3 bg-white rounded">
-                    <div className="text-center mb-2">
-                      <div className="font-bold text-red-800 font-serif">{poster.name}</div>
-                      <div className="text-sm text-red-600 font-serif italic">{poster.crime}</div>
+              {/* Community Stats */}
+              <Card className="border-4 border-black">
+                <CardHeader className="bg-blue-100">
+                  <CardTitle className="text-lg font-serif flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Territory Stats
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span>Active Pioneers</span>
+                      <span className="font-bold">{communityStats.activeUsers.toLocaleString()}</span>
                     </div>
-                    <Separator className="my-2" />
-                    <div className="text-xs text-gray-600 font-serif mb-2">{poster.description}</div>
-                    <div className="text-center">
-                      <Badge variant="destructive" className="font-serif">
-                        REWARD: {poster.reward}
-                      </Badge>
+                    <div className="flex justify-between">
+                      <span>Total Trades</span>
+                      <span className="font-bold">{communityStats.totalTransactions.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Land Claimed</span>
+                      <span className="font-bold">{communityStats.landClaimed.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Games Played</span>
+                      <span className="font-bold">{communityStats.gamesPlayed.toLocaleString()}</span>
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
-          {/* Upcoming Events */}
-          <Card className="border border-amber-300 bg-amber-50">
-            <CardHeader className="bg-amber-100">
-              <CardTitle className="text-xl font-bold text-amber-800 font-serif flex items-center">
-                <Calendar className="h-5 w-5 mr-2" />
-                Upcoming Events
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="space-y-3">
-                {upcomingEvents.map((event, index) => (
-                  <div key={index} className="flex items-start space-x-3 p-2 bg-white rounded border">
-                    <div className="text-center min-w-[50px]">
-                      <div className="text-sm font-bold text-amber-800 font-serif">{event.date}</div>
+              {/* Games Advertisement */}
+              <Card className="border-4 border-black bg-gradient-to-b from-purple-100 to-purple-200">
+                <CardHeader>
+                  <CardTitle className="text-lg font-serif text-center">🎮 PLAY MORE GAMES! 🎮</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 text-center">
+                  <div className="space-y-3">
+                    <div className="text-sm font-serif">
+                      <strong>Visit Luckyspotonline on GitHub</strong>
                     </div>
-                    <div className="flex-1">
-                      <div className="font-semibold text-gray-800 font-serif text-sm">{event.event}</div>
-                      <div className="text-xs text-gray-600 font-serif flex items-center">
-                        <MapPin className="h-3 w-3 mr-1" />
-                        {event.location}
+
+                    <Button asChild className="w-full bg-purple-600 hover:bg-purple-700 text-white">
+                      <a
+                        href="https://github.com/Luckyspotonline/Crypto"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        Crypto Game
+                      </a>
+                    </Button>
+
+                    <div className="text-xs text-gray-600 font-serif">
+                      More exciting games coming soon to the frontier!
+                    </div>
+
+                    <div className="border-t pt-3 mt-3">
+                      <div className="text-xs font-serif text-gray-700">
+                        <strong>Featured Games:</strong>
+                      </div>
+                      <div className="text-xs space-y-1 mt-1">
+                        <div>🥊 Crypto Clashers Boxing</div>
+                        <div>🏇 Digital Rodeo Racing</div>
+                        <div>⛏️ STONES Mining Simulator</div>
+                        <div>🏛️ Wyoming Pyramid Explorer</div>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
-          {/* Weather & Conditions */}
-          <Card className="border border-gray-300 bg-gray-50">
-            <CardHeader className="bg-gray-100">
-              <CardTitle className="text-xl font-bold text-gray-800 font-serif">🌤️ Frontier Conditions</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-gray-800">72°F</div>
-                <div className="text-sm text-gray-600 font-serif">Partly Cloudy</div>
-                <div className="text-xs text-gray-500 font-serif mt-2">Perfect weather for mining and exploration</div>
-              </div>
-              <Separator className="my-3" />
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="font-serif text-gray-700">Network Status:</span>
-                  <Badge variant="default" className="bg-green-100 text-green-800">
-                    Optimal
-                  </Badge>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-serif text-gray-700">Mining Difficulty:</span>
-                  <Badge variant="secondary">Moderate</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+              {/* Weather & Events */}
+              <Card className="border-4 border-black">
+                <CardHeader className="bg-yellow-100">
+                  <CardTitle className="text-lg font-serif flex items-center gap-2">
+                    <Calendar className="h-5 w-5" />
+                    Frontier Events
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-start gap-2">
+                      <MapPin className="h-4 w-4 mt-0.5 text-red-500" />
+                      <div>
+                        <div className="font-bold">Boxing Championship</div>
+                        <div className="text-xs text-gray-600">Tonight at 8 PM MST</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <MapPin className="h-4 w-4 mt-0.5 text-blue-500" />
+                      <div>
+                        <div className="font-bold">Land Auction</div>
+                        <div className="text-xs text-gray-600">Tomorrow 2 PM MST</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <MapPin className="h-4 w-4 mt-0.5 text-green-500" />
+                      <div>
+                        <div className="font-bold">Mining Expedition</div>
+                        <div className="text-xs text-gray-600">Weekend Event</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
 
-      {/* Footer */}
-      <div className="mt-12 pt-6 border-t-2 border-amber-800 text-center">
-        <div className="text-sm text-amber-700 font-serif space-y-2">
-          <div>Published by WyoVerse Media Corporation • Established in the Digital Frontier</div>
-          <div>"Building Tomorrow's West, Today" • All Rights Reserved © 2024</div>
-          <div className="flex justify-center items-center space-x-4 mt-4">
-            <Button
-              variant="link"
-              size="sm"
-              className="text-amber-600 font-serif"
-              onClick={() => window.open("https://github.com/Luckyspotonline", "_blank")}
-            >
-              <ExternalLink className="h-3 w-3 mr-1" />
-              More Games
-            </Button>
-            <span className="text-amber-400">•</span>
-            <Button variant="link" size="sm" className="text-amber-600 font-serif">
-              Subscribe
-            </Button>
-            <span className="text-amber-400">•</span>
-            <Button variant="link" size="sm" className="text-amber-600 font-serif">
-              Contact
-            </Button>
+          {/* Footer */}
+          <Separator className="my-6 border-2 border-black" />
+          <div className="text-center text-sm font-serif text-gray-600">
+            <div className="mb-2">
+              <strong>THE WYOVERSE PIONEER</strong> • Published Daily in the Digital Frontier
+            </div>
+            <div className="flex justify-center items-center gap-4 text-xs">
+              <span>Printed by WyoVerse Press</span>
+              <span>•</span>
+              <span>Distributed Territory-Wide</span>
+              <span>•</span>
+              <span>All Rights Reserved © 2024</span>
+            </div>
+            <div className="mt-2 text-xs">"Bringing Truth and Prosperity to the Digital Frontier Since 1852"</div>
           </div>
         </div>
       </div>
