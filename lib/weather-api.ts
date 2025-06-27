@@ -19,20 +19,20 @@ class WyomingWeatherAPI {
     // Wyoming seasonal temperature ranges (Fahrenheit)
     let baseTemp: number
     if (month >= 12 || month <= 2) {
-      // Winter: -10°F to 30°F
-      baseTemp = Math.random() * 40 - 10
+      // Winter
+      baseTemp = Math.random() * 40 - 10 // -10°F to 30°F
     } else if (month >= 3 && month <= 5) {
-      // Spring: 20°F to 70°F
-      baseTemp = Math.random() * 50 + 20
+      // Spring
+      baseTemp = Math.random() * 50 + 20 // 20°F to 70°F
     } else if (month >= 6 && month <= 8) {
-      // Summer: 50°F to 90°F
-      baseTemp = Math.random() * 40 + 50
+      // Summer
+      baseTemp = Math.random() * 40 + 50 // 50°F to 90°F
     } else {
-      // Fall: 10°F to 60°F
-      baseTemp = Math.random() * 50 + 10
+      // Fall
+      baseTemp = Math.random() * 50 + 10 // 10°F to 60°F
     }
 
-    // Daily temperature variation using sine wave
+    // Daily temperature variation
     const dailyVariation = Math.sin(((hour - 6) * Math.PI) / 12) * 15
     return Math.round(baseTemp + dailyVariation)
   }
@@ -40,7 +40,7 @@ class WyomingWeatherAPI {
   private getCondition(temp: number): string {
     const conditions = [
       "Clear Skies",
-      "Partly Cloudy", 
+      "Partly Cloudy",
       "Mostly Sunny",
       "Scattered Clouds",
       "Overcast",

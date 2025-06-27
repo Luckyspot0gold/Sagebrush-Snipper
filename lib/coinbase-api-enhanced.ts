@@ -20,14 +20,7 @@ class CoinbaseAPI {
   async getCryptoPrice(symbol: string): Promise<CryptoPrice | null> {
     try {
       // Try Coinbase Pro API first
-      const proResponse = await fetch(`${this.proUrl}/products/${symbol}-USD/ticker`, {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'WyoVerse/1.0'
-        },
-        cache: 'no-store'
-      })
-      
+      const proResponse = await fetch(`${this.proUrl}/products/${symbol}-USD/ticker`)
       if (proResponse.ok) {
         const data: CoinbaseTickerResponse = await proResponse.json()
         return {
@@ -41,14 +34,7 @@ class CoinbaseAPI {
       }
 
       // Fallback to regular Coinbase API
-      const response = await fetch(`${this.baseUrl}/exchange-rates?currency=${symbol}`, {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'WyoVerse/1.0'
-        },
-        cache: 'no-store'
-      })
-      
+      const response = await fetch(`${this.baseUrl}/exchange-rates?currency=${symbol}`)
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
       const data = await response.json()
@@ -86,7 +72,7 @@ export const coinbaseAPI = new CoinbaseAPI()
 // Popular crypto symbols for WyoVerse
 export const CRYPTO_SYMBOLS = [
   "BTC",
-  "ETH", 
+  "ETH",
   "AVAX",
   "SOL",
   "ADA",
