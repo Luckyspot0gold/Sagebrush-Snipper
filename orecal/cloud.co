@@ -1,0 +1,23 @@
+# .env.production
+GCLOUD_CREDENTIALS_JSON='{"type":"service_account",...}'
+SUPABASE_URL=https://muqonovfliktsugrlaxj.supabase.co
+SUPABASE_KEY=your-key
+BOLT_API_KEY=your-bolt-key
+# Use caching for common queries
+from functools import lru_cache
+
+@lru_cache(maxsize=100)
+def get_cached_response(question):
+    return generate_response(question)
+try:
+    response = get_cached_response(question)
+except Exception as e:
+    logger.error(f"AI failed: {str(e)}")
+    return ("Dagnabbit! My thinker's jammed", "shrug")Show Render dashboard with:
+- Active deployment
+- Log streams
+- Performance metrics
+"Tell me about Avalanche troubles"
+[Bill spits in spittoon, gives troubleshooting tips]
+"Bill! What's happening in crypto today?"
+[Bill animates thinking, gives real-time BTC analysis]
