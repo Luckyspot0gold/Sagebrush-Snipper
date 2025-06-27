@@ -171,3 +171,13 @@ export async function getCurrentNetwork(): Promise<{ chainId: string; isAvalanch
     throw error
   }
 }
+
+// Aggregate helpers for convenient import elsewhere in the app
+export const avalancheIntegration = {
+  connectAvalancheWallet,
+  getAvalancheBalance,
+  getCurrentNetwork,
+}
+
+// Optional default export (covers both named & default import styles)
+export default avalancheIntegration
