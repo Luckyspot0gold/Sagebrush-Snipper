@@ -1,0 +1,138 @@
+service: wyoverse-bartender
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-west-2
+  stage: ${opt:stage, 'dev'}
+  environment:
+    STAGE: ${self:provider.stage}
+    GOOGLE_PROJECT_ID: ${env:GOOGLE_PROJECT_ID}
+    GOOGLE_APPLICATION_CREDENTIALS_JSON: ${env:GOOGLE_APPLICATION_CREDENTIALS_JSON}
+    VENICE_API_KEY: ${env:VENICE_API_KEY}
+    SUPABASE_URL: ${env:SUPABASE_URL}
+    SUPABASE_SERVICE_KEY: ${env:SUPABASE_SERVICE_KEY}
+    COINMARKETCAP_API_KEY: ${env:COINMARKETCAP_API_KEY}
+    DEEPINFRA_API_KEY: ${env:DEEPINFRA_API_KEY}
+
+functions:
+  bartender:
+    handler: lib/bill-langgraph-agent.handler
+    timeout: 30
+    memorySize: 512
+    events:
+      - http:
+          path: /bartender
+          method: post
+          cors: true
+      - http:
+          path: /bartender/health
+          method: get
+          cors: true
+
+  health-check:
+    handler: api/health.handler
+    timeout: 10
+    memorySize: 256
+    events:
+      - http:
+          path: /health
+          method: post
+          cors: true
+      - http:
+          path: /health
+          method: get
+          cors: true
+      - schedule:
+          rate: rate(5 minutes)
+          enabled: true
+
+  judge-mode:
+    handler: api/judge-mode.handler
+    timeout: 15
+    memorySize: 256
+    events:
+      - http:
+          path: /judge
+          method: post
+          cors: true
+      - http:
+          path: /judge
+          method: get
+          cors: true
+
+plugins:
+  - serverless-python-requirements
+  - serverless-offline
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    slim: true
+    strip: false
+  serverless-offline:
+    httpPort: 3001
+    host: 0.0.0.0
+
+package:
+  exclude:
+    - node_modules/**
+    - .git/**
+    - .env
+    - README.md
+    - package.json
+    - yarn.lock
+  include:
+    - lib/**
+    - api/**
+    - requirements.txt
+
+resources:
+  Resources:
+    # CloudWatch Log Groups
+    BartenderLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/lambda/${self:service}-${self:provider.stage}-bartender
+        RetentionInDays: 14
+
+    HealthCheckLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/lambda/${self:service}-${self:provider.stage}-health-check
+        RetentionInDays: 7
+
+    # API Gateway Custom Domain (optional)
+    ApiGatewayCustomDomain:
+      Type: AWS::ApiGateway::DomainName
+      Properties:
+        DomainName: api.wyoverse.com
+        CertificateArn: ${env:SSL_CERTIFICATE_ARN}
+        SecurityPolicy: TLS_1_2
+
+  Outputs:
+    BartenderApiUrl:
+      Description: "API Gateway endpoint URL for Bartender function"
+      Value:
+        Fn::Join:
+          - ""
+          - - "https://"
+            - Ref: "ApiGatewayRestApi"
+            - ".execute-api."
+            - ${self:provider.region}
+            - ".amazonaws.com/"
+            - ${self:provider.stage}
+            - "/bartender"
+
+    HealthCheckUrl:
+      Description: "Health check endpoint URL"
+      Value:
+        Fn::Join:
+          - ""
+          - - "https://"
+            - Ref: "ApiGatewayRestApi"
+            - ".execute-api."
+            - ${self:provider.region}
+            - ".amazonaws.com/"
+            - ${self:provider.stage}
+            - "/health"

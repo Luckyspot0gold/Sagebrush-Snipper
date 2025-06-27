@@ -1,0 +1,134 @@
+{
+  "name": "wyoverse-web",
+  "version": "1.2.0",
+  "description": "WyoVerse - Digital Frontier Gaming Platform",
+  "environments": {
+    "development": {
+      "url": "http://localhost:3000",
+      "api_url": "http://localhost:3000/api",
+      "database_url": "${SUPABASE_URL}",
+      "features": {
+        "judge_mode": true,
+        "debug_mode": true,
+        "hot_reload": true,
+        "mock_apis": true
+      }
+    },
+    "staging": {
+      "url": "https://wyoverse-staging.vercel.app",
+      "api_url": "https://wyoverse-staging.vercel.app/api",
+      "database_url": "${SUPABASE_URL}",
+      "features": {
+        "judge_mode": true,
+        "debug_mode": false,
+        "hot_reload": false,
+        "mock_apis": false
+      }
+    },
+    "production": {
+      "url": "https://wyoverse.com",
+      "api_url": "https://wyoverse.com/api",
+      "database_url": "${SUPABASE_URL}",
+      "features": {
+        "judge_mode": false,
+        "debug_mode": false,
+        "hot_reload": false,
+        "mock_apis": false
+      }
+    }
+  },
+  "services": {
+    "bartender": {
+      "endpoint": "/api/bartender",
+      "health_check": "/api/health",
+      "timeout": 30000,
+      "retry_attempts": 3,
+      "fallback_enabled": true
+    },
+    "market_data": {
+      "endpoint": "/api/market-data",
+      "cache_duration": 60000,
+      "providers": ["coinmarketcap", "coingecko"],
+      "fallback_enabled": true
+    },
+    "wallet_connect": {
+      "supported_wallets": [
+        "metamask",
+        "walletconnect",
+        "coinbase",
+        "phantom",
+        "solflare",
+        "avalanche",
+        "core",
+        "rabby"
+      ],
+      "timeout": 15000
+    }
+  },
+  "monitoring": {
+    "health_check_interval": 300000,
+    "performance_tracking": true,
+    "error_reporting": true,
+    "analytics": {
+      "google_analytics": "${GOOGLE_ANALYTICS_ID}",
+      "mixpanel": "${MIXPANEL_TOKEN}",
+      "custom_events": true
+    }
+  },
+  "security": {
+    "cors_origins": ["https://wyoverse.com", "https://www.wyoverse.com", "https://wyoverse-staging.vercel.app"],
+    "rate_limiting": {
+      "api_calls": 100,
+      "window": 900000,
+      "judge_mode_calls": 1000
+    },
+    "content_security_policy": {
+      "default_src": ["'self'"],
+      "script_src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+      "style_src": ["'self'", "'unsafe-inline'"],
+      "img_src": ["'self'", "data:", "https:"],
+      "connect_src": ["'self'", "https://api.venice.ai", "https://pro-api.coinmarketcap.com"]
+    }
+  },
+  "build": {
+    "node_version": "18.x",
+    "build_command": "npm run build",
+    "output_directory": ".next",
+    "install_command": "npm ci",
+    "environment_variables": [
+      "SUPABASE_URL",
+      "SUPABASE_SERVICE_KEY",
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "VENICE_API_KEY",
+      "COINMARKETCAP_API_KEY",
+      "DEEPINFRA_API_KEY",
+      "GOOGLE_PROJECT_ID",
+      "GOOGLE_APPLICATION_CREDENTIALS_JSON"
+    ]
+  },
+  "deployment": {
+    "strategy": "blue_green",
+    "rollback_enabled": true,
+    "health_check_path": "/api/health",
+    "warm_up_requests": 5,
+    "pre_deploy_hooks": ["npm run test", "npm run lint", "npm run type-check"],
+    "post_deploy_hooks": ["scripts/health-check.sh", "scripts/warm-up-cache.sh"]
+  },
+  "judge_mode": {
+    "access_code": "DEE_2025",
+    "enabled_environments": ["development", "staging"],
+    "features": [
+      "advanced_analytics",
+      "real_time_monitoring",
+      "system_controls",
+      "debug_mode",
+      "performance_metrics",
+      "user_management",
+      "content_moderation",
+      "financial_oversight"
+    ],
+    "session_duration": 86400000,
+    "max_concurrent_sessions": 3
+  }
+}
