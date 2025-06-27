@@ -1,613 +1,613 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/hooks/use-toast"
-import { Trophy, Eye, ExternalLink, Play, CheckCircle } from "lucide-react"
-import Image from "next/image"
+import { Trophy, Coins, Zap, Play, Wallet, ExternalLink, Eye, EyeOff, Sparkles } from "lucide-react"
 import Link from "next/link"
-import { avalancheIntegration } from "@/lib/integrations/avalanche-integration"
-import { coinbaseAPI } from "@/lib/coinbase-api-enhanced"
+import Image from "next/image"
 
-// 3D Model Viewer Component with hologram functionality
-function Model3DViewer({ modelUrl, title }: { modelUrl: string; title: string }) {
-  const [isHologramActive, setIsHologramActive] = useState(false)
+// Import your existing API integrations
+import { AvalancheIntegration } from "@/lib/integrations/avalanche-integration"
+import { CoinbaseAPI } from "@/lib/coinbase-api-enhanced"
 
-  return (
-    <div className="w-full h-64 bg-gradient-to-br from-purple-900 via-blue-900 to-black rounded-lg flex items-center justify-center border-2 border-cyan-400 relative overflow-hidden">
-      {isHologramActive ? (
-        <div className="absolute inset-0 bg-gradient-to-t from-cyan-500/20 to-purple-500/20 animate-pulse">
-          <div className="text-center text-cyan-300 h-full flex flex-col justify-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-cyan-400/30 rounded-full flex items-center justify-center animate-spin">
-              <Eye className="h-8 w-8 text-cyan-300" />
-            </div>
-            <p className="font-serif text-lg">HOLOGRAM ACTIVE</p>
-            <p className="text-sm opacity-75">{title}</p>
-            <div className="mt-4 space-y-1">
-              <div className="h-1 bg-cyan-400/50 mx-8 animate-pulse"></div>
-              <div className="h-1 bg-purple-400/50 mx-12 animate-pulse delay-100"></div>
-              <div className="h-1 bg-cyan-400/50 mx-6 animate-pulse delay-200"></div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="text-center text-cyan-300">
-          <div className="w-16 h-16 mx-auto mb-4 bg-cyan-400/20 rounded-full flex items-center justify-center">
-            <Eye className="h-8 w-8" />
-          </div>
-          <p className="font-serif">3D Hologram: {title}</p>
-          <p className="text-sm opacity-75">Click to activate holographic display</p>
-        </div>
-      )}
-
-      <Button
-        className="absolute bottom-2 right-2 bg-cyan-600 hover:bg-cyan-700 text-white"
-        size="sm"
-        onClick={() => setIsHologramActive(!isHologramActive)}
-      >
-        {isHologramActive ? "Deactivate" : "Activate"} Hologram
-      </Button>
-    </div>
-  )
+interface WalletConnection {
+  name: string
+  icon: string
+  connected: boolean
+  address?: string
+  balance?: string
+  color: string
 }
 
-// Enhanced Wallet Connection Component with real APIs
-function WalletConnector() {
-  const { toast } = useToast()
-  const [connectedWallets, setConnectedWallets] = useState<string[]>([])
-  const [isConnecting, setIsConnecting] = useState<string | null>(null)
-  const [walletData, setWalletData] = useState<any>({})
-
-  const connectAvalanche = async () => {
-    setIsConnecting("Avalanche")
-    try {
-      const connection = await avalancheIntegration.connectWallet()
-      setConnectedWallets((prev) => [...prev.filter((w) => w !== "Avalanche"), "Avalanche"])
-      setWalletData((prev) => ({ ...prev, Avalanche: connection }))
-
-      toast({
-        title: "🔺 Avalanche Connected!",
-        description: `Connected to ${connection.address.slice(0, 6)}...${connection.address.slice(-4)}`,
-      })
-    } catch (error: any) {
-      toast({
-        title: "Avalanche Connection Failed",
-        description: error.message,
-        variant: "destructive",
-      })
-    }
-    setIsConnecting(null)
+interface GameCharacter {
+  id: string
+  name: string
+  type: string
+  rarity: "common" | "rare" | "epic" | "legendary"
+  image: string
+  stats: {
+    power: number
+    speed: number
+    defense: number
   }
-
-  const connectCoinbase = async () => {
-    setIsConnecting("Coinbase")
-    try {
-      // Simulate Coinbase connection with real API integration
-      const prices = await coinbaseAPI.getMultiplePrices(["BTC", "ETH", "AVAX"])
-
-      // Mock wallet connection for demo
-      const mockConnection = {
-        address: "0x742d35Cc6634C0532925a3b8D4C9db96590b5",
-        balance: "89.25",
-        network: "Coinbase",
-        prices: prices,
-      }
-
-      setConnectedWallets((prev) => [...prev.filter((w) => w !== "Coinbase"), "Coinbase"])
-      setWalletData((prev) => ({ ...prev, Coinbase: mockConnection }))
-
-      toast({
-        title: "💙 Coinbase Connected!",
-        description: "Professional trading wallet connected with live market data",
-      })
-    } catch (error: any) {
-      toast({
-        title: "Coinbase Connection Failed",
-        description: error.message,
-        variant: "destructive",
-      })
-    }
-    setIsConnecting(null)
-  }
-
-  const connectMetaMask = async () => {
-    setIsConnecting("MetaMask")
-    try {
-      if (typeof window.ethereum !== "undefined") {
-        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
-
-        if (accounts.length > 0) {
-          const balance = await window.ethereum.request({
-            method: "eth_getBalance",
-            params: [accounts[0], "latest"],
-          })
-
-          const balanceInEth = (Number.parseInt(balance, 16) / Math.pow(10, 18)).toFixed(4)
-
-          const connection = {
-            address: accounts[0],
-            balance: balanceInEth,
-            network: "Ethereum",
-          }
-
-          setConnectedWallets((prev) => [...prev.filter((w) => w !== "MetaMask"), "MetaMask"])
-          setWalletData((prev) => ({ ...prev, MetaMask: connection }))
-
-          toast({
-            title: "🦊 MetaMask Connected!",
-            description: `Connected to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
-          })
-        }
-      } else {
-        window.open("https://metamask.io/", "_blank")
-        toast({
-          title: "MetaMask Required",
-          description: "Please install MetaMask extension",
-        })
-      }
-    } catch (error: any) {
-      toast({
-        title: "MetaMask Connection Failed",
-        description: error.message,
-        variant: "destructive",
-      })
-    }
-    setIsConnecting(null)
-  }
-
-  const connectPhantom = async () => {
-    setIsConnecting("Phantom")
-    try {
-      if (window.solana && window.solana.isPhantom) {
-        const response = await window.solana.connect()
-        const connection = {
-          address: response.publicKey.toString(),
-          balance: "45.75",
-          network: "Solana",
-        }
-
-        setConnectedWallets((prev) => [...prev.filter((w) => w !== "Phantom"), "Phantom"])
-        setWalletData((prev) => ({ ...prev, Phantom: connection }))
-
-        toast({
-          title: "👻 Phantom Connected!",
-          description: "Connected to Solana network",
-        })
-      } else {
-        window.open("https://phantom.app/", "_blank")
-        toast({
-          title: "Phantom Required",
-          description: "Please install Phantom wallet for Solana",
-        })
-      }
-    } catch (error: any) {
-      toast({
-        title: "Phantom Connection Failed",
-        description: error.message,
-        variant: "destructive",
-      })
-    }
-    setIsConnecting(null)
-  }
-
-  const connectGeneric = (walletName: string) => {
-    setIsConnecting(walletName)
-    setTimeout(() => {
-      setConnectedWallets((prev) => [...prev.filter((w) => w !== walletName), walletName])
-      toast({
-        title: `${walletName} Connected!`,
-        description: "Wallet integration coming soon to WyoVerse!",
-      })
-      setIsConnecting(null)
-    }, 2000)
-  }
-
-  const wallets = [
-    {
-      name: "Coinbase",
-      icon: "🟦",
-      color: "bg-blue-600",
-      action: connectCoinbase,
-    },
-    {
-      name: "Phantom",
-      icon: "👻",
-      color: "bg-purple-600",
-      action: connectPhantom,
-    },
-    {
-      name: "Avalanche",
-      icon: "🔺",
-      color: "bg-red-600",
-      action: connectAvalanche,
-    },
-    {
-      name: "MetaMask",
-      icon: "🦊",
-      color: "bg-orange-600",
-      action: connectMetaMask,
-    },
-    {
-      name: "DESO",
-      icon: "💎",
-      color: "bg-green-600",
-      action: () => connectGeneric("DESO"),
-    },
-    {
-      name: "MUSE",
-      icon: "🎵",
-      color: "bg-pink-600",
-      action: () => connectGeneric("MUSE"),
-    },
-    {
-      name: "Social Good",
-      icon: "🌍",
-      color: "bg-emerald-600",
-      action: () => connectGeneric("Social Good"),
-    },
-  ]
-
-  return (
-    <div className="space-y-4">
-      <h3 className="text-xl font-bold font-serif text-center">Connect Your Wallet</h3>
-
-      {/* Connected Wallets Display */}
-      {connectedWallets.length > 0 && (
-        <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4 mb-4">
-          <h4 className="font-serif font-bold text-green-800 mb-2">Connected Wallets:</h4>
-          <div className="space-y-2">
-            {connectedWallets.map((wallet) => (
-              <div key={wallet} className="flex items-center justify-between bg-white p-2 rounded border">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="font-serif font-medium">{wallet}</span>
-                </div>
-                {walletData[wallet] && (
-                  <div className="text-sm text-gray-600">
-                    {walletData[wallet].balance}{" "}
-                    {walletData[wallet].network === "Solana"
-                      ? "SOL"
-                      : walletData[wallet].network === "Avalanche"
-                        ? "AVAX"
-                        : "ETH"}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {wallets.map((wallet) => (
-          <Button
-            key={wallet.name}
-            onClick={wallet.action}
-            disabled={isConnecting === wallet.name}
-            className={`${wallet.color} hover:opacity-80 text-white font-serif flex flex-col items-center p-4 h-auto relative`}
-          >
-            {connectedWallets.includes(wallet.name) && (
-              <CheckCircle className="absolute top-1 right-1 h-4 w-4 text-green-300" />
-            )}
-            <span className="text-2xl mb-1">{wallet.icon}</span>
-            <span className="text-xs">{isConnecting === wallet.name ? "Connecting..." : wallet.name}</span>
-          </Button>
-        ))}
-      </div>
-
-      <div className="flex gap-4 justify-center mt-6">
-        <Link href="https://cryptoclashers.games" target="_blank">
-          <Button className="bg-yellow-600 hover:bg-yellow-700 text-white font-serif">
-            <ExternalLink className="h-4 w-4 mr-2" />
-            CryptoClashers.games
-          </Button>
-        </Link>
-        <Link href="https://stoneyard.cash" target="_blank">
-          <Button className="bg-gray-700 hover:bg-gray-800 text-white font-serif">
-            <ExternalLink className="h-4 w-4 mr-2" />
-            StoneYard.cash
-          </Button>
-        </Link>
-      </div>
-    </div>
-  )
 }
 
 export function EnhancedGamesPortal() {
-  const [selectedModel, setSelectedModel] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState("overview")
+  const [hologramActive, setHologramActive] = useState(false)
+  const [selectedCharacter, setSelectedCharacter] = useState<GameCharacter | null>(null)
+  const [walletConnections, setWalletConnections] = useState<WalletConnection[]>([
+    { name: "Coinbase", icon: "🟦", connected: false, color: "bg-blue-500" },
+    { name: "Phantom", icon: "👻", connected: false, color: "bg-purple-500" },
+    { name: "Avalanche", icon: "🔺", connected: false, color: "bg-red-500" },
+    { name: "MetaMask", icon: "🦊", connected: false, color: "bg-orange-500" },
+    { name: "DESO", icon: "💎", connected: false, color: "bg-green-500" },
+    { name: "MUSE", icon: "🎵", connected: false, color: "bg-pink-500" },
+    { name: "Social Good", icon: "🌍", connected: false, color: "bg-emerald-500" },
+  ])
+  const [cryptoPrices, setCryptoPrices] = useState<any>({})
+  const [isConnecting, setIsConnecting] = useState<string | null>(null)
+
   const { toast } = useToast()
 
-  const models3D = [
+  // Initialize APIs
+  const avalancheIntegration = new AvalancheIntegration()
+  const coinbaseAPI = new CoinbaseAPI()
+
+  useEffect(() => {
+    // Load crypto prices on component mount
+    loadCryptoPrices()
+  }, [])
+
+  const loadCryptoPrices = async () => {
+    try {
+      const prices = await coinbaseAPI.getSpotPrices(["BTC-USD", "ETH-USD", "AVAX-USD"])
+      setCryptoPrices(prices)
+    } catch (error) {
+      console.error("Failed to load crypto prices:", error)
+    }
+  }
+
+  const connectWallet = async (walletName: string) => {
+    setIsConnecting(walletName)
+
+    try {
+      let connection: Partial<WalletConnection> = {}
+
+      switch (walletName) {
+        case "Avalanche":
+          const avalancheResult = await avalancheIntegration.connectWallet()
+          if (avalancheResult.success) {
+            connection = {
+              connected: true,
+              address: avalancheResult.address,
+              balance: `${avalancheResult.balance} AVAX`,
+            }
+            toast({
+              title: "Avalanche Connected!",
+              description: `Connected to ${avalancheResult.address?.slice(0, 6)}...${avalancheResult.address?.slice(-4)}`,
+            })
+          }
+          break
+
+        case "Coinbase":
+          // Coinbase Wallet connection logic
+          if (typeof window !== "undefined" && (window as any).ethereum) {
+            const accounts = await (window as any).ethereum.request({
+              method: "eth_requestAccounts",
+            })
+            if (accounts.length > 0) {
+              const balance = await (window as any).ethereum.request({
+                method: "eth_getBalance",
+                params: [accounts[0], "latest"],
+              })
+              connection = {
+                connected: true,
+                address: accounts[0],
+                balance: `${Number.parseInt(balance, 16) / 1e18} ETH`,
+              }
+              toast({
+                title: "Coinbase Connected!",
+                description: `Connected to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
+              })
+            }
+          }
+          break
+
+        case "MetaMask":
+          if (typeof window !== "undefined" && (window as any).ethereum) {
+            const accounts = await (window as any).ethereum.request({
+              method: "eth_requestAccounts",
+            })
+            if (accounts.length > 0) {
+              const balance = await (window as any).ethereum.request({
+                method: "eth_getBalance",
+                params: [accounts[0], "latest"],
+              })
+              connection = {
+                connected: true,
+                address: accounts[0],
+                balance: `${(Number.parseInt(balance, 16) / 1e18).toFixed(4)} ETH`,
+              }
+              toast({
+                title: "MetaMask Connected!",
+                description: `Connected to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
+              })
+            }
+          }
+          break
+
+        default:
+          // Simulate connection for other wallets
+          connection = {
+            connected: true,
+            address: `0x${Math.random().toString(16).substr(2, 8)}...`,
+            balance: `${(Math.random() * 10).toFixed(2)} tokens`,
+          }
+          toast({
+            title: `${walletName} Connected!`,
+            description: "Wallet connected successfully",
+          })
+      }
+
+      setWalletConnections((prev) =>
+        prev.map((wallet) => (wallet.name === walletName ? { ...wallet, ...connection } : wallet)),
+      )
+    } catch (error) {
+      console.error(`Failed to connect ${walletName}:`, error)
+      toast({
+        title: "Connection Failed",
+        description: `Failed to connect to ${walletName}. Please try again.`,
+        variant: "destructive",
+      })
+    } finally {
+      setIsConnecting(null)
+    }
+  }
+
+  const gameCharacters: GameCharacter[] = [
     {
-      id: "holograms",
-      title: "Bull vs Bear Holograms",
-      url: "/models/3d-bull-vs-bear-holograms.glb",
-      description: "Interactive holographic fighters with market-driven animations",
+      id: "crypto-fighter",
+      name: "Crypto Clasher",
+      type: "Fighter",
+      rarity: "legendary",
+      image: "/images/crypto-clashers-fighter.png",
+      stats: { power: 95, speed: 88, defense: 92 },
     },
     {
-      id: "bull-boxer",
-      title: "3D Bull Boxer",
-      url: "/models/bull-3d-boxer.glb",
-      description: "Detailed bull fighter with crypto-powered combat moves",
+      id: "frontier-trader",
+      name: "Frontier Trader",
+      type: "Trader",
+      rarity: "epic",
+      image: "/images/frontiertraderposter.jpg",
+      stats: { power: 75, speed: 95, defense: 80 },
+    },
+    {
+      id: "bar-keep-bill",
+      name: "Bar Keep Bill",
+      type: "Advisor",
+      rarity: "legendary",
+      image: "/images/bar-keep-bill-poster.png",
+      stats: { power: 70, speed: 60, defense: 90 },
+    },
+    {
+      id: "clutch-mechanic",
+      name: "Clutch the Mechanic",
+      type: "Engineer",
+      rarity: "rare",
+      image: "/images/clutch-on-horse.webp",
+      stats: { power: 85, speed: 75, defense: 88 },
     },
   ]
 
-  const characterGallery = [
-    {
-      name: "Clutch - The Pixel Boxer",
-      image:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/clutchpiskelboxer-YWPvJ8eSnJWD1vYu66im3TtFegPUwW.gif",
-      description: "Animated pixel art boxer with retro gaming vibes",
-    },
-    {
-      name: "Clutch - The Armored Rider",
-      image:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Clutchonhorse-yL2WHTseGsQCBG3cSfUOCWNdlov493.webp",
-      description: "Fantasy warrior on horseback, ready for adventure",
-    },
-    {
-      name: "The Wolf Pack",
-      image:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/wolfmanveniceai-zcrid6XP4sXXh52D7dQeUNKfDh8nwr.webp",
-      description: "Mysterious figures in the foggy streets",
-    },
-    {
-      name: "Crypto Clashers Fighter",
-      image: "/images/crypto-clashers-fighter.png",
-      description: "Elite street fighter with energy-charged combat abilities",
-    },
-    {
-      name: "Frontier Trader",
-      image:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/frontiertraderposter.jpg-qkFwH7ktU7ngpOes7GOZJg2ivot7wr.jpeg",
-      description: "Master trader navigating the digital frontier markets",
-      isTrader: true,
-      link: "/frontier-trader",
-    },
-  ]
+  const getRarityColor = (rarity: string) => {
+    switch (rarity) {
+      case "legendary":
+        return "text-yellow-500 border-yellow-500"
+      case "epic":
+        return "text-purple-500 border-purple-500"
+      case "rare":
+        return "text-blue-500 border-blue-500"
+      default:
+        return "text-gray-500 border-gray-500"
+    }
+  }
 
   return (
-    <div className="space-y-8">
-      {/* Header with WyoVerse Stone Wanted Poster */}
-      <div className="newspaper-article">
-        <div className="newspaper-article-inner">
-          <div className="relative h-96 mb-6">
-            <Image
-              src="/images/wyoverse-stone-wanted-poster.png"
-              alt="WyoVerse - New Era in GameFi"
-              fill
-              className="object-cover border-4 border-black"
-            />
+    <div className="newspaper-bg min-h-screen p-6">
+      {/* Hero Header with WyoVerse Stone Wanted Poster */}
+      <div className="relative mb-8 overflow-hidden rounded-lg border-4 border-black">
+        <Image
+          src="/images/wyoverse-stone-wanted-poster.png"
+          alt="WyoVerse Gaming Portal"
+          width={1200}
+          height={600}
+          className="w-full h-[400px] object-cover"
+        />
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+          <div className="text-center text-white">
+            <h1 className="text-6xl font-serif font-bold mb-4 headline-primary">WYOVERSE GAMING PORTAL</h1>
+            <p className="text-2xl font-serif headline-secondary">
+              New Era in GameFi - Where Crypto Meets the Frontier
+            </p>
           </div>
         </div>
       </div>
 
-      {/* 3D Models Showcase with Holograms */}
-      <div className="newspaper-article">
-        <div className="newspaper-article-inner">
-          <h2 className="text-3xl font-bold font-serif text-center mb-6 border-b-2 border-black pb-2">
-            3D HOLOGRAPHIC CHARACTER MODELS
-          </h2>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-5 mb-8 border-2 border-black">
+          <TabsTrigger value="overview" className="font-serif">
+            🎮 Overview
+          </TabsTrigger>
+          <TabsTrigger value="characters" className="font-serif">
+            👤 Characters
+          </TabsTrigger>
+          <TabsTrigger value="tournaments" className="font-serif">
+            🏆 Tournaments
+          </TabsTrigger>
+          <TabsTrigger value="holograms" className="font-serif">
+            ✨ 3D Models
+          </TabsTrigger>
+          <TabsTrigger value="ecosystem" className="font-serif">
+            🌐 Ecosystem
+          </TabsTrigger>
+        </TabsList>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {models3D.map((model) => (
-              <div key={model.id} className="border-4 border-black p-1">
-                <div className="border-2 border-black p-4 bg-white">
-                  <Model3DViewer modelUrl={model.url} title={model.title} />
-                  <div className="mt-4">
-                    <h3 className="text-xl font-bold font-serif">{model.title}</h3>
-                    <p className="text-sm font-serif mt-2">{model.description}</p>
+        <TabsContent value="overview" className="space-y-6">
+          {/* Wallet Connection Section */}
+          <Card className="border-4 border-black newspaper-article">
+            <CardHeader className="border-b-2 border-black bg-amber-100">
+              <CardTitle className="font-serif headline-primary flex items-center gap-2">
+                <Wallet className="h-6 w-6" />
+                Connect Your Wallets
+              </CardTitle>
+              <CardDescription className="font-serif">
+                Connect multiple wallets to access all WyoVerse features
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                {walletConnections.map((wallet) => (
+                  <div key={wallet.name} className="text-center">
                     <Button
-                      className="mt-3 w-full bg-purple-600 text-white hover:bg-purple-700 font-serif"
-                      onClick={() => {
-                        toast({
-                          title: "Hologram Viewer Loading",
-                          description: "Advanced 3D holographic display activating!",
-                        })
-                      }}
+                      onClick={() => connectWallet(wallet.name)}
+                      disabled={isConnecting === wallet.name}
+                      className={`w-full h-20 flex flex-col items-center justify-center gap-2 ${
+                        wallet.connected ? "bg-green-500 hover:bg-green-600" : wallet.color
+                      } text-white font-serif`}
                     >
-                      <Eye className="h-4 w-4 mr-2" />
-                      View in 3D Hologram
+                      <span className="text-2xl">{wallet.icon}</span>
+                      <span className="text-xs">{isConnecting === wallet.name ? "Connecting..." : wallet.name}</span>
+                      {wallet.connected && <span className="text-xs">✓</span>}
                     </Button>
+                    {wallet.connected && wallet.address && (
+                      <div className="mt-2 text-xs font-mono">
+                        <div>
+                          {wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}
+                        </div>
+                        <div className="text-green-600 font-bold">{wallet.balance}</div>
+                      </div>
+                    )}
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
+            </CardContent>
+          </Card>
+
+          {/* Game Links Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="border-4 border-black newspaper-article">
+              <CardHeader className="border-b-2 border-black bg-red-100">
+                <CardTitle className="font-serif headline-primary">🥊 Crypto Clashers</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <Image
+                  src="/images/crypto-clashers-fighter.png"
+                  alt="Crypto Clashers"
+                  width={300}
+                  height={200}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                />
+                <p className="font-serif mb-4">
+                  Enter the ring and battle with crypto-powered fighters in the ultimate blockchain boxing experience.
+                </p>
+                <Link href="https://CryptoClashers.games" target="_blank">
+                  <Button className="frontier-button w-full font-serif">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Play Crypto Clashers
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="border-4 border-black newspaper-article">
+              <CardHeader className="border-b-2 border-black bg-amber-100">
+                <CardTitle className="font-serif headline-primary">⛏️ Stone Yard</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <Image
+                  src="/images/bar-keep-bill-poster.png"
+                  alt="Stone Yard"
+                  width={300}
+                  height={200}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                />
+                <p className="font-serif mb-4">
+                  Mine, trade, and build your fortune in the digital frontier's premier mining simulation.
+                </p>
+                <Link href="https://StoneYard.cash" target="_blank">
+                  <Button className="frontier-button w-full font-serif">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Visit Stone Yard
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
           </div>
-        </div>
-      </div>
 
-      {/* Character Gallery with Wallet Connection */}
-      <div className="newspaper-article">
-        <div className="newspaper-article-inner">
-          <h2 className="text-3xl font-bold font-serif text-center mb-6 border-b-2 border-black pb-2">
-            CHARACTER GALLERY & WALLET CONNECTION
-          </h2>
+          {/* Live Market Data */}
+          {Object.keys(cryptoPrices).length > 0 && (
+            <Card className="border-4 border-black newspaper-article">
+              <CardHeader className="border-b-2 border-black bg-green-100">
+                <CardTitle className="font-serif headline-primary flex items-center gap-2">
+                  <Coins className="h-6 w-6" />
+                  Live Market Data
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {Object.entries(cryptoPrices).map(([pair, price]: [string, any]) => (
+                    <div key={pair} className="text-center p-4 border-2 border-black rounded-lg">
+                      <div className="font-serif font-bold text-lg">{pair}</div>
+                      <div className="text-2xl font-bold text-green-600">${price.amount}</div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
 
-          <div className="mb-8">
-            <WalletConnector />
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            {characterGallery.map((character, index) => (
-              <div key={index} className="border-4 border-black p-1">
-                <div className="border-2 border-black p-4 bg-white">
-                  <div className="relative h-48 mb-4">
-                    <Image
-                      src={character.image || "/placeholder.svg"}
-                      alt={character.name}
-                      fill
-                      className="object-cover border-2 border-black"
-                    />
+        <TabsContent value="characters" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {gameCharacters.map((character) => (
+              <Card
+                key={character.id}
+                className={`border-4 border-black newspaper-article cursor-pointer hover:shadow-lg transition-shadow ${getRarityColor(character.rarity)}`}
+              >
+                <CardHeader className="text-center">
+                  <Avatar className="w-24 h-24 mx-auto mb-4">
+                    <AvatarImage src={character.image || "/placeholder.svg"} alt={character.name} />
+                    <AvatarFallback>{character.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <CardTitle className="font-serif">{character.name}</CardTitle>
+                  <Badge variant="outline" className={getRarityColor(character.rarity)}>
+                    {character.rarity}
+                  </Badge>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="font-serif">Power:</span>
+                      <Progress value={character.stats.power} className="w-20" />
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-serif">Speed:</span>
+                      <Progress value={character.stats.speed} className="w-20" />
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-serif">Defense:</span>
+                      <Progress value={character.stats.defense} className="w-20" />
+                    </div>
                   </div>
-                  <h3 className="text-lg font-bold font-serif">{character.name}</h3>
-                  <p className="text-sm font-serif mt-2">{character.description}</p>
-
-                  {character.isTrader && (
-                    <Link href={character.link || "#"}>
-                      <Button className="mt-3 w-full bg-green-600 hover:bg-green-700 text-white font-serif">
+                  {character.id === "frontier-trader" && (
+                    <Link href="/frontier-trader" className="mt-4 block">
+                      <Button className="frontier-button w-full font-serif">
                         <ExternalLink className="h-4 w-4 mr-2" />
                         Visit Frontier Trader
                       </Button>
                     </Link>
                   )}
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
-        </div>
-      </div>
+        </TabsContent>
 
-      {/* Tournaments with Weird C.F.D. Image */}
-      <div className="newspaper-article">
-        <div className="newspaper-article-inner">
-          <h2 className="text-3xl font-bold font-serif text-center mb-6 border-b-2 border-black pb-2">
-            UPCOMING TOURNAMENTS & EVENTS
-          </h2>
-
-          <div className="mb-6">
-            <div className="relative h-64 border-4 border-black">
-              <Image
-                src="/images/weirdC.H.F.D.img.png"
-                alt="Cheyenne Frontier Days Championship"
-                fill
-                className="object-cover"
-              />
-              <div className="absolute bottom-0 left-0 right-0 bg-black/80 text-white p-4">
-                <h3 className="text-xl font-bold font-serif">Cheyenne Frontier Days Championship</h3>
-                <p className="font-serif">The ultimate WyoVerse tournament experience</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="border-4 border-black p-1">
-              <div className="border-2 border-black p-4 bg-white">
-                <div className="flex gap-4">
-                  <div className="w-24 h-24 relative flex-shrink-0">
-                    <Image
-                      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/arialcheyennerodeo-ZhM5k3peZKJQIuvYvyx3nje6bSjYUq.png"
-                      alt="Cheyenne Frontier Days"
-                      fill
-                      className="object-cover border border-black"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold font-serif">Cheyenne Frontier Days Championship</h3>
-                    <p className="text-sm font-serif text-gray-600">All Games Tournament</p>
-                    <div className="mt-2 grid grid-cols-3 gap-4 text-sm">
-                      <div>
-                        <span className="font-serif font-medium">Prize Pool:</span>
-                        <p className="font-serif">10,000 STONES</p>
-                      </div>
-                      <div>
-                        <span className="font-serif font-medium">Date:</span>
-                        <p className="font-serif">July 22-31, 2024</p>
-                      </div>
-                      <div>
-                        <span className="font-serif font-medium">Participants:</span>
-                        <p className="font-serif">50,000+</p>
-                      </div>
+        <TabsContent value="tournaments" className="space-y-6">
+          <Card className="border-4 border-black newspaper-article">
+            <CardHeader className="border-b-2 border-black bg-yellow-100">
+              <CardTitle className="font-serif headline-primary flex items-center gap-2">
+                <Trophy className="h-6 w-6" />
+                Cheyenne Frontier Days Championship
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                  <Image
+                    src="/images/weirdC.H.F.D.img.png"
+                    alt="Cheyenne Frontier Days Championship"
+                    width={500}
+                    height={300}
+                    className="w-full h-64 object-cover rounded-lg border-2 border-black"
+                  />
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-serif font-bold">The Ultimate Frontier Tournament</h3>
+                  <p className="font-serif">
+                    Join the most prestigious gaming tournament in the digital frontier. Compete in multiple games
+                    across the WyoVerse ecosystem for massive crypto prizes and eternal glory.
+                  </p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="font-serif">Prize Pool:</span>
+                      <span className="font-bold">$50,000 USDC</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-serif">Entry Fee:</span>
+                      <span className="font-bold">0.1 ETH</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-serif">Start Date:</span>
+                      <span className="font-bold">July 4th, 2024</span>
                     </div>
                   </div>
-                  <div className="flex items-center">
-                    <Button variant="outline" className="font-serif border-black bg-transparent">
-                      Register Now
-                    </Button>
+                  <Button className="frontier-button w-full font-serif">
+                    <Trophy className="h-4 w-4 mr-2" />
+                    Register for Tournament
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="holograms" className="space-y-6">
+          <Card className="border-4 border-black newspaper-article">
+            <CardHeader className="border-b-2 border-black bg-purple-100">
+              <CardTitle className="font-serif headline-primary flex items-center gap-2">
+                <Sparkles className="h-6 w-6" />
+                3D Holographic Models
+              </CardTitle>
+              <CardDescription className="font-serif">
+                View interactive 3D models of your favorite WyoVerse characters
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="text-center mb-6">
+                <Button
+                  onClick={() => setHologramActive(!hologramActive)}
+                  className={`frontier-button font-serif ${hologramActive ? "bg-purple-600" : ""}`}
+                >
+                  {hologramActive ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+                  {hologramActive ? "Deactivate Holograms" : "Activate Holograms"}
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div
+                  className={`relative border-4 border-purple-500 rounded-lg p-6 h-64 ${hologramActive ? "bg-purple-900/20 animate-pulse" : "bg-gray-100"}`}
+                >
+                  <h3 className="font-serif font-bold text-center mb-4">Bull vs Bear Hologram</h3>
+                  {hologramActive ? (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-6xl animate-spin">🐂⚡🐻</div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                      <div className="text-center">
+                        <Sparkles className="h-12 w-12 mx-auto mb-2" />
+                        <p className="font-serif">Hologram Inactive</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  className={`relative border-4 border-orange-500 rounded-lg p-6 h-64 ${hologramActive ? "bg-orange-900/20 animate-pulse" : "bg-gray-100"}`}
+                >
+                  <h3 className="font-serif font-bold text-center mb-4">Bull Boxer Hologram</h3>
+                  {hologramActive ? (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-6xl animate-bounce">🥊🐂🥊</div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                      <div className="text-center">
+                        <Sparkles className="h-12 w-12 mx-auto mb-2" />
+                        <p className="font-serif">Hologram Inactive</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {hologramActive && (
+                <div className="mt-6 p-4 bg-purple-100 border-2 border-purple-500 rounded-lg">
+                  <p className="font-serif text-center text-purple-800">
+                    🌟 Holograms Active! Experience the future of gaming with interactive 3D characters 🌟
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="ecosystem" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: "Digital Rodeo", icon: "🤠", description: "Ride the crypto waves" },
+              { title: "Mining Operations", icon: "⛏️", description: "Extract digital gold" },
+              { title: "Trading Post", icon: "💰", description: "Buy, sell, trade assets" },
+              { title: "Saloon Social", icon: "🍺", description: "Meet fellow pioneers" },
+            ].map((feature, index) => (
+              <Card key={index} className="border-4 border-black newspaper-article">
+                <CardContent className="p-6 text-center">
+                  <div className="relative mb-4">
+                    <Image
+                      src="/images/clutch-on-horse.webp"
+                      alt={feature.title}
+                      width={200}
+                      height={150}
+                      className="w-full h-32 object-cover rounded-lg"
+                    />
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
+                      <span className="text-4xl">{feature.icon}</span>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </div>
+                  <h3 className="font-serif font-bold text-lg mb-2">{feature.title}</h3>
+                  <p className="font-serif text-sm text-gray-600 mb-4">{feature.description}</p>
+                  <Button className="frontier-button w-full font-serif">
+                    <Play className="h-4 w-4 mr-2" />
+                    Explore
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        </div>
-      </div>
 
-      {/* WyoVerse Ecosystem Features - All linking to Clutch working on car */}
-      <div className="newspaper-article">
-        <div className="newspaper-article-inner">
-          <h2 className="text-3xl font-bold font-serif text-center mb-6 border-b-2 border-black pb-2">
-            WYOVERSE ECOSYSTEM FEATURES
-          </h2>
-
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <div className="border-4 border-black p-1">
-              <div className="border-2 border-black p-4 bg-white text-center">
-                <div className="relative h-32 mb-4">
-                  <Image
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Clutchonhorse-yL2WHTseGsQCBG3cSfUOCWNdlov493.webp"
-                    alt="Clutch Working on Car"
-                    fill
-                    className="object-cover border border-black"
-                  />
+          {/* Devils Tower Mystery Section */}
+          <Card className="border-4 border-black newspaper-article">
+            <CardHeader className="border-b-2 border-black bg-gray-100">
+              <CardTitle className="font-serif headline-primary">🗿 The Devils Tower Mystery</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Image
+                  src="/images/devils-tower-mystery.png"
+                  alt="Devils Tower Mystery"
+                  width={500}
+                  height={400}
+                  className="w-full h-64 object-cover rounded-lg border-2 border-black"
+                />
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-serif font-bold">Ancient Secrets Await</h3>
+                  <p className="font-serif">
+                    Deep in the Wyoming wilderness, Devils Tower holds secrets that predate the digital frontier.
+                    Strange phenomena have been reported, and some say the tower itself pulses with an otherworldly
+                    energy that affects cryptocurrency markets.
+                  </p>
+                  <p className="font-serif">
+                    Join expeditions to uncover the truth behind the mysterious figure that guards the tower, and
+                    discover how ancient powers might influence modern blockchain technology.
+                  </p>
+                  <Button className="frontier-button w-full font-serif">
+                    <Zap className="h-4 w-4 mr-2" />
+                    Investigate the Mystery
+                  </Button>
                 </div>
-                <h3 className="font-bold font-serif">Green Energy</h3>
-                <p className="text-sm font-serif">Sustainable Wyoming power systems</p>
-                <Button size="sm" className="mt-2 w-full font-serif">
-                  <Play className="h-3 w-3 mr-1" />
-                  Explore
-                </Button>
               </div>
-            </div>
-
-            <div className="border-4 border-black p-1">
-              <div className="border-2 border-black p-4 bg-white text-center">
-                <div className="relative h-32 mb-4">
-                  <Image
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Clutchonhorse-yL2WHTseGsQCBG3cSfUOCWNdlov493.webp"
-                    alt="Clutch Working on Car"
-                    fill
-                    className="object-cover border border-black"
-                  />
-                </div>
-                <h3 className="font-bold font-serif">Horse Racing</h3>
-                <p className="text-sm font-serif">8 horses in the gate racing</p>
-                <Button size="sm" className="mt-2 w-full font-serif">
-                  <Play className="h-3 w-3 mr-1" />
-                  Race Now
-                </Button>
-              </div>
-            </div>
-
-            <div className="border-4 border-black p-1">
-              <div className="border-2 border-black p-4 bg-white text-center">
-                <div className="relative h-32 mb-4">
-                  <Image
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Clutchonhorse-yL2WHTseGsQCBG3cSfUOCWNdlov493.webp"
-                    alt="Clutch Working on Car"
-                    fill
-                    className="object-cover border border-black"
-                  />
-                </div>
-                <h3 className="font-bold font-serif">Crypto Integration</h3>
-                <p className="text-sm font-serif">Real market data integration</p>
-                <Button size="sm" className="mt-2 w-full font-serif">
-                  <Play className="h-3 w-3 mr-1" />
-                  Trade
-                </Button>
-              </div>
-            </div>
-
-            <div className="border-4 border-black p-1">
-              <div className="border-2 border-black p-4 bg-white text-center">
-                <div className="relative h-32 mb-4">
-                  <Image
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Clutchonhorse-yL2WHTseGsQCBG3cSfUOCWNdlov493.webp"
-                    alt="Clutch Working on Car"
-                    fill
-                    className="object-cover border border-black"
-                  />
-                </div>
-                <h3 className="font-bold font-serif">Tournaments</h3>
-                <p className="text-sm font-serif">Compete for prizes and glory</p>
-                <Button size="sm" className="mt-2 w-full font-serif">
-                  <Trophy className="h-3 w-3 mr-1" />
-                  Compete
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
