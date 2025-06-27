@@ -1,271 +1,222 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { useToast } from "@/components/ui/use-toast"
-import { Wind, Droplet, Flame, Mountain, Zap } from "lucide-react"
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts"
-
-type EnergySource = {
-  id: string
-  name: string
-  production: number
-  price: number
-  change: number
-  trend: number[]
-  color: string
-  icon: "wind" | "water" | "gas" | "mineral" | "electric"
-}
-
-const energySources: EnergySource[] = [
-  {
-    id: "energy-1",
-    name: "Wind Power",
-    production: 42,
-    price: 0.045,
-    change: 2.3,
-    trend: [40, 41, 39, 40, 42, 43, 42],
-    color: "#4ade80",
-    icon: "wind",
-  },
-  {
-    id: "energy-2",
-    name: "Oil & Gas",
-    production: 35,
-    price: 3.75,
-    change: -1.2,
-    trend: [38, 37, 36, 35, 34, 35, 35],
-    color: "#f97316",
-    icon: "gas",
-  },
-  {
-    id: "energy-3",
-    name: "Coal",
-    production: 15,
-    price: 65.2,
-    change: -3.5,
-    trend: [20, 19, 18, 17, 16, 15, 15],
-    color: "#6b7280",
-    icon: "mineral",
-  },
-  {
-    id: "energy-4",
-    name: "Hydroelectric",
-    production: 8,
-    price: 0.038,
-    change: 0.5,
-    trend: [7, 7.5, 8, 8, 7.5, 8, 8],
-    color: "#3b82f6",
-    icon: "water",
-  },
-]
-
-const productionData = [
-  { name: "Wind", value: 42, color: "#4ade80" },
-  { name: "Oil & Gas", value: 35, color: "#f97316" },
-  { name: "Coal", value: 15, color: "#6b7280" },
-  { name: "Hydro", value: 8, color: "#3b82f6" },
-]
-
-const historicalData = [
-  { month: "Jan", Wind: 38, "Oil & Gas": 40, Coal: 22, Hydro: 7 },
-  { month: "Feb", Wind: 39, "Oil & Gas": 39, Coal: 21, Hydro: 7 },
-  { month: "Mar", Wind: 40, "Oil & Gas": 38, Coal: 20, Hydro: 7.5 },
-  { month: "Apr", Wind: 41, "Oil & Gas": 37, Coal: 19, Hydro: 8 },
-  { month: "May", Wind: 42, "Oil & Gas": 36, Coal: 18, Hydro: 8 },
-  { month: "Jun", Wind: 43, "Oil & Gas": 35, Coal: 17, Hydro: 7.5 },
-  { month: "Jul", Wind: 42, "Oil & Gas": 35, Coal: 15, Hydro: 8 },
-]
+import { TrendingUp, TrendingDown, Zap, Mountain, Coins, AlertTriangle } from "lucide-react"
+import Image from "next/image"
 
 export function EnergyMarkets() {
-  const { toast } = useToast()
-  const [geoData, setGeoData] = useState({
-    latitude: 43.0731,
-    longitude: 107.2903,
-    region: "Central Wyoming",
-  })
-
-  useEffect(() => {
-    // Simulate getting user's location
-    const interval = setInterval(() => {
-      // Randomly adjust location slightly to simulate movement
-      setGeoData((prev) => ({
-        ...prev,
-        latitude: prev.latitude + (Math.random() * 0.01 - 0.005),
-        longitude: prev.longitude + (Math.random() * 0.01 - 0.005),
-      }))
-    }, 10000)
-
-    return () => clearInterval(interval)
-  }, [])
-
-  const handleInvest = (source: EnergySource) => {
-    toast({
-      title: "Investment Initiated",
-      description: `You're investing in ${source.name} at $${source.price.toFixed(2)}.`,
-    })
-  }
+  const naturalResourceCoins = [
+    { name: "Petro Gold", symbol: "PAXG", price: "$2,045.67", change: "+2.3%", trend: "up", icon: "🥇" },
+    { name: "Silver Token", symbol: "PSLV", price: "$24.89", change: "+1.8%", trend: "up", icon: "🥈" },
+    { name: "Oil Coin", symbol: "OIL", price: "$78.45", change: "-0.5%", trend: "down", icon: "🛢️" },
+    { name: "Natural Gas", symbol: "NGAS", price: "$3.21", change: "+4.2%", trend: "up", icon: "⛽" },
+    { name: "Copper Token", symbol: "COPR", price: "$4.12", change: "+1.1%", trend: "up", icon: "🔶" },
+    { name: "Uranium Coin", symbol: "URA", price: "$89.34", change: "+6.7%", trend: "up", icon: "⚛️" },
+    { name: "Coal Energy", symbol: "COAL", price: "$156.78", change: "-2.1%", trend: "down", icon: "⚫" },
+    { name: "Lithium Token", symbol: "LTHM", price: "$45.67", change: "+3.4%", trend: "up", icon: "🔋" },
+    { name: "Rare Earth", symbol: "REMX", price: "$67.89", change: "+2.8%", trend: "up", icon: "💎" },
+    { name: "Wind Power", symbol: "WIND", price: "$34.56", change: "+5.1%", trend: "up", icon: "💨" },
+  ]
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-6 md:grid-cols-2">
-        <div>
-          <h3 className="text-xl font-bold mb-4">Energy Production</h3>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={productionData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                >
-                  {productionData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => `${value}%`} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-xl font-bold mb-4">Historical Trends</h3>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={historicalData}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="Wind" stroke="#4ade80" />
-                <Line type="monotone" dataKey="Oil & Gas" stroke="#f97316" />
-                <Line type="monotone" dataKey="Coal" stroke="#6b7280" />
-                <Line type="monotone" dataKey="Hydro" stroke="#3b82f6" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      <div className="border-t pt-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold">Energy Sources</h3>
-          <div className="text-sm text-muted-foreground">
-            <span>Geo Location: </span>
-            <span>
-              {geoData.latitude.toFixed(4)}°, {geoData.longitude.toFixed(4)}° ({geoData.region})
-            </span>
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          {energySources.map((source) => (
-            <EnergyCard key={source.id} source={source} onInvest={handleInvest} />
-          ))}
-        </div>
-      </div>
-
-      <div className="border-t pt-6">
-        <h3 className="text-xl font-bold mb-4">Regional Energy Availability</h3>
-        <div className="p-4 border rounded-lg">
-          <p className="mb-4">Based on your current location in the WyoVerse, these energy sources are available:</p>
-          <div className="grid gap-4 md:grid-cols-4">
-            <div className="p-3 border rounded-lg flex items-center gap-2">
-              <Wind className="h-5 w-5 text-green-500" />
-              <span>Wind: High</span>
-            </div>
-            <div className="p-3 border rounded-lg flex items-center gap-2">
-              <Flame className="h-5 w-5 text-orange-500" />
-              <span>Natural Gas: Medium</span>
-            </div>
-            <div className="p-3 border rounded-lg flex items-center gap-2">
-              <Mountain className="h-5 w-5 text-gray-500" />
-              <span>Coal: Low</span>
-            </div>
-            <div className="p-3 border rounded-lg flex items-center gap-2">
-              <Droplet className="h-5 w-5 text-blue-500" />
-              <span>Water: Medium</span>
+      {/* Wind Energy Hero Image */}
+      <Card className="border-2 border-amber-700">
+        <CardContent className="p-0">
+          <div className="relative h-64 w-full">
+            <Image
+              src="/images/windmillwyoig.png"
+              alt="Wyoming Wind Turbines - Aerial view of wind energy infrastructure across Wyoming's agricultural landscape"
+              fill
+              className="object-cover rounded-t-lg"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+              <h3 className="text-white text-xl font-bold">Wyoming Wind Power Initiative</h3>
+              <p className="text-white/90 text-sm">Harnessing the frontier winds for sustainable energy production</p>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  )
-}
+        </CardContent>
+      </Card>
 
-function EnergyCard({
-  source,
-  onInvest,
-}: {
-  source: EnergySource
-  onInvest: (source: EnergySource) => void
-}) {
-  return (
-    <div className="border rounded-lg p-4">
-      <div className="flex items-center gap-3">
-        {source.icon === "wind" && <Wind className="h-6 w-6" style={{ color: source.color }} />}
-        {source.icon === "water" && <Droplet className="h-6 w-6" style={{ color: source.color }} />}
-        {source.icon === "gas" && <Flame className="h-6 w-6" style={{ color: source.color }} />}
-        {source.icon === "mineral" && <Mountain className="h-6 w-6" style={{ color: source.color }} />}
-        {source.icon === "electric" && <Zap className="h-6 w-6" style={{ color: source.color }} />}
-        <div>
-          <h3 className="font-medium">{source.name}</h3>
-          <div className="flex items-center gap-2">
-            <span className="text-sm">${source.price.toFixed(3)}</span>
-            <span className={`text-xs ${source.change >= 0 ? "text-green-500" : "text-red-500"}`}>
-              {source.change >= 0 ? "+" : ""}
-              {source.change.toFixed(1)}%
-            </span>
+      {/* Natural Resource Cryptocurrency Markets */}
+      <Card className="border-2 border-amber-700">
+        <CardHeader className="bg-amber-100">
+          <CardTitle className="text-xl font-bold text-amber-900 flex items-center gap-2">
+            <Coins className="h-5 w-5" />
+            NATURAL RESOURCE CRYPTOCURRENCY MARKETS
+          </CardTitle>
+          <p className="text-sm text-amber-700">Top 500 resource-backed digital assets</p>
+        </CardHeader>
+        <CardContent className="p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {naturalResourceCoins.map((coin, index) => (
+              <div key={index} className="border border-amber-300 rounded-lg p-3 bg-amber-50">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{coin.icon}</span>
+                    <div>
+                      <div className="font-bold text-amber-900 text-sm">{coin.name}</div>
+                      <div className="text-xs text-amber-600">{coin.symbol}</div>
+                    </div>
+                  </div>
+                  {coin.trend === "up" ? (
+                    <TrendingUp className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <TrendingDown className="h-4 w-4 text-red-600" />
+                  )}
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-amber-900">{coin.price}</span>
+                  <Badge variant={coin.trend === "up" ? "default" : "destructive"} className="text-xs">
+                    {coin.change}
+                  </Badge>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+          <Button className="w-full mt-4 bg-transparent" variant="outline">
+            View All Resource Markets
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Historical Trends & Research */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Fracking Alternative Research */}
+        <Card className="border-2 border-green-700">
+          <CardHeader className="bg-green-100">
+            <CardTitle className="text-lg font-bold text-green-900 flex items-center gap-2">
+              <Mountain className="h-5 w-5" />
+              SUSTAINABLE EXTRACTION RESEARCH
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="bg-green-50 border-l-4 border-green-600 p-4 mb-4">
+              <h3 className="font-bold text-green-900 mb-2">🎓 University Partnership Opportunity</h3>
+              <p className="text-sm text-green-800 mb-3">
+                The WyoVerse Institute is seeking academic partners to develop revolutionary earth-friendly extraction
+                technologies. Our research initiative aims to replace traditional fracking methods with innovative,
+                ecosystem-preserving alternatives.
+              </p>
+              <div className="text-xs text-green-700 mb-3">
+                <strong>Research Focus Areas:</strong>
+                <ul className="list-disc list-inside mt-1 space-y-1">
+                  <li>Sonic extraction methodologies</li>
+                  <li>Bio-remediation techniques</li>
+                  <li>Minimal surface disruption protocols</li>
+                  <li>Wildlife habitat preservation</li>
+                </ul>
+              </div>
+              <Button size="sm" variant="outline" className="border-green-600 text-green-700 bg-transparent">
+                Partner With Us
+              </Button>
+            </div>
+
+            <div className="text-xs text-green-600 italic">
+              "The future of resource extraction lies in harmony with nature, not dominance over it." - Dr. Sarah
+              Frontier, WyoVerse Research Director
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Old Faithful Geological Changes */}
+        <Card className="border-2 border-orange-700">
+          <CardHeader className="bg-orange-100">
+            <CardTitle className="text-lg font-bold text-orange-900 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              GEOLOGICAL FRONTIER REPORT
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="bg-orange-50 border-l-4 border-orange-600 p-4 mb-4">
+              <h3 className="font-bold text-orange-900 mb-2">🌋 Old Faithful's New Rhythm</h3>
+              <p className="text-sm text-orange-800 mb-3">
+                For decades, Yellowstone's Old Faithful geyser has been as predictable as a frontier timepiece. However,
+                recent observations indicate increased activity and irregular eruption patterns, departing from its
+                historical 90-minute schedule.
+              </p>
+              <p className="text-sm text-orange-800 mb-3">
+                Our geological survey team suggests these changes may correlate with subtle tectonic adjustments
+                occurring across the western continental plates. The Yellowstone Caldera's thermal dynamics appear to be
+                responding to deep crustal movements extending from the Pacific Coast to the Great Plains.
+              </p>
+              <div className="text-xs text-orange-700 mb-3">
+                <strong>Observed Changes:</strong>
+                <ul className="list-disc list-inside mt-1 space-y-1">
+                  <li>Eruption intervals: 60-120 minutes (previously 90±10)</li>
+                  <li>Increased thermal output: +15% average</li>
+                  <li>Seismic micro-tremors: 23% increase</li>
+                  <li>Mineral composition shifts detected</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="text-xs text-orange-600 italic">
+              "The Earth speaks to those who listen. These changes tell a story of deep geological processes that have
+              shaped our frontier for millennia." - Chief Geologist Marcus Rockwell
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="mt-3 flex items-center gap-2">
-        <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-          <div
-            className="h-full rounded-full"
-            style={{
-              width: `${source.production}%`,
-              backgroundColor: source.color,
-            }}
-          />
-        </div>
-        <span className="text-xs">{source.production}%</span>
-      </div>
+      {/* Energy Production Stats */}
+      <Card className="border-2 border-blue-700">
+        <CardHeader className="bg-blue-100">
+          <CardTitle className="text-xl font-bold text-blue-900 flex items-center gap-2">
+            <Zap className="h-5 w-5" />
+            WYOMING ENERGY PRODUCTION
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-900">47%</div>
+              <div className="text-sm text-blue-700">Wind Power</div>
+              <div className="text-xs text-blue-600">Leading the frontier</div>
+            </div>
+            <div className="text-center p-4 bg-gray-100 rounded-lg">
+              <div className="text-2xl font-bold text-gray-900">31%</div>
+              <div className="text-sm text-gray-700">Natural Gas</div>
+              <div className="text-xs text-gray-600">Clean burning</div>
+            </div>
+            <div className="text-center p-4 bg-yellow-100 rounded-lg">
+              <div className="text-2xl font-bold text-yellow-900">15%</div>
+              <div className="text-sm text-yellow-700">Solar</div>
+              <div className="text-xs text-yellow-600">Growing rapidly</div>
+            </div>
+            <div className="text-center p-4 bg-green-100 rounded-lg">
+              <div className="text-2xl font-bold text-green-900">7%</div>
+              <div className="text-sm text-green-700">Hydro</div>
+              <div className="text-xs text-green-600">Mountain streams</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="mt-4 flex justify-between items-center">
-        <span className="text-sm">Production: {source.production}%</span>
-        <Button size="sm" onClick={() => onInvest(source)}>
-          Invest
-        </Button>
-      </div>
+      {/* Market Outlook */}
+      <Card className="border-2 border-purple-700">
+        <CardHeader className="bg-purple-100">
+          <CardTitle className="text-lg font-bold text-purple-900">FRONTIER ENERGY OUTLOOK</CardTitle>
+        </CardHeader>
+        <CardContent className="p-4">
+          <div className="space-y-3 text-sm text-purple-800">
+            <p>
+              <strong>Wind Energy Expansion:</strong> Three new wind farms planned for 2025, expected to increase
+              capacity by 40% and create 500+ frontier jobs.
+            </p>
+            <p>
+              <strong>Crypto Mining Integration:</strong> Renewable energy partnerships with major cryptocurrency
+              operations, utilizing excess wind power during peak production.
+            </p>
+            <p>
+              <strong>Grid Modernization:</strong> Smart grid technology implementation to optimize energy distribution
+              across the digital frontier.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

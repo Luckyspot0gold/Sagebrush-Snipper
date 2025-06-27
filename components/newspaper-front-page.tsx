@@ -1,105 +1,300 @@
+"use client"
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import { Clock, TrendingUp, Users, Star } from "lucide-react"
+import Link from "next/link"
+
 export function NewspaperFrontPage() {
   return (
-    <div className="container mx-auto p-4 font-serif">
-      <header className="text-center mb-8">
-        <h1 className="text-4xl font-bold headline-primary">The Frontier Times</h1>
-        <p className="text-gray-600 italic">"All the News That's Fit to Print... and Some That Isn't!"</p>
-        <p className="text-sm">June 15, 2025</p>
-      </header>
-
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Main Story */}
-        <div className="col-span-2 border-2 border-black p-4">
-          <h2 className="text-2xl font-bold mb-2 headline-secondary">🚀 Frontier Colony Achieves Self-Sufficiency!</h2>
-          <p className="text-sm mb-3 font-serif">
-            After years of struggle, the Ares VI colony has announced complete self-sufficiency in food production and
-            energy. This marks a pivotal moment in the history of space colonization.
-          </p>
-          <img src="https://placehold.co/600x300" alt="Colony Image" className="mb-3" />
-          <p className="text-xs text-gray-700 font-serif italic">
-            "A giant leap for mankind, and a small step for... Martian-kind?" - Governor Anya Sharma
-          </p>
-        </div>
-
-        {/* Weather Report */}
-        <div className="border-2 border-black p-4 bg-yellow-100">
-          <h3 className="font-bold text-lg mb-2 headline-secondary">☀️ Weather Outlook</h3>
-          <p className="text-sm mb-3 font-serif">
-            Expect clear skies and warm temperatures across the region. A slight chance of meteor showers tonight.
-          </p>
-          <ul className="list-disc list-inside text-xs">
-            <li>High: 28°C</li>
-            <li>Low: 15°C</li>
-            <li>UV Index: 8</li>
-          </ul>
-        </div>
-
-        {/* Political Cartoon */}
-        <div className="border-2 border-black p-4">
-          <h3 className="font-bold text-lg mb-2 headline-secondary">😂 Political Satire</h3>
-          <img src="https://placehold.co/300x200" alt="Political Cartoon" className="mb-3" />
-          <p className="text-xs text-gray-700 font-serif italic">
-            "Is this progress, or just another glitch in the matrix?" - Anonymous
-          </p>
-        </div>
-
-        {/* Social Good Network */}
-        <div className="border-2 border-black p-4 bg-blue-50">
-          <h3 className="font-bold text-lg mb-2 headline-secondary">🤝 Social Good Network</h3>
-          <p className="text-sm mb-3 font-serif">
-            Connecting volunteers with organizations making a difference in our community.
-          </p>
-          <div className="flex flex-col gap-2">
-            <a
-              href="https://example.com/volunteer"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-serif text-center transition-colors"
-            >
-              Volunteer at the Local Food Bank
-            </a>
-            <p className="text-xs text-gray-600 font-serif italic">"Lend a hand, make a difference."</p>
+    <div className="min-h-screen bg-amber-50 p-4">
+      {/* Header */}
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center border-b-4 border-amber-800 pb-4 mb-6">
+          <h1 className="text-6xl font-bold text-amber-900 mb-2" style={{ fontFamily: "serif" }}>
+            WYOVERSE PIONEER
+          </h1>
+          <div className="flex justify-between items-center text-sm text-amber-700">
+            <span>ESTABLISHED 2024</span>
+            <span className="text-lg font-semibold">DIGITAL FRONTIER EDITION</span>
+            <span>VOL. 1, NO. 1</span>
           </div>
-          {/* Environmental Conservation */}
-          <div className="border-2 border-black p-4 bg-green-50">
-            <h3 className="font-bold text-lg mb-2 headline-secondary">🦅 SAVE OUR FEATHERED FRIENDS</h3>
-            <p className="text-sm mb-3 font-serif">
-              Climate change threatens bird populations across the frontier. Join the fight to protect our winged
-              companions!
-            </p>
-            <div className="flex flex-col gap-2">
-              <a
-                href="https://act.audubon.org/a/jun-2025-a"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-serif text-center transition-colors"
-              >
-                Stand Up for Birds w/ @audubonsociety
-              </a>
-              <p className="text-xs text-gray-600 font-serif italic">
-                "Help birds through climate change - every action counts in preserving our natural heritage."
-              </p>
-            </div>
+          <div className="text-xs text-amber-600 mt-1">
+            "Where Digital Meets the Wild West" • Wyoming Territory • {new Date().toLocaleDateString()}
           </div>
         </div>
 
-        {/* Classified Ads */}
-        <div className="border-2 border-black p-4 bg-gray-100">
-          <h3 className="font-bold text-lg mb-2 headline-secondary">📢 Classifieds</h3>
-          <ul className="list-none text-sm">
-            <li>
-              <span className="font-bold">For Sale:</span> Hovercar, slightly used. Contact John at 555-1234.
-            </li>
-            <li>
-              <span className="font-bold">Job Opening:</span> Software Engineer at NovaTech. Apply online.
-            </li>
-          </ul>
-        </div>
-      </section>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Main Stories */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Lead Story */}
+            <Card className="border-2 border-amber-800">
+              <CardHeader className="bg-amber-100">
+                <CardTitle className="text-2xl font-bold text-amber-900">
+                  🏔️ DIGITAL GOLD RUSH HITS WYOMING TERRITORY
+                </CardTitle>
+                <Badge variant="secondary" className="w-fit">
+                  BREAKING NEWS
+                </Badge>
+              </CardHeader>
+              <CardContent className="p-6">
+                <p className="text-lg leading-relaxed text-amber-800 mb-4">
+                  Pioneers from across the digital frontier are staking claims in the WyoVerse, where cryptocurrency
+                  meets the untamed wilderness. Land deeds are being traded faster than a gunslinger's draw, and the
+                  saloons are buzzing with talk of blockchain fortunes.
+                </p>
+                <div className="flex gap-2 flex-wrap">
+                  <Link href="/land-deeds">
+                    <Button variant="outline" size="sm">
+                      Stake Your Claim
+                    </Button>
+                  </Link>
+                  <Link href="/saloon">
+                    <Button variant="outline" size="sm">
+                      Visit the Saloon
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
 
-      <footer className="text-center mt-8 text-gray-500 text-xs">
-        © 2025 The Frontier Times. All rights reserved.
-      </footer>
+            {/* Market Report */}
+            <Card className="border-2 border-amber-700">
+              <CardHeader className="bg-amber-50">
+                <CardTitle className="text-xl font-bold text-amber-900 flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  FRONTIER TRADING POST REPORT
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                  <div>
+                    <div className="text-2xl font-bold text-green-600">₿ $67,420</div>
+                    <div className="text-sm text-amber-700">Bitcoin Gold</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-blue-600">Ξ $3,245</div>
+                    <div className="text-sm text-amber-700">Ethereum Silver</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-yellow-600">Ð $0.42</div>
+                    <div className="text-sm text-amber-700">Dogecoin Copper</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-purple-600">◎ $245</div>
+                    <div className="text-sm text-amber-700">Solana Steel</div>
+                  </div>
+                </div>
+                <Link href="/market">
+                  <Button className="w-full mt-4 bg-transparent" variant="outline">
+                    View Full Market
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Community News */}
+            <Card className="border-2 border-amber-700">
+              <CardHeader className="bg-amber-50">
+                <CardTitle className="text-xl font-bold text-amber-900 flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  COMMUNITY ROUNDUP
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-4">
+                <div className="border-l-4 border-amber-600 pl-4">
+                  <h3 className="font-bold text-amber-900">🥊 Crypto Clashers Championship</h3>
+                  <p className="text-sm text-amber-700">
+                    Bar Keep Bill announces the grand opening of the boxing arena! Watch Bull vs Bear matches while
+                    sipping frontier cocktails.
+                  </p>
+                  <Link href="/boxing-arena">
+                    <Button size="sm" variant="outline" className="mt-2 bg-transparent">
+                      Enter the Ring
+                    </Button>
+                  </Link>
+                </div>
+
+                <div className="border-l-4 border-green-600 pl-4">
+                  <h3 className="font-bold text-amber-900">🏇 Digital Rodeo Circuit</h3>
+                  <p className="text-sm text-amber-700">
+                    Saddle up for the wildest ride in the metaverse! Compete in bull riding, barrel racing, and lasso
+                    competitions.
+                  </p>
+                  <Link href="/digital-rodeo">
+                    <Button size="sm" variant="outline" className="mt-2 bg-transparent">
+                      Join the Rodeo
+                    </Button>
+                  </Link>
+                </div>
+
+                <div className="border-l-4 border-blue-600 pl-4">
+                  <h3 className="font-bold text-amber-900">🎨 Art Gallery Opening</h3>
+                  <p className="text-sm text-amber-700">
+                    Local artists showcase NFT masterpieces inspired by Wyoming's natural beauty and frontier spirit.
+                  </p>
+                  <Link href="/art">
+                    <Button size="sm" variant="outline" className="mt-2 bg-transparent">
+                      View Gallery
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Social Good Network */}
+            <Card className="border-2 border-green-700">
+              <CardHeader className="bg-green-50">
+                <CardTitle className="text-xl font-bold text-green-900 flex items-center gap-2">
+                  <Star className="h-5 w-5" />
+                  SOCIAL GOOD NETWORK
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-4">
+                <div className="border-l-4 border-green-600 pl-4">
+                  <h3 className="font-bold text-green-900">🦅 Save Our Feathered Friends</h3>
+                  <p className="text-sm text-green-700 mb-2">
+                    Help birds through climate change. Stand up for birds with @audubonsociety.
+                  </p>
+                  <a href="https://act.audubon.org/a/jun-2025-a" target="_blank" rel="noopener noreferrer">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-green-600 text-green-700 hover:bg-green-50 bg-transparent"
+                    >
+                      Take Action for Birds
+                    </Button>
+                  </a>
+                </div>
+
+                <div className="border-l-4 border-blue-600 pl-4">
+                  <h3 className="font-bold text-blue-900">🌱 Environmental Stewardship</h3>
+                  <p className="text-sm text-blue-700">
+                    Join our community initiatives to protect Wyoming's natural heritage while building the digital
+                    frontier.
+                  </p>
+                </div>
+
+                <div className="border-l-4 border-purple-600 pl-4">
+                  <h3 className="font-bold text-purple-900">🤝 Community Support</h3>
+                  <p className="text-sm text-purple-700">
+                    Supporting local businesses and charities through blockchain technology and community engagement.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Sidebar */}
+          <div className="space-y-6">
+            {/* Weather & Time */}
+            <Card className="border-2 border-amber-600">
+              <CardHeader className="bg-amber-100 text-center">
+                <CardTitle className="text-lg font-bold text-amber-900 flex items-center justify-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  FRONTIER CONDITIONS
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 text-center">
+                <div className="text-3xl font-bold text-amber-900 mb-2">72°F</div>
+                <div className="text-sm text-amber-700">Partly Cloudy</div>
+                <div className="text-xs text-amber-600 mt-2">
+                  Perfect weather for mining crypto and riding the range
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Links */}
+            <Card className="border-2 border-amber-600">
+              <CardHeader className="bg-amber-100">
+                <CardTitle className="text-lg font-bold text-amber-900">FRONTIER SERVICES</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-2">
+                <Link href="/store" className="block">
+                  <Button variant="ghost" className="w-full justify-start text-amber-800 hover:bg-amber-100">
+                    🏪 General Store
+                  </Button>
+                </Link>
+                <Link href="/classifieds" className="block">
+                  <Button variant="ghost" className="w-full justify-start text-amber-800 hover:bg-amber-100">
+                    📰 Classifieds
+                  </Button>
+                </Link>
+                <Link href="/calendar" className="block">
+                  <Button variant="ghost" className="w-full justify-start text-amber-800 hover:bg-amber-100">
+                    📅 Events Calendar
+                  </Button>
+                </Link>
+                <Link href="/education" className="block">
+                  <Button variant="ghost" className="w-full justify-start text-amber-800 hover:bg-amber-100">
+                    🎓 Frontier Academy
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Wanted Poster */}
+            <Card className="border-2 border-red-600 bg-red-50">
+              <CardHeader className="bg-red-100 text-center">
+                <CardTitle className="text-lg font-bold text-red-900">⚠️ WANTED ⚠️</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 text-center">
+                <div className="text-sm text-red-800 mb-2">
+                  <strong>REWARD: 1000 GOLD COINS</strong>
+                </div>
+                <div className="text-xs text-red-700">
+                  Information leading to the capture of the notorious "Rug Pull Bandit" who's been scamming honest
+                  miners.
+                </div>
+                <Button size="sm" variant="outline" className="mt-3 border-red-600 text-red-700 bg-transparent">
+                  Report Sighting
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Games Advertisement */}
+            <Card className="border-2 border-purple-600">
+              <CardHeader className="bg-purple-100">
+                <CardTitle className="text-lg font-bold text-purple-900">🎮 OTHER FRONTIER GAMES</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-3">
+                <div className="text-center">
+                  <h3 className="font-bold text-purple-800">Crypto Clashers</h3>
+                  <p className="text-xs text-purple-700 mb-2">Epic boxing matches between crypto titans!</p>
+                  <a href="https://github.com/LuckyspotOgold" target="_blank" rel="noopener noreferrer">
+                    <Button size="sm" variant="outline" className="border-purple-600 text-purple-700 bg-transparent">
+                      Play Now
+                    </Button>
+                  </a>
+                </div>
+
+                <Separator />
+
+                <div className="text-center">
+                  <h3 className="font-bold text-purple-800">More Adventures</h3>
+                  <p className="text-xs text-purple-700 mb-2">Discover more games at LuckyspotOgold</p>
+                  <a href="https://github.com/LuckyspotOgold" target="_blank" rel="noopener noreferrer">
+                    <Button size="sm" variant="outline" className="border-purple-600 text-purple-700 bg-transparent">
+                      Explore Games
+                    </Button>
+                  </a>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 pt-4 border-t-2 border-amber-800 text-center text-xs text-amber-600">
+          <p>Published by the WyoVerse Pioneer Press • Printed on the finest digital parchment</p>
+          <p className="mt-1">"All the News That's Fit to Mine" • Est. 2024</p>
+        </div>
+      </div>
     </div>
   )
 }
+
+export default NewspaperFrontPage
