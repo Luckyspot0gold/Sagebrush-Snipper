@@ -1,0 +1,29 @@
+# bartender.py
+animations = {
+  "greeting": "animations/wave.anim",
+  "thinking": "animations/scratch_chin.anim",
+  "serving": "animations/pour_whiskey.anim"
+}
+
+def get_animation(response_type):
+  return animations.get(response_type, "animations/default.anim")
+  common_responses = {
+  "hello": ("Howdy partner! What'll it be today?", "greeting"),
+  "weather": ("Dry as a bone 'round these parts!", "thinking"),
+  "bitcoin": ("*spits* That digital gold's wilder than a mustang!", "excited")
+}
+from google.cloud import texttospeech
+
+def speak(text):
+    client = texttospeech.TextToSpeechClient()
+    synthesis_input = texttospeech.SynthesisInput(text=text)
+    voice = texttospeech.VoiceSelectionParams(
+        language_code="en-US", name="en-US-Wavenet-D"
+    )
+    audio_config = texttospeech.AudioConfig(
+        audio_encoding=texttospeech.AudioEncoding.MP3
+    )
+    response = client.synthesize_speech(
+        input=synthesis_input, voice=voice, audio_config=audio_config
+    )
+    return response.audio_content
