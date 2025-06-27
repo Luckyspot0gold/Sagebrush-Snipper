@@ -48,6 +48,7 @@
     "@react-spring/web": "latest",
     "@react-three/drei": "latest",
     "@react-three/fiber": "latest",
+    "@solana/web3.js": "latest",
     "@supabase/auth-helpers-nextjs": "latest",
     "@supabase/supabase-js": "latest",
     "@types/node": "^20",
