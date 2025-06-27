@@ -1,0 +1,28 @@
+0:00-0:15 - Wyoverse newspaper intro
+0:16-0:45 - Connect Coinbase/Phantom/Avalanche wallets
+0:46-1:15 - Crypto Clashers boxing match (show NFT reward)
+1:16-1:45 - FrontierTrader commodity trading
+1:46-2:15 - Bar Keep Bill AI conversation
+2:16-2:45 - Buy special move with Bolt payment
+2:46-3:00 - Revenue counter ($307.90) and closing
+gantt
+    title Last 2 Hours Timeline
+    dateFormat  HH:mm
+    section Fixes
+    Avalanche Connection      :active,  now, 15min
+    DESO/Muse Links           : after avax, 5min
+    section Video
+    Record Demo               : after links, 30min
+    Edit & Upload             : after record, 30min
+    section Submission
+    Prepare Description       : after links, 20min
+    Final Checks              : after video, 15min
+    Submit!                   : after checks, 5min
+// Animated counter in dashboard
+animateValue('revenue-counter', 0, 307.90, 2000);
+try {
+  riskyOperation();
+} catch (error) {
+  showSaloonError("Dagnabbit! Something broke");
+  logError(error);
+}
