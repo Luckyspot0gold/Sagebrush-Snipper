@@ -11,7 +11,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 })
 
-// Server-side client for admin operations
+// Enhanced client for server-side operations
 export const supabaseAdmin = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_KEY!, {
   auth: {
     persistSession: false,
@@ -21,45 +21,53 @@ export const supabaseAdmin = createClient(supabaseUrl, process.env.SUPABASE_SERV
 
 // Wallet linking function
 export async function linkWalletToProfile(userId: string, walletData: any) {
-  try {
-    const { data, error } = await supabase.from("player_wallets").upsert({
-      user_id: userId,
-      wallets: JSON.stringify(walletData),
-      last_updated: new Date().toISOString(),
-    })
+  const { data, error } = await supabase.from("player_wallets").upsert({
+    user_id: userId,
+    wallets: JSON.stringify(walletData),
+    last_updated: new Date().toISOString(),
+  })
 
-    if (error) throw error
-    return data
-  } catch (error) {
-    console.error("Wallet linking failed:", error)
-    throw new Error("Failed to link wallet to profile")
-  }
+  if (error) throw new Error("Wallet linking failed: " + error.message)
+  return data
 }
 
 // Track wallet connections
-export async function trackWalletConnection(userId: string, provider: string, status: string) {
-  try {
-    const { data, error } = await supabase.from("connection_logs").insert({
-      user_id: userId,
-      wallet_type: provider,
-      status: status,
-      timestamp: new Date().toISOString(),
-    })
+export async function trackWalletConnection(userId: string, walletType: string, address: string) {
+  const { data, error } = await supabase.from("connection_logs").insert({
+    user_id: userId,
+    wallet_type: walletType,
+    wallet_address: address,
+    status: "connected",
+    timestamp: new Date().toISOString(),
+  })
 
-    if (error) throw error
-    return data
-  } catch (error) {
-    console.error("Failed to track wallet connection:", error)
-  }
+  if (error) throw new Error("Failed to track connection: " + error.message)
+  return data
 }
 
-// Health check function
-export async function testSupabaseConnection() {
-  try {
-    const { data, error } = await supabase.from("health_check").select("*").limit(1)
+// Get user profile with wallets
+export async function getUserProfile(userId: string) {
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .select(`
+      *,
+      player_wallets (*)
+    `)
+    .eq("id", userId)
+    .single()
 
-    return { success: !error, error: error?.message }
-  } catch (error) {
-    return { success: false, error: "Connection failed" }
-  }
+  if (error) throw new Error("Failed to get user profile: " + error.message)
+  return data
+}
+
+// Update user balance
+export async function updateUserBalance(userId: string, amount: number, currency: string) {
+  const { data, error } = await supabase.rpc("increment_balance", {
+    user_id: userId,
+    amount: amount,
+    currency: currency,
+  })
+
+  if (error) throw new Error("Failed to update balance: " + error.message)
+  return data
 }
