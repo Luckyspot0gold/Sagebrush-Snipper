@@ -1,9 +1,9 @@
 import { createClient } from "@supabase/supabase-js"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-export const supabase = createClient(supabaseUrl, supabaseKey, {
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
@@ -12,7 +12,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 })
 
 // Server-side client for admin operations
-export const supabaseAdmin = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+export const supabaseAdmin = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_KEY!, {
   auth: {
     persistSession: false,
     autoRefreshToken: false,
@@ -25,6 +25,7 @@ export interface WalletData {
     balance: number
     connected: boolean
     provider: string
+    network: string
   }
 }
 
@@ -46,10 +47,10 @@ export interface ConnectionLog {
   id: string
   user_id: string
   wallet_type: string
+  wallet_address: string
   status: "connected" | "disconnected" | "failed"
   timestamp: string
-  ip_address?: string
-  user_agent?: string
+  metadata?: string
 }
 
 // Wallet linking function
@@ -92,7 +93,7 @@ export async function getUserWallets(userId: string): Promise<WalletData | null>
 }
 
 // Track wallet connection events
-export async function logWalletConnection(
+export async function trackWalletConnection(
   userId: string,
   walletType: string,
   status: "connected" | "disconnected" | "failed",
@@ -220,4 +221,14 @@ export function subscribeToCommunityStats(callback: (stats: any) => void) {
 // Cleanup function
 export function unsubscribeFromCommunityStats(subscription: any) {
   supabase.removeChannel(subscription)
+}
+
+// Health check function
+export async function testSupabaseConnection() {
+  try {
+    const { data, error } = await supabase.from("health_check").select("*").limit(1)
+    return { success: !error, error: error?.message }
+  } catch (error) {
+    return { success: false, error: "Connection failed" }
+  }
 }

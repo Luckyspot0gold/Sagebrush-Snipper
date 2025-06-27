@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { Sidebar } from "@/components/sidebar"
 import { Button } from "@/components/ui/button"
@@ -65,12 +64,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100">
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden" onClick={() => setSidebarOpen(false)} />
-      )}
-
+    <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar */}
       <div
         className={cn(
@@ -82,8 +76,8 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-80">
-        {/* Top bar */}
+      <div className="flex flex-col flex-1 overflow-hidden">
+        {/* Header */}
         <div className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-amber-200 bg-white/80 backdrop-blur-sm px-4 lg:px-6">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
@@ -102,7 +96,7 @@ export function DashboardLayout({ children, title, description }: DashboardLayou
         </div>
 
         {/* Page content */}
-        <main className="p-4 lg:p-6">{children}</main>
+        <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </div>
   )

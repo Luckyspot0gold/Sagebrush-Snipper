@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Wallet, ExternalLink, CheckCircle, AlertCircle, Loader2 } from "lucide-react"
-import { linkWalletToProfile } from "@/lib/supabase/client"
+import { Wallet, ExternalLink, CheckCircle, AlertCircle, Loader2, Copy, QrCode, Shield } from "lucide-react"
 
 interface WalletProvider {
   id: string
@@ -24,6 +23,7 @@ interface WalletConnection {
   balance: number
   connected: boolean
   provider: string
+  network: string
 }
 
 const WALLET_PROVIDERS: WalletProvider[] = [
@@ -32,7 +32,7 @@ const WALLET_PROVIDERS: WalletProvider[] = [
     name: "MetaMask",
     icon: "🦊",
     type: "native",
-    description: "Most popular Ethereum wallet",
+    description: "Most popular Ethereum wallet with Avalanche support",
     supported: true,
   },
   {
@@ -40,7 +40,7 @@ const WALLET_PROVIDERS: WalletProvider[] = [
     name: "Coinbase Wallet",
     icon: "🔵",
     type: "native",
-    description: "Coinbase's self-custody wallet",
+    description: "Coinbase's self-custody wallet solution",
     supported: true,
   },
   {
@@ -48,7 +48,7 @@ const WALLET_PROVIDERS: WalletProvider[] = [
     name: "Phantom",
     icon: "👻",
     type: "native",
-    description: "Leading Solana wallet",
+    description: "Leading Solana wallet for DeFi and NFTs",
     supported: true,
   },
   {
@@ -56,7 +56,7 @@ const WALLET_PROVIDERS: WalletProvider[] = [
     name: "Core Wallet",
     icon: "🔥",
     type: "native",
-    description: "Avalanche ecosystem wallet",
+    description: "Official Avalanche ecosystem wallet",
     supported: true,
   },
   {
@@ -64,7 +64,7 @@ const WALLET_PROVIDERS: WalletProvider[] = [
     name: "WalletConnect",
     icon: "🔗",
     type: "native",
-    description: "Connect any mobile wallet",
+    description: "Connect any mobile wallet via QR code",
     supported: true,
   },
   {
@@ -72,7 +72,7 @@ const WALLET_PROVIDERS: WalletProvider[] = [
     name: "Trust Wallet",
     icon: "🛡️",
     type: "native",
-    description: "Multi-chain mobile wallet",
+    description: "Multi-chain mobile wallet solution",
     supported: true,
   },
   {
@@ -81,7 +81,7 @@ const WALLET_PROVIDERS: WalletProvider[] = [
     icon: "💎",
     type: "external",
     url: "https://deso.org/",
-    description: "Decentralized social blockchain",
+    description: "Decentralized social blockchain platform",
     supported: false,
   },
   {
@@ -90,7 +90,7 @@ const WALLET_PROVIDERS: WalletProvider[] = [
     icon: "🎨",
     type: "external",
     url: "https://muse.place/",
-    description: "NFT marketplace and wallet",
+    description: "Creative NFT marketplace and wallet",
     supported: false,
   },
 ]
@@ -100,6 +100,7 @@ export function WalletConnect() {
   const [connecting, setConnecting] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [showQR, setShowQR] = useState(false)
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null)
 
   const connectWallet = async (provider: WalletProvider) => {
     if (provider.type === "external") {
@@ -140,10 +141,8 @@ export function WalletConnect() {
           [provider.id]: connection,
         }))
 
-        // Track connection in Supabase
-        await linkWalletToProfile("demo-user", {
-          [provider.id]: connection,
-        })
+        // Track connection in analytics
+        console.log(`Wallet connected: ${provider.name}`, connection)
       }
     } catch (err) {
       setError(`Failed to connect ${provider.name}: ${err instanceof Error ? err.message : "Unknown error"}`)
@@ -154,7 +153,57 @@ export function WalletConnect() {
 
   const connectMetaMask = async (): Promise<WalletConnection> => {
     if (typeof window.ethereum === "undefined") {
-      throw new Error("MetaMask not installed")
+      throw new Error("MetaMask not installed. Please install MetaMask extension.")
+    }
+
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    })
+
+    // Switch to Avalanche C-Chain
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: "0xA86A" }],
+      })
+    } catch (switchError: any) {
+      if (switchError.code === 4902) {
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [
+            {
+              chainId: "0xA86A",
+              chainName: "Avalanche C-Chain",
+              nativeCurrency: {
+                name: "AVAX",
+                symbol: "AVAX",
+                decimals: 18,
+              },
+              rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
+              blockExplorerUrls: ["https://snowtrace.io/"],
+            },
+          ],
+        })
+      }
+    }
+
+    const balance = await window.ethereum.request({
+      method: "eth_getBalance",
+      params: [accounts[0], "latest"],
+    })
+
+    return {
+      address: accounts[0],
+      balance: Number.parseInt(balance, 16) / 1e18,
+      connected: true,
+      provider: "metamask",
+      network: "Avalanche C-Chain",
+    }
+  }
+
+  const connectCoinbase = async (): Promise<WalletConnection> => {
+    if (typeof window.ethereum === "undefined" || !window.ethereum.isCoinbaseWallet) {
+      throw new Error("Coinbase Wallet not installed. Please install Coinbase Wallet.")
     }
 
     const accounts = await window.ethereum.request({
@@ -170,90 +219,82 @@ export function WalletConnect() {
       address: accounts[0],
       balance: Number.parseInt(balance, 16) / 1e18,
       connected: true,
-      provider: "metamask",
-    }
-  }
-
-  const connectCoinbase = async (): Promise<WalletConnection> => {
-    // Coinbase Wallet SDK integration
-    if (typeof window.ethereum === "undefined") {
-      throw new Error("Coinbase Wallet not available")
-    }
-
-    const accounts = await window.ethereum.request({
-      method: "eth_requestAccounts",
-    })
-
-    return {
-      address: accounts[0],
-      balance: Math.random() * 10, // Mock balance
-      connected: true,
       provider: "coinbase",
+      network: "Ethereum",
     }
   }
 
   const connectPhantom = async (): Promise<WalletConnection> => {
-    if (typeof window.solana === "undefined") {
-      throw new Error("Phantom wallet not installed")
+    if (typeof window.solana === "undefined" || !window.solana.isPhantom) {
+      throw new Error("Phantom wallet not installed. Please install Phantom wallet.")
     }
 
     const response = await window.solana.connect()
+    const balance = await window.solana.getBalance(response.publicKey)
 
     return {
       address: response.publicKey.toString(),
-      balance: Math.random() * 5, // Mock SOL balance
+      balance: balance / 1e9,
       connected: true,
       provider: "phantom",
+      network: "Solana",
     }
   }
 
   const connectCore = async (): Promise<WalletConnection> => {
-    // Core Wallet integration for Avalanche
     if (typeof window.avalanche === "undefined") {
-      throw new Error("Core Wallet not installed")
+      throw new Error("Core Wallet not installed. Please install Core Wallet.")
     }
 
     const accounts = await window.avalanche.request({
       method: "eth_requestAccounts",
     })
 
+    const balance = await window.avalanche.request({
+      method: "eth_getBalance",
+      params: [accounts[0], "latest"],
+    })
+
     return {
       address: accounts[0],
-      balance: Math.random() * 20, // Mock AVAX balance
+      balance: Number.parseInt(balance, 16) / 1e18,
       connected: true,
       provider: "core",
+      network: "Avalanche C-Chain",
     }
   }
 
   const connectWalletConnect = async (): Promise<WalletConnection> => {
     setShowQR(true)
 
-    // Simulate QR code connection
+    // Simulate QR code connection process
     await new Promise((resolve) => setTimeout(resolve, 3000))
 
     setShowQR(false)
 
     return {
       address: "0x" + Math.random().toString(16).substr(2, 40),
-      balance: Math.random() * 15,
+      balance: Math.random() * 10,
       connected: true,
       provider: "walletconnect",
+      network: "Ethereum",
     }
   }
 
   const connectTrust = async (): Promise<WalletConnection> => {
-    // Trust Wallet deep link
+    // Trust Wallet deep link for mobile
     const deepLink = `trust://wallet_connect?uri=${encodeURIComponent(window.location.href)}`
     window.open(deepLink, "_blank")
 
-    // Mock connection after delay
+    // Simulate connection after delay
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
     return {
       address: "0x" + Math.random().toString(16).substr(2, 40),
-      balance: Math.random() * 8,
+      balance: Math.random() * 5,
       connected: true,
       provider: "trust",
+      network: "Ethereum",
     }
   }
 
@@ -265,6 +306,12 @@ export function WalletConnect() {
     })
   }
 
+  const copyAddress = async (address: string) => {
+    await navigator.clipboard.writeText(address)
+    setCopiedAddress(address)
+    setTimeout(() => setCopiedAddress(null), 2000)
+  }
+
   const getTotalBalance = () => {
     return Object.values(connections).reduce((total, conn) => total + conn.balance, 0)
   }
@@ -273,69 +320,83 @@ export function WalletConnect() {
     return Object.keys(connections).length
   }
 
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`
+  }
+
   return (
-    <div className="space-y-6">
-      <Card className="border-2 border-amber-200">
+    <div className="max-w-6xl mx-auto p-6 space-y-6">
+      {/* Header */}
+      <Card className="border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Wallet className="h-5 w-5" />
-            Wallet Connection Hub
+          <CardTitle className="flex items-center text-3xl text-amber-900">
+            <Wallet className="mr-3 h-8 w-8" />
+            WyoVerse Wallet Connection Hub
           </CardTitle>
-          <CardDescription>Connect your wallets to access all WyoVerse features</CardDescription>
+          <CardDescription className="text-lg text-amber-700">
+            Connect your favorite wallets to access the full WyoVerse frontier experience
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{getConnectionCount()}</div>
+              <div className="text-3xl font-bold text-green-600">{getConnectionCount()}</div>
               <div className="text-sm text-gray-600">Connected Wallets</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">${getTotalBalance().toFixed(2)}</div>
+              <div className="text-3xl font-bold text-blue-600">${getTotalBalance().toFixed(4)}</div>
               <div className="text-sm text-gray-600">Total Balance</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">
+              <div className="text-3xl font-bold text-purple-600">
                 {WALLET_PROVIDERS.filter((p) => p.supported).length}
               </div>
               <div className="text-sm text-gray-600">Supported Wallets</div>
             </div>
           </div>
-
-          {error && (
-            <Alert className="mb-4 border-red-200 bg-red-50">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {showQR && (
-            <Alert className="mb-4 border-blue-200 bg-blue-50">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <AlertDescription>Scan QR code with your mobile wallet to connect...</AlertDescription>
-            </Alert>
-          )}
         </CardContent>
       </Card>
+
+      {/* Error Display */}
+      {error && (
+        <Alert className="border-red-200 bg-red-50">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* QR Code Modal */}
+      {showQR && (
+        <Alert className="border-blue-200 bg-blue-50">
+          <QrCode className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-800">
+            <div className="flex items-center">
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Scan QR code with your mobile wallet to connect...
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
 
       <Tabs defaultValue="connect" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="connect">Connect Wallets</TabsTrigger>
           <TabsTrigger value="connected">Connected ({getConnectionCount()})</TabsTrigger>
-          <TabsTrigger value="security">Security Tips</TabsTrigger>
+          <TabsTrigger value="security">Security Guide</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="connect" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <TabsContent value="connect" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {WALLET_PROVIDERS.map((provider) => (
-              <Card key={provider.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">{provider.icon}</span>
-                      <span className="font-semibold">{provider.name}</span>
+              <Card key={provider.id} className="hover:shadow-lg transition-all duration-200">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{provider.icon}</span>
+                      <span className="font-bold text-lg">{provider.name}</span>
                     </div>
                     {connections[provider.id] ? (
-                      <Badge variant="default" className="bg-green-100 text-green-800">
+                      <Badge className="bg-green-100 text-green-800">
                         <CheckCircle className="h-3 w-3 mr-1" />
                         Connected
                       </Badge>
@@ -346,20 +407,43 @@ export function WalletConnect() {
                     )}
                   </div>
 
-                  <p className="text-sm text-gray-600 mb-3">{provider.description}</p>
+                  <p className="text-sm text-gray-600 mb-4">{provider.description}</p>
 
                   {connections[provider.id] ? (
-                    <div className="space-y-2">
-                      <div className="text-xs font-mono bg-gray-100 p-2 rounded">
-                        {connections[provider.id].address.slice(0, 6)}...
-                        {connections[provider.id].address.slice(-4)}
+                    <div className="space-y-3">
+                      <div className="p-3 bg-green-50 rounded-lg">
+                        <div className="text-xs text-gray-600">Address</div>
+                        <div className="font-mono text-sm flex items-center justify-between">
+                          <span>{formatAddress(connections[provider.id].address)}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyAddress(connections[provider.id].address)}
+                            className="h-6 w-6 p-0"
+                          >
+                            {copiedAddress === connections[provider.id].address ? (
+                              <CheckCircle className="h-3 w-3 text-green-600" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </div>
                       </div>
-                      <div className="text-sm">Balance: {connections[provider.id].balance.toFixed(4)}</div>
+                      <div className="p-3 bg-blue-50 rounded-lg">
+                        <div className="text-xs text-gray-600">Balance</div>
+                        <div className="font-bold">
+                          {connections[provider.id].balance.toFixed(4)}{" "}
+                          {connections[provider.id].network === "Solana" ? "SOL" : "ETH"}
+                        </div>
+                      </div>
+                      <div className="p-3 bg-gray-50 rounded-lg">
+                        <div className="text-xs text-gray-600">Network</div>
+                        <div className="text-sm">{connections[provider.id].network}</div>
+                      </div>
                       <Button
                         variant="outline"
-                        size="sm"
                         onClick={() => disconnectWallet(provider.id)}
-                        className="w-full"
+                        className="w-full bg-transparent"
                       >
                         Disconnect
                       </Button>
@@ -392,14 +476,16 @@ export function WalletConnect() {
           </div>
         </TabsContent>
 
-        <TabsContent value="connected" className="space-y-4">
+        <TabsContent value="connected" className="space-y-6">
           {getConnectionCount() === 0 ? (
             <Card>
-              <CardContent className="p-8 text-center">
-                <Wallet className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-lg font-semibold mb-2">No Wallets Connected</h3>
-                <p className="text-gray-600 mb-4">Connect your first wallet to get started with WyoVerse</p>
-                <Button onClick={() => document.querySelector('[value="connect"]')?.click()}>Connect Wallet</Button>
+              <CardContent className="p-12 text-center">
+                <Wallet className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                <h3 className="text-xl font-bold mb-2">No Wallets Connected</h3>
+                <p className="text-gray-600 mb-6">Connect your first wallet to start your WyoVerse adventure</p>
+                <Button onClick={() => document.querySelector('[value="connect"]')?.click()}>
+                  Connect Your First Wallet
+                </Button>
               </CardContent>
             </Card>
           ) : (
@@ -407,21 +493,24 @@ export function WalletConnect() {
               {Object.entries(connections).map(([providerId, connection]) => {
                 const provider = WALLET_PROVIDERS.find((p) => p.id === providerId)
                 return (
-                  <Card key={providerId}>
-                    <CardContent className="p-4">
+                  <Card key={providerId} className="border-2 border-green-200">
+                    <CardContent className="p-6">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="text-2xl">{provider?.icon}</span>
+                        <div className="flex items-center gap-4">
+                          <span className="text-3xl">{provider?.icon}</span>
                           <div>
-                            <div className="font-semibold">{provider?.name}</div>
-                            <div className="text-sm font-mono text-gray-600">
-                              {connection.address.slice(0, 8)}...{connection.address.slice(-6)}
-                            </div>
+                            <div className="font-bold text-lg">{provider?.name}</div>
+                            <div className="text-sm text-gray-600">{connection.network}</div>
+                            <div className="font-mono text-sm text-gray-500">{formatAddress(connection.address)}</div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-semibold">{connection.balance.toFixed(4)}</div>
-                          <div className="text-sm text-gray-600">Balance</div>
+                          <div className="text-2xl font-bold text-green-600">{connection.balance.toFixed(4)}</div>
+                          <div className="text-sm text-gray-600">{connection.network === "Solana" ? "SOL" : "ETH"}</div>
+                          <Badge className="bg-green-100 text-green-800 mt-2">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Active
+                          </Badge>
                         </div>
                       </div>
                     </CardContent>
@@ -432,49 +521,102 @@ export function WalletConnect() {
           )}
         </TabsContent>
 
-        <TabsContent value="security" className="space-y-4">
+        <TabsContent value="security" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>🔒 Security Best Practices</CardTitle>
+              <CardTitle className="flex items-center text-2xl">
+                <Shield className="mr-3 h-6 w-6" />
+                Wallet Security Best Practices
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                  <div>
-                    <div className="font-semibold">Never share your seed phrase</div>
-                    <div className="text-sm text-gray-600">
-                      Your seed phrase is the key to your wallet. Never share it with anyone.
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-green-700">✅ Do These Things</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                      <div>
+                        <div className="font-semibold">Use Hardware Wallets</div>
+                        <div className="text-sm text-gray-600">
+                          For large amounts, use hardware wallets like Ledger or Trezor
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                      <div>
+                        <div className="font-semibold">Verify URLs</div>
+                        <div className="text-sm text-gray-600">
+                          Always check you're on the correct website before connecting
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                      <div>
+                        <div className="font-semibold">Keep Software Updated</div>
+                        <div className="text-sm text-gray-600">Regular updates include important security fixes</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                      <div>
+                        <div className="font-semibold">Use Strong Passwords</div>
+                        <div className="text-sm text-gray-600">Create unique, complex passwords for all accounts</div>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                  <div>
-                    <div className="font-semibold">Verify URLs before connecting</div>
-                    <div className="text-sm text-gray-600">
-                      Always check that you're on the correct website before connecting your wallet.
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-red-700">❌ Never Do These</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
+                      <div>
+                        <div className="font-semibold">Share Your Seed Phrase</div>
+                        <div className="text-sm text-gray-600">
+                          Never share your 12/24 word recovery phrase with anyone
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
+                      <div>
+                        <div className="font-semibold">Store Keys Online</div>
+                        <div className="text-sm text-gray-600">Don't save private keys in cloud storage or email</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
+                      <div>
+                        <div className="font-semibold">Click Suspicious Links</div>
+                        <div className="text-sm text-gray-600">
+                          Be wary of phishing attempts via email or social media
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
+                      <div>
+                        <div className="font-semibold">Rush Transactions</div>
+                        <div className="text-sm text-gray-600">
+                          Always double-check transaction details before signing
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                  <div>
-                    <div className="font-semibold">Use hardware wallets for large amounts</div>
-                    <div className="text-sm text-gray-600">
-                      Consider using a hardware wallet for storing significant amounts of crypto.
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                  <div>
-                    <div className="font-semibold">Keep your wallet software updated</div>
-                    <div className="text-sm text-gray-600">
-                      Regular updates include important security fixes and improvements.
-                    </div>
-                  </div>
-                </div>
+              </div>
+
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 className="font-bold text-blue-900 mb-2">🛡️ WyoVerse Security Promise</h4>
+                <p className="text-blue-800 text-sm">
+                  WyoVerse never stores your private keys or seed phrases. All wallet connections are encrypted and
+                  processed locally in your browser. We use industry-standard security practices to protect your data
+                  and transactions.
+                </p>
               </div>
             </CardContent>
           </Card>
