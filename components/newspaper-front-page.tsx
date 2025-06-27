@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { ExternalLink, Users, Calendar, MapPin } from "lucide-react"
+import { ExternalLink, Users, Calendar, MapPin, Gamepad2 } from "lucide-react"
 import Link from "next/link"
 
 export function NewspaperFrontPage() {
@@ -181,16 +181,16 @@ export function NewspaperFrontPage() {
           <Card className="border-4 border-amber-900 bg-white">
             <CardHeader className="text-center border-b-2 border-amber-900 pb-2">
               <h3 className="text-xl font-bold text-amber-900" style={{ fontFamily: "serif" }}>
-                EDUCATION FRONTIER
+                SAFETY TRAINING AVAILABLE
               </h3>
             </CardHeader>
             <CardContent className="pt-4">
               <p className="text-gray-700 text-sm leading-relaxed mb-3">
-                The WyoVerse Academy opens its doors with courses in digital literacy, blockchain technology, and
-                virtual world navigation for pioneers of all ages.
+                The WyoVerse OSHA Training Center now offers interactive safety courses. Learn essential workplace
+                safety through engaging mini-games and simulations.
               </p>
-              <Link href="/education">
-                <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white">Enroll Today</Button>
+              <Link href="/osha">
+                <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white">Start Training</Button>
               </Link>
             </CardContent>
           </Card>
@@ -208,7 +208,9 @@ export function NewspaperFrontPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="text-center">
                 <div className="bg-white border-2 border-amber-600 rounded-lg p-6 mb-4">
-                  <h3 className="text-2xl font-bold text-amber-900 mb-2">🥊 CRYPTO CLASHERS</h3>
+                  <h3 className="text-2xl font-bold text-amber-900 mb-2 flex items-center justify-center gap-2">
+                    🥊 CRYPTO CLASHERS
+                  </h3>
                   <p className="text-amber-700 mb-4">
                     Step into the ring at our premier boxing arena! Watch epic battles between digital champions and
                     place your bets on the outcome.
@@ -227,7 +229,9 @@ export function NewspaperFrontPage() {
 
               <div className="text-center">
                 <div className="bg-white border-2 border-amber-600 rounded-lg p-6 mb-4">
-                  <h3 className="text-2xl font-bold text-amber-900 mb-2">🏎️ RACING CIRCUIT</h3>
+                  <h3 className="text-2xl font-bold text-amber-900 mb-2 flex items-center justify-center gap-2">
+                    🏎️ RACING CIRCUIT
+                  </h3>
                   <p className="text-amber-700 mb-4">
                     High-speed thrills await at our digital racing track! Compete against other pioneers in
                     heart-pounding races across the frontier.
@@ -246,11 +250,13 @@ export function NewspaperFrontPage() {
             </div>
 
             <div className="text-center mt-6 p-4 bg-amber-200 border-2 border-amber-600 rounded-lg">
-              <p className="text-amber-900 font-semibold text-lg mb-2">
-                🎮 More Games Available at Our Partner Studios
+              <p className="text-amber-900 font-semibold text-lg mb-2 flex items-center justify-center gap-2">
+                <Gamepad2 className="h-5 w-5" />
+                More Games Available at Our Partner Studios
               </p>
               <p className="text-amber-800 mb-4">
                 Discover additional gaming experiences and digital entertainment at our affiliated development studios.
+                From classic arcade games to modern blockchain adventures!
               </p>
               <Button
                 className="bg-amber-600 hover:bg-amber-700 text-white"
@@ -288,6 +294,11 @@ export function NewspaperFrontPage() {
                     <strong>Prospector's Guild:</strong> New member orientation Tuesdays
                   </p>
                 </div>
+                <div className="border-l-4 border-amber-600 pl-3">
+                  <p className="text-sm text-gray-700">
+                    <strong>Safety Training:</strong> OSHA certification available daily
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -315,6 +326,10 @@ export function NewspaperFrontPage() {
                 <Separator />
                 <p>
                   <strong>LOST:</strong> Digital wallet containing rare NFTs. Reward offered!
+                </p>
+                <Separator />
+                <p>
+                  <strong>HIRING:</strong> Safety instructors for OSHA training center. Apply in person.
                 </p>
               </div>
             </CardContent>
