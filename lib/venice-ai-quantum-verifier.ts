@@ -27,12 +27,13 @@ interface CombatMove {
 }
 
 interface BoxerStats {
+  name: string
   health: number
   energy: number
-  cryptoAffinity: string
+  cryptoToken: string
   marketSentiment: number
   koCount: number
-  wyomingCompliance: boolean
+  sprite: string
 }
 
 export class VeniceAIQuantumVerifier {
