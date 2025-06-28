@@ -1,28 +1,28 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
-  Shield,
   CheckCircle,
-  AlertTriangle,
   XCircle,
-  Loader2,
+  AlertTriangle,
+  Play,
   Download,
   RefreshCw,
-  Zap,
-  Activity,
-  Globe,
-  Wallet,
+  Shield,
+  Link,
+  Cpu,
   Bot,
   TrendingUp,
-  Lock,
+  Wallet,
+  Zap,
 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 interface ComplianceResult {
   component: string
@@ -44,37 +44,57 @@ interface AuditReport {
 }
 
 const componentIcons = {
-  "Link Integrity": Globe,
-  "Blockchain Connectivity": Activity,
+  "Link Integrity": Link,
+  "Blockchain Connectivity": Cpu,
   "Bar Keep Bill AI": Bot,
   "Market Data APIs": TrendingUp,
   "Wallet Integration": Wallet,
-  "Security Compliance": Lock,
+  "Security Compliance": Shield,
+}
+
+const statusColors = {
+  PASS: "text-green-600 bg-green-50 border-green-200",
+  FAIL: "text-red-600 bg-red-50 border-red-200",
+  WARN: "text-yellow-600 bg-yellow-50 border-yellow-200",
+}
+
+const statusIcons = {
+  PASS: CheckCircle,
+  FAIL: XCircle,
+  WARN: AlertTriangle,
 }
 
 export default function AuditPage() {
   const [auditReport, setAuditReport] = useState<AuditReport | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [isRunning, setIsRunning] = useState(false)
+  const [currentTest, setCurrentTest] = useState("")
+  const [progress, setProgress] = useState(0)
   const [selectedComponent, setSelectedComponent] = useState<string | null>(null)
-  const [lastAuditTime, setLastAuditTime] = useState<string>("")
-
-  useEffect(() => {
-    // Load last audit from localStorage
-    const savedAudit = localStorage.getItem("wyoverse_audit")
-    if (savedAudit) {
-      try {
-        const parsed = JSON.parse(savedAudit)
-        setAuditReport(parsed)
-        setLastAuditTime(parsed.timestamp)
-      } catch (error) {
-        console.error("Failed to load saved audit:", error)
-      }
-    }
-  }, [])
+  const { toast } = useToast()
 
   const runFullAudit = async () => {
-    setLoading(true)
+    setIsRunning(true)
+    setProgress(0)
+    setCurrentTest("Initializing Wyoming-Quantum Compliance Audit...")
+
     try {
+      const components = [
+        "Link Integrity",
+        "Blockchain Connectivity",
+        "Bar Keep Bill AI",
+        "Market Data APIs",
+        "Wallet Integration",
+        "Security Compliance",
+      ]
+
+      for (let i = 0; i < components.length; i++) {
+        setCurrentTest(`Testing ${components[i]}...`)
+        setProgress(((i + 1) / components.length) * 100)
+
+        // Simulate test delay for realistic progress
+        await new Promise((resolve) => setTimeout(resolve, 1500))
+      }
+
       const response = await fetch("/api/audit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -85,125 +105,69 @@ export default function AuditPage() {
 
       if (data.success) {
         setAuditReport(data.report)
-        setLastAuditTime(data.report.timestamp)
-        localStorage.setItem("wyoverse_audit", JSON.stringify(data.report))
+        toast({
+          title: "🤠 Audit Complete!",
+          description: `Wyoming-Quantum Compliance Score: ${data.report.overallScore}%`,
+          duration: 3000,
+        })
       } else {
         throw new Error(data.message || "Audit failed")
       }
     } catch (error) {
-      console.error("Audit failed:", error)
-      alert("Audit failed: " + (error instanceof Error ? error.message : "Unknown error"))
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const runQuickCheck = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch("/api/audit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "quick_check" }),
+      console.error("Audit error:", error)
+      toast({
+        title: "❌ Audit Failed",
+        description: "Could not complete compliance audit",
+        variant: "destructive",
       })
-
-      const data = await response.json()
-
-      if (data.success) {
-        // Update only the checked components
-        if (auditReport) {
-          const updatedResults = auditReport.results.map((result) => {
-            const quickResult = data.results.find((r: ComplianceResult) => r.component === result.component)
-            return quickResult || result
-          })
-
-          const updatedReport = {
-            ...auditReport,
-            results: updatedResults,
-            timestamp: new Date().toISOString(),
-          }
-
-          setAuditReport(updatedReport)
-          localStorage.setItem("wyoverse_audit", JSON.stringify(updatedReport))
-        }
-      }
-    } catch (error) {
-      console.error("Quick check failed:", error)
     } finally {
-      setLoading(false)
+      setIsRunning(false)
+      setCurrentTest("")
+      setProgress(0)
     }
   }
 
-  const checkComponent = async (component: string) => {
-    setLoading(true)
+  const runComponentTest = async (component: string) => {
     setSelectedComponent(component)
 
     try {
-      const componentMap: Record<string, string> = {
-        "Link Integrity": "links",
-        "Blockchain Connectivity": "blockchain",
-        "Bar Keep Bill AI": "ai",
-        "Market Data APIs": "market",
-        "Wallet Integration": "wallet",
-        "Security Compliance": "security",
-      }
-
       const response = await fetch("/api/audit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "component_check",
-          component: componentMap[component],
+          component: component.toLowerCase().replace(/\s+/g, "_"),
         }),
       })
 
       const data = await response.json()
 
-      if (data.success && auditReport) {
-        const updatedResults = auditReport.results.map((result) =>
-          result.component === component ? data.result : result,
-        )
+      if (data.success) {
+        // Update the specific component in the report
+        if (auditReport) {
+          const updatedResults = auditReport.results.map((result) =>
+            result.component === component ? data.result : result,
+          )
 
-        const updatedReport = {
-          ...auditReport,
-          results: updatedResults,
-          timestamp: new Date().toISOString(),
+          setAuditReport({
+            ...auditReport,
+            results: updatedResults,
+          })
         }
 
-        setAuditReport(updatedReport)
-        localStorage.setItem("wyoverse_audit", JSON.stringify(updatedReport))
+        toast({
+          title: `✅ ${component} Test Complete`,
+          description: `Status: ${data.result.status} (${data.result.score}%)`,
+        })
       }
     } catch (error) {
-      console.error("Component check failed:", error)
+      toast({
+        title: `❌ ${component} Test Failed`,
+        description: "Could not complete component test",
+        variant: "destructive",
+      })
     } finally {
-      setLoading(false)
       setSelectedComponent(null)
-    }
-  }
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "PASS":
-        return <CheckCircle className="h-5 w-5 text-green-600" />
-      case "WARN":
-        return <AlertTriangle className="h-5 w-5 text-yellow-600" />
-      case "FAIL":
-        return <XCircle className="h-5 w-5 text-red-600" />
-      default:
-        return <Activity className="h-5 w-5 text-gray-600" />
-    }
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "PASS":
-        return "bg-green-100 text-green-800"
-      case "WARN":
-        return "bg-yellow-100 text-yellow-800"
-      case "FAIL":
-        return "bg-red-100 text-red-800"
-      default:
-        return "bg-gray-100 text-gray-800"
     }
   }
 
@@ -212,8 +176,8 @@ export default function AuditPage() {
 
     const reportData = {
       ...auditReport,
+      generatedBy: "WyoVerse Quantum Audit System v1.0",
       generatedAt: new Date().toISOString(),
-      format: "JSON",
     }
 
     const blob = new Blob([JSON.stringify(reportData, null, 2)], {
@@ -228,223 +192,380 @@ export default function AuditPage() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+
+    toast({
+      title: "📄 Report Downloaded",
+      description: "Audit report saved successfully",
+    })
+  }
+
+  const downloadMarkdownReport = () => {
+    if (!auditReport) return
+
+    const markdown = `# Wyoming-Quantum Compliance Audit Report
+
+**Audit ID:** ${auditReport.auditId}  
+**Timestamp:** ${new Date(auditReport.timestamp).toLocaleString()}  
+**Overall Score:** ${auditReport.overallScore}%  
+**Status:** ${auditReport.status}  
+**Quantum Signature:** ${auditReport.quantumSignature}  
+
+## Summary
+
+${
+  auditReport.status === "COMPLIANT"
+    ? "🏆 **WYOMING-QUANTUM COMPLIANT**"
+    : auditReport.status === "PARTIALLY_COMPLIANT"
+      ? "⚠️ **PARTIALLY COMPLIANT**"
+      : "❌ **NON-COMPLIANT**"
+}
+
+## Component Results
+
+${auditReport.results
+  .map(
+    (result) => `
+### ${result.component}
+
+- **Status:** ${result.status}
+- **Score:** ${result.score}%
+- **Details:** ${result.details}
+- **Timestamp:** ${new Date(result.timestamp).toLocaleString()}
+`,
+  )
+  .join("\n")}
+
+## Recommendations
+
+${auditReport.recommendations.map((rec) => `- ${rec}`).join("\n")}
+
+---
+*Generated by WyoVerse Quantum Audit System v1.0*
+`
+
+    const blob = new Blob([markdown], { type: "text/markdown" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `wyoverse_audit_${auditReport.auditId}.md`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const getStatusBadge = (status: string) => {
+    const Icon = statusIcons[status as keyof typeof statusIcons]
+    return (
+      <Badge className={statusColors[status as keyof typeof statusColors]}>
+        <Icon className="w-3 h-3 mr-1" />
+        {status}
+      </Badge>
+    )
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-amber-900 mb-2">🤠 Wyoming-Quantum Compliance Audit</h1>
-        <p className="text-lg text-amber-700">Comprehensive system verification with Venice AI precision</p>
-        {lastAuditTime && (
-          <p className="text-sm text-gray-600 mt-2">Last audit: {new Date(lastAuditTime).toLocaleString()}</p>
-        )}
-      </div>
-
-      {/* Control Panel */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Shield className="mr-2 h-6 w-6" />
-            Audit Control Panel
-          </CardTitle>
-          <CardDescription>Run comprehensive compliance checks on all WyoVerse systems</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-4">
-            <Button onClick={runFullAudit} disabled={loading} className="bg-amber-600 hover:bg-amber-700">
-              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Zap className="mr-2 h-4 w-4" />}
-              Run Full Audit
-            </Button>
-
-            <Button onClick={runQuickCheck} disabled={loading} variant="outline">
-              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
-              Quick Check
-            </Button>
-
-            {auditReport && (
-              <Button onClick={downloadReport} variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                Download Report
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Audit Results */}
-      {auditReport && (
-        <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="components">Components</TabsTrigger>
-            <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-6">
-            {/* Overall Status */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Overall Compliance Status</span>
-                  <Badge className={getStatusColor(auditReport.status)}>{auditReport.status.replace("_", " ")}</Badge>
+    <div className="newspaper-bg min-h-screen p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <Card className="border-4 border-black shadow-lg mb-6 newspaper-article">
+          <CardHeader className="border-b-2 border-black bg-blue-900 text-white">
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="text-3xl font-serif headline-primary text-white">
+                  🤠 Wyoming-Quantum Compliance Audit
                 </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium">Overall Score</span>
-                      <span className="text-2xl font-bold">{auditReport.overallScore}%</span>
-                    </div>
-                    <Progress value={auditReport.overallScore} className="h-3" />
-                  </div>
+                <CardDescription className="text-lg font-serif text-gray-200">
+                  Comprehensive system verification with Venice AI precision
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={runFullAudit}
+                  disabled={isRunning}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {isRunning ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Running...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-4 h-4 mr-2" />
+                      Run Full Audit
+                    </>
+                  )}
+                </Button>
+                {auditReport && (
+                  <>
+                    <Button
+                      onClick={downloadReport}
+                      variant="outline"
+                      className="border-white text-white hover:bg-white hover:text-blue-900 bg-transparent"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      JSON
+                    </Button>
+                    <Button
+                      onClick={downloadMarkdownReport}
+                      variant="outline"
+                      className="border-white text-white hover:bg-white hover:text-blue-900 bg-transparent"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Markdown
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          </CardHeader>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600">
-                        {auditReport.results.filter((r) => r.status === "PASS").length}
-                      </div>
-                      <div className="text-sm text-gray-600">Passed</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-yellow-600">
-                        {auditReport.results.filter((r) => r.status === "WARN").length}
-                      </div>
-                      <div className="text-sm text-gray-600">Warnings</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-red-600">
-                        {auditReport.results.filter((r) => r.status === "FAIL").length}
-                      </div>
-                      <div className="text-sm text-gray-600">Failed</div>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                    <div className="text-sm font-medium text-blue-900">Quantum Signature</div>
-                    <div className="font-mono text-xs text-blue-700 break-all">{auditReport.quantumSignature}</div>
-                  </div>
+          {/* Progress Bar */}
+          {isRunning && (
+            <CardContent className="p-4 newspaper-article-inner">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>{currentTest}</span>
+                  <span>{Math.round(progress)}%</span>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                <Progress value={progress} className="h-2" />
+              </div>
+            </CardContent>
+          )}
+        </Card>
 
-          <TabsContent value="components" className="space-y-4">
-            {auditReport.results.map((result, index) => {
-              const IconComponent = componentIcons[result.component as keyof typeof componentIcons] || Activity
-              const isChecking = loading && selectedComponent === result.component
+        {/* Audit Results */}
+        {auditReport && (
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="components">Components</TabsTrigger>
+              <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
+            </TabsList>
 
-              return (
-                <Card key={index}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <IconComponent className="mr-2 h-5 w-5" />
-                        {result.component}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge className={getStatusColor(result.status)}>{result.status}</Badge>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => checkComponent(result.component)}
-                          disabled={loading}
-                        >
-                          {isChecking ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <RefreshCw className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">Score</span>
-                        <span className="text-lg font-bold">{result.score}%</span>
-                      </div>
-                      <Progress value={result.score} className="h-2" />
-
-                      <div className="text-sm text-gray-600">
-                        <strong>Details:</strong> {result.details}
-                      </div>
-
-                      <div className="text-xs text-gray-500">
-                        Last checked: {new Date(result.timestamp).toLocaleString()}
-                      </div>
-
-                      {result.quantumSignature && (
-                        <div className="text-xs font-mono text-blue-600 bg-blue-50 p-2 rounded">
-                          Quantum: {result.quantumSignature}
-                        </div>
+            {/* Overview Tab */}
+            <TabsContent value="overview">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Overall Status */}
+                <Card className="border-4 border-black newspaper-article">
+                  <CardHeader className="text-center newspaper-article-inner">
+                    <CardTitle className="text-2xl font-serif headline-secondary">Overall Status</CardTitle>
+                    <div className="text-4xl font-bold mt-4">{auditReport.overallScore}%</div>
+                    <div className="mt-2">
+                      {getStatusBadge(
+                        auditReport.overallScore >= 90 ? "PASS" : auditReport.overallScore >= 75 ? "WARN" : "FAIL",
                       )}
                     </div>
-                  </CardContent>
+                  </CardHeader>
                 </Card>
-              )
-            })}
-          </TabsContent>
 
-          <TabsContent value="recommendations" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Audit Recommendations</CardTitle>
-                <CardDescription>Action items to improve system compliance and performance</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {auditReport.recommendations.map((recommendation, index) => (
-                    <Alert key={index}>
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertDescription>{recommendation}</AlertDescription>
-                    </Alert>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Audit Metadata</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <strong>Audit ID:</strong> {auditReport.auditId}
-                  </div>
-                  <div>
-                    <strong>Timestamp:</strong> {new Date(auditReport.timestamp).toLocaleString()}
-                  </div>
-                  <div className="md:col-span-2">
-                    <strong>Quantum Signature:</strong>
-                    <div className="font-mono text-xs bg-gray-100 p-2 rounded mt-1 break-all">
+                {/* Quantum Signature */}
+                <Card className="border-4 border-black newspaper-article">
+                  <CardHeader className="newspaper-article-inner">
+                    <CardTitle className="text-xl font-serif headline-secondary flex items-center">
+                      <Zap className="w-5 h-5 mr-2" />
+                      Quantum Signature
+                    </CardTitle>
+                    <div className="font-mono text-sm break-all bg-gray-100 p-2 rounded">
                       {auditReport.quantumSignature}
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      )}
+                    <div className="text-sm text-gray-600 mt-2">Audit ID: {auditReport.auditId}</div>
+                  </CardHeader>
+                </Card>
 
-      {/* No Audit Message */}
-      {!auditReport && !loading && (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <Shield className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-xl font-bold mb-2">No Audit Data Available</h3>
-            <p className="text-gray-600 mb-6">Run your first Wyoming-Quantum Compliance Audit to get started</p>
-            <Button onClick={runFullAudit} className="bg-amber-600 hover:bg-amber-700">
-              <Zap className="mr-2 h-4 w-4" />
-              Run First Audit
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+                {/* Test Summary */}
+                <Card className="border-4 border-black newspaper-article">
+                  <CardHeader className="newspaper-article-inner">
+                    <CardTitle className="text-xl font-serif headline-secondary">Test Summary</CardTitle>
+                    <div className="space-y-2 mt-4">
+                      <div className="flex justify-between">
+                        <span>Passed:</span>
+                        <span className="text-green-600 font-bold">
+                          {auditReport.results.filter((r) => r.status === "PASS").length}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Warnings:</span>
+                        <span className="text-yellow-600 font-bold">
+                          {auditReport.results.filter((r) => r.status === "WARN").length}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Failed:</span>
+                        <span className="text-red-600 font-bold">
+                          {auditReport.results.filter((r) => r.status === "FAIL").length}
+                        </span>
+                      </div>
+                    </div>
+                  </CardHeader>
+                </Card>
+              </div>
+
+              {/* Status Alert */}
+              <Alert
+                className={`border-4 ${
+                  auditReport.status === "COMPLIANT"
+                    ? "border-green-500 bg-green-50"
+                    : auditReport.status === "PARTIALLY_COMPLIANT"
+                      ? "border-yellow-500 bg-yellow-50"
+                      : "border-red-500 bg-red-50"
+                }`}
+              >
+                <Shield className="h-4 w-4" />
+                <AlertTitle className="font-serif headline-secondary">
+                  {auditReport.status === "COMPLIANT"
+                    ? "🏆 WYOMING-QUANTUM COMPLIANT"
+                    : auditReport.status === "PARTIALLY_COMPLIANT"
+                      ? "⚠️ PARTIALLY COMPLIANT"
+                      : "❌ NON-COMPLIANT"}
+                </AlertTitle>
+                <AlertDescription>
+                  {auditReport.status === "COMPLIANT"
+                    ? "All systems are operating within Wyoming-Quantum compliance standards. Your platform is ready for production deployment."
+                    : auditReport.status === "PARTIALLY_COMPLIANT"
+                      ? "Most systems are compliant, but some components need attention. Review the warnings and recommendations."
+                      : "Critical compliance issues detected. Address failed components before deployment."}
+                </AlertDescription>
+              </Alert>
+            </TabsContent>
+
+            {/* Components Tab */}
+            <TabsContent value="components">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {auditReport.results.map((result, index) => {
+                  const Icon = componentIcons[result.component as keyof typeof componentIcons] || Shield
+                  return (
+                    <Card key={index} className="border-4 border-black newspaper-article">
+                      <CardHeader className="newspaper-article-inner">
+                        <div className="flex justify-between items-start">
+                          <div className="flex items-center space-x-2">
+                            <Icon className="w-5 h-5" />
+                            <CardTitle className="text-lg font-serif headline-secondary">{result.component}</CardTitle>
+                          </div>
+                          {getStatusBadge(result.status)}
+                        </div>
+                        <div className="text-2xl font-bold mt-2">{result.score}%</div>
+                      </CardHeader>
+                      <CardContent className="newspaper-article-inner">
+                        <p className="text-sm text-gray-600 mb-4">{result.details}</p>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-500">{new Date(result.timestamp).toLocaleString()}</span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => runComponentTest(result.component)}
+                            disabled={selectedComponent === result.component}
+                            className="frontier-button"
+                          >
+                            {selectedComponent === result.component ? (
+                              <RefreshCw className="w-3 h-3 animate-spin" />
+                            ) : (
+                              "Retest"
+                            )}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
+            </TabsContent>
+
+            {/* Recommendations Tab */}
+            <TabsContent value="recommendations">
+              <Card className="border-4 border-black newspaper-article">
+                <CardHeader className="newspaper-article-inner">
+                  <CardTitle className="text-2xl font-serif headline-secondary">Audit Recommendations</CardTitle>
+                  <CardDescription>Follow these recommendations to improve your compliance score</CardDescription>
+                </CardHeader>
+                <CardContent className="newspaper-article-inner">
+                  <div className="space-y-4">
+                    {auditReport.recommendations.map((recommendation, index) => (
+                      <div key={index} className="flex items-start space-x-3 p-3 border-l-4 border-blue-500 bg-blue-50">
+                        <div className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                          {index + 1}
+                        </div>
+                        <p className="text-sm">{recommendation}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Additional Resources */}
+                  <div className="mt-8 p-4 bg-gray-50 rounded border-2 border-gray-200">
+                    <h4 className="font-serif headline-secondary text-lg mb-3">Additional Resources</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <h5 className="font-bold mb-2">Documentation:</h5>
+                        <ul className="space-y-1 text-blue-600">
+                          <li>
+                            •{" "}
+                            <a href="/docs/compliance" className="hover:underline">
+                              Compliance Guide
+                            </a>
+                          </li>
+                          <li>
+                            •{" "}
+                            <a href="/docs/security" className="hover:underline">
+                              Security Best Practices
+                            </a>
+                          </li>
+                          <li>
+                            •{" "}
+                            <a href="/docs/deployment" className="hover:underline">
+                              Deployment Checklist
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h5 className="font-bold mb-2">Support:</h5>
+                        <ul className="space-y-1 text-blue-600">
+                          <li>
+                            •{" "}
+                            <a href="mailto:support@wyoverse.com" className="hover:underline">
+                              Technical Support
+                            </a>
+                          </li>
+                          <li>
+                            •{" "}
+                            <a href="/community" className="hover:underline">
+                              Community Forum
+                            </a>
+                          </li>
+                          <li>
+                            •{" "}
+                            <a href="/docs/api" className="hover:underline">
+                              API Documentation
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        )}
+
+        {/* No Audit Message */}
+        {!auditReport && !isRunning && (
+          <Card className="border-4 border-black newspaper-article">
+            <CardContent className="text-center py-12 newspaper-article-inner">
+              <Shield className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+              <h3 className="text-xl font-serif headline-secondary mb-2">No Audit Results</h3>
+              <p className="text-gray-600 mb-6">
+                Run a compliance audit to verify your WyoVerse platform meets all Wyoming-Quantum standards.
+              </p>
+              <Button onClick={runFullAudit} className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Play className="w-4 h-4 mr-2" />
+                Start Compliance Audit
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   )
 }
