@@ -1,0 +1,6 @@
+``javascript
+   // Add global error catcher
+   window.onerror = (msg) => {
+     if(msg.includes("Vercel")) location.reload(); // Bypass Vercel issues
+     if(msg.includes("Wallet")) showFallbackWalletUI();
+   };
