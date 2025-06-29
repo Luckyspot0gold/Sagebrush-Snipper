@@ -1,0 +1,5 @@
+function pioneerSpirit(problem) {
+  return problem.isImpossible ? 
+         new CreativeSolution() : 
+         problem.solve();
+}
