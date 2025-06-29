@@ -131,12 +131,21 @@ export default function AuditPage() {
     setSelectedComponent(component)
 
     try {
+      const componentMap: Record<string, string> = {
+        "Link Integrity": "links",
+        "Blockchain Connectivity": "blockchain",
+        "Bar Keep Bill AI": "ai",
+        "Market Data APIs": "market",
+        "Wallet Integration": "wallet",
+        "Security Compliance": "security",
+      }
+
       const response = await fetch("/api/audit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "component_check",
-          component: component.toLowerCase().replace(/\s+/g, "_"),
+          component: componentMap[component],
         }),
       })
 

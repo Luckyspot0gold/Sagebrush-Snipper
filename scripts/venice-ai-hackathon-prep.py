@@ -269,7 +269,7 @@ class VeniceAIHackathonPrep:
                     "has_frontier_language": any(term in ai_response.lower() for term in ["partner", "howdy", "reckon", "dagnabbit", "well"]),
                     "has_wyoming_references": any(term in ai_response.lower() for term in ["wyoming", "frontier", "ranch", "cowboy"]),
                     "has_crypto_knowledge": any(term in ai_response.lower() for term in ["bitcoin", "mining", "crypto", "blockchain"]),
-                    "has_boxing_context": any(term in ai_response.lower() for term in ["boxing", "fight", "punch", "strategy"]),
+                    "has_boxing_context": any(term in ai_response.lower() for term in ["boxing", "fight", "arena", "strategy"]),
                     "maintains_character": "bill" in ai_response.lower() or "bartender" in ai_response.lower(),
                     "appropriate_length": 50 < len(ai_response) < 300
                 }

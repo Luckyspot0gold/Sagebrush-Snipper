@@ -340,16 +340,17 @@ export class WyomingQuantumComplianceChecker {
   async runFullAudit(): Promise<AuditReport> {
     console.log(`🤠 Starting Wyoming-Quantum Compliance Audit ${this.auditId}`)
 
-    const checks = [
+    const start_time = Date.now()
+
+    // Run all verifications
+    this.results = await Promise.all([
       this.checkLinkIntegrity(),
       this.checkBlockchainConnectivity(),
       this.checkBarKeepBillAI(),
       this.checkMarketDataAPIs(),
       this.checkWalletIntegration(),
       this.checkSecurityCompliance(),
-    ]
-
-    this.results = await Promise.all(checks)
+    ])
 
     const totalScore = this.results.reduce((sum, result) => sum + result.score, 0)
     const overallScore = Math.round(totalScore / this.results.length)
