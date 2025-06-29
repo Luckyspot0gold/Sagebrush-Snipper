@@ -6,6 +6,12 @@
 version: 2
 updates:
   - package-ecosystem: "" # See documentation for possible values
-    directory: "/" # Location of package manifests
+    directory: "/frontend" # Location of package manifests
     schedule:
       interval: "weekly"
+version: 2
+updates:
+  - package-ecosystem: "npm"   # Example: JavaScript/Node.js
+    directory: "/rmain"              # Location of package manifests (e.g., package.json)
+    schedule:
+      interval: "weekly"        # Checks for updates weekly
