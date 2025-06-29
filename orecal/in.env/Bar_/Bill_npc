@@ -1,0 +1,9 @@
+`mermaid
+graph LR
+    A[Bar Keep Bill NPC] --> B[LangGraph Agent]
+    B --> C{Event Trigger}
+    C -->|New Player| D[Send Welcome Brew]
+    C -->|Market Crash| E[Offer Discount]
+    C -->|High Activity| F[Start Minigame]
+    B --> G[Human Oversight Hub]
+```
