@@ -1,0 +1,2 @@
+# Start Discord bridge
+discord_crew_bot --start-meeting --topic "Hackathon Final Push"
