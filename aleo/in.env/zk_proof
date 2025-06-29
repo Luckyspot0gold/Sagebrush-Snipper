@@ -1,0 +1,26 @@
+``bash
+# Aleo Smart Contract for KO Verification
+aleo new wyoming_ko
+cd wyoming_ko
+
+echo 'program wyoming_ko;
+record KO {
+    winner as address.private;
+    loser as address.private;
+    ko_hash as field.private;
+}
+
+fn verify_ko:
+    input r0 as field.private;
+    cast r0 into KO;
+    output KO;' > contracts/ko_verification.aleo
+```
+
+```python
+# ZK Proof Generation
+def generate_zk_proof(boxer1, boxer2):
+    return aleo.run_zk_prover(
+        "contracts/ko_verification.aleo",
+        inputs=[boxer1, boxer2, generate_ko_hash()]
+    )
+```
