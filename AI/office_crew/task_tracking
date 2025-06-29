@@ -1,0 +1,17 @@
+gantt
+    title Wyoverse 1880 - Team Timeline
+    dateFormat  YYYY-MM-DD
+    section Frontend
+    Player Submissions     :a1, 2025-06-23, 2d
+    Status Panel           :2025-06-24, 1d
+    Sound Integration      :2025-06-25, 1d
+    
+    section Blockchain
+    NFT Contract           :2025-06-23, 1d
+    Verification API       :2025-06-24, 1d
+    Node Setup             :2025-06-25, 1d
+    
+    section Media
+    Video Recording        :2025-06-24, 1d
+    Editing                :2025-06-25, 1d
+    Submission Package     :2025-06-26, 1d
