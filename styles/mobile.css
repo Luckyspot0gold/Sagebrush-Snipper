@@ -1,0 +1,203 @@
+/* 📱 Mobile-First Wyoming Responsive Design */
+
+/* Base mobile styles */
+@media (max-width: 768px) {
+  .wyoverse-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+  }
+
+  .hero-section {
+    padding: 1rem !important;
+    text-align: center;
+  }
+
+  .hero-section h1 {
+    font-size: 2rem !important;
+    line-height: 1.2;
+  }
+
+  .hero-section p {
+    font-size: 1rem !important;
+    margin: 0.5rem 0;
+  }
+
+  /* Navigation fixes */
+  .nav-menu {
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
+    padding: 1rem;
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .nav-menu.open {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* Button improvements */
+  .btn-primary {
+    width: 100% !important;
+    padding: 1rem !important;
+    font-size: 1.1rem !important;
+    margin: 0.5rem 0 !important;
+  }
+
+  /* Card layouts */
+  .card {
+    margin: 0.5rem 0 !important;
+    padding: 1rem !important;
+  }
+
+  /* Trading interface */
+  .trading-controls {
+    flex-direction: column !important;
+  }
+
+  .trading-controls > * {
+    width: 100% !important;
+    margin: 0.25rem 0 !important;
+  }
+
+  /* Chart responsiveness */
+  .chart-container {
+    height: 300px !important;
+    overflow-x: auto;
+  }
+
+  /* Wallet connection */
+  .wallet-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Revenue dashboard */
+  .revenue-modules {
+    flex-direction: column !important;
+  }
+
+  .revenue-card {
+    width: 100% !important;
+    margin: 0.5rem 0 !important;
+  }
+
+  /* Gaming interface */
+  .game-arena {
+    height: 250px !important;
+    padding: 0.5rem !important;
+  }
+
+  .boxer-controls {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+  }
+
+  .boxer-controls button {
+    min-width: 80px !important;
+    margin: 0.25rem !important;
+  }
+
+  /* Text scaling */
+  .mobile-text-scale {
+    font-size: 0.9rem !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Touch targets */
+  button, .clickable {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+
+  /* Spacing adjustments */
+  .container {
+    padding: 0 1rem !important;
+  }
+
+  .section-padding {
+    padding: 2rem 1rem !important;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .wyoverse-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .hero-section h1 {
+    font-size: 2.5rem !important;
+  }
+
+  .trading-controls {
+    flex-wrap: wrap !important;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .logo, .icon {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hero-section {
+    padding: 0.5rem !important;
+  }
+
+  .game-arena {
+    height: 200px !important;
+  }
+
+  .nav-menu {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .card {
+    background: rgba(30, 60, 114, 0.9) !important;
+    border: 1px solid rgba(255, 215, 0, 0.3) !important;
+  }
+
+  .text-primary {
+    color: #FFD700 !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}

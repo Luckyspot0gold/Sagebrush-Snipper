@@ -8,7 +8,19 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy": "npm run build && surge ./out wyoverse.surge.sh"
+    "export": "next build && next export",
+    "deploy": "npm run build && npm run deploy:platforms",
+    "deploy:platforms": "npm run deploy:vercel && npm run deploy:surge",
+    "deploy:vercel": "vercel --prod",
+    "deploy:surge": "surge ./out wyoverse.surge.sh",
+    "deploy:production": "chmod +x scripts/deploy-production.sh && ./scripts/deploy-production.sh",
+    "test": "echo 'Tests will be added' && exit 0",
+    "start:sagebrush": "cd apps/sagebrush-sniper && streamlit run main.py --server.port 8501",
+    "start:dr-dee": "cd apps/dr-dee-assistant && streamlit run main.py --server.port 8502",
+    "start:all": "concurrently \"npm run dev\" \"npm run start:sagebrush\" \"npm run start:dr-dee\"",
+    "health-check": "node scripts/health-check.js",
+    "clean": "rm -rf .next out node_modules/.cache",
+    "postinstall": "echo '🤠 WyoVerse dependencies installed successfully!'"
   },
   "dependencies": {
     "next": "^14.0.0",
@@ -17,20 +29,27 @@
     "@supabase/supabase-js": "^2.38.0",
     "@coinbase/onchainkit": "^0.10.0",
     "web3": "^4.0.0",
-    "ethers": "^6.0.0",
-    "streamlit": "^1.28.0",
-    "yfinance": "^0.2.18",
-    "plotly": "^5.17.0",
-    "pandas": "^2.0.0"
+    "ethers": "^6.0.0"
   },
   "devDependencies": {
     "eslint": "^8.0.0",
     "eslint-config-next": "^14.0.0",
     "typescript": "^5.0.0",
     "@types/react": "^18.0.0",
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "concurrently": "^8.2.0",
+    "surge": "^0.23.0"
   },
-  "keywords": ["wyoming", "crypto", "gaming", "ai", "blockchain"],
-  "author": "Justin McCrea",
-  "license": "MIT"
+  "keywords": ["wyoming", "crypto", "gaming", "ai", "blockchain", "defi", "nft"],
+  "author": "Justin McCrea <justin@wyoverse.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Luckyspot0gold/WyoVerse.git"
+  },
+  "homepage": "https://wyoverse.com",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
 }
