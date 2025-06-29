@@ -1,0 +1,7 @@
+bash
+# Quantum Token Staking
+curl -X POST https://venice.ai/token/stake \
+  -H "Authorization: Bearer $VENICE_API_KEY" \
+  -F "amount=300000" \
+  -F "project=wyoverse-boxing"
+```
