@@ -1,0 +1,52 @@
+`bash
+# Deploy Supabase
+npx supabase gen2 init -n wyoming_boxing << EOF
+CREATE TABLE boxers (
+    id UUID PRIMARY KEY,
+    token_symbol TEXT NOT NULL,
+    sprite_hash TEXT NOT NULL,
+    health INT DEFAULT 100,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE matches (
+    id UUID PRIMARY KEY,
+    boxer1 UUID REFERENCES boxers(id),
+    boxer2 UUID REFERENCES boxers(id),
+    winner UUID,
+    ko_round INT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+EOF
+
+# Deploy to production
+supabase gen2 deploy -n wyoming_boxing
+```
+
+**StoneYard.cash (AWS Frontend):**
+```bash
+# AWS CloudFront deployment
+aws cloudfront create-distribution \
+  --origin-domain-name stoneyard.s3.amazonaws.com \
+  --price-class PriceClass_200 \
+  --custom-error-responses '[{"ErrorCode":404,"ResponseCode":"200","ResponsePagePath":"/index.html"}]'
+
+# S3 bucket policy
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowWyomingAccess",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::stoneyard.cash/*",
+            "Condition": {
+                "IpAddress": { "aws:SourceIp": "142.251.42.174/32" }  # Wyoming IP range
+            }
+        }
+    ]
+}
+```
+
+---
