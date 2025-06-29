@@ -30,3 +30,6 @@ class WyomingCompliance:
         send_to_wyoming_regulators(move)
         apply_animation_filter(move)
 ```
+function verifyAge() {
+  const location = geoLocate(ip); // <<< BREAKPOINT
+  if (!LICENSED_STATES.includes(location.state)) throw error;
