@@ -1,0 +1,5 @@
+```bash
+# Deploy to Supabase (run from wyoverse-boxing/)
+cd wyoverse-boxing
+supabase link --project-ref YOUR_PROJECT_ID
+supabase deploy
