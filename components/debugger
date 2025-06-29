@@ -1,0 +1,8 @@
+# Add to package.json
+"devDependencies": {
+  "vite-plugin-inspect": "^0.8.1",       # Component inspector
+  "vite-plugin-node": "^0.14.3",         # Node backend debugging
+  "stackblitz-debugger": "^1.4.0",       # StackBlitz-specific debug
+  "vitest": "^1.3.1",                    # Test runner with UI
+  "playwright": "^1.43.0"                # E2E testing
+}
