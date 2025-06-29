@@ -1,0 +1,3 @@
+async function connectWallet() {
+  debugger; // <<< SET BREAKPOINT
+  const accounts = await window.ethereum.request(...);
