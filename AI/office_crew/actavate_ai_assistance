@@ -1,0 +1,4 @@
+# Dee_Helper.py
+activate_assistant("frontend_ai")
+activate_assistant("blockchain_ai")
+activate_assistant("compliance_ai")
