@@ -1,0 +1,28 @@
+`python
+from langgraph.graph import StateGraph
+from venice_sdk import GameAI
+
+# Initialize ambient agent
+class BarKeepAgent:
+    def __init__(self):
+        self.llm = GameAI(character="saloon_keeper")
+        self.workflow = StateGraph()
+        
+        # Define state nodes
+        self.workflow.add_node("detect_event", self._detect_event)
+        self.workflow.add_node("generate_response", self._generate_response)
+        
+    def _detect_event(self, state):
+        # Connect to Wyoverse market events
+        if wyoverse_api.get_market_change() > 10%:
+            return "market_boom"
+        elif player.new_player:
+            return "welcome"
+        return "idle"
+    
+    def _generate_response(self, state):
+        # Use Venice AI for character-appropriate dialogue
+        return self.llm.generate_dialogue(
+            context=f"Respond to {state.event_type} as western bartender"
+        )
+```
