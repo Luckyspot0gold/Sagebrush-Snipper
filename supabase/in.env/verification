@@ -1,0 +1,20 @@
+``bash
+# Verify all systems
+python3 -c "import quantum; quantum.verify_integrity()" || exit 1
+python3 compliance.py --wyoming-signature || exit 1
+python3 encryption.py --undead-stackerS || exit 1
+
+# Test domain connections
+curl -I https://cryptoclashers.games
+# Expected: "X-Supabase: Active"
+
+curl -I https://stoneyard.cash
+# Expected: "X-Cache: AWS CloudFront"
+
+# Test wallet integrations
+python3 -c "from web3 import Web3; w3 = Web3(Web3.HTTPProvider('https://rpc.avalanchechain.com')); print(w3.isConnected())"
+# Expected: True
+
+python3 -c "from solana.rpc.api import Client; c = Client('https://api.mainnet-beta.solana.com'); print(c.get_epoch_info())"
+# Expected: Epoch data + validator info
+```
