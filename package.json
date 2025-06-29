@@ -78,3 +78,25 @@ export default {
   }
 }
 }
+{
+  "configurations": [
+    {
+      "type": "pwa-chrome",
+      "request": "launch",
+      "name": "Frontend: Vite",
+      "url": "https://crypto-clashers-<your-id>.stackblitz.io",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "breakOnLoad": true
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Backend: Node",
+      "address": "localhost",
+      "port": 9229,
+      "localRoot": "${workspaceFolder}/HF_transformers",
+      "remoteRoot": "/home/project/HF_transformers"
+    }
+  ]
+}
