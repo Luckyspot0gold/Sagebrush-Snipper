@@ -1,0 +1,26 @@
+python
+# Boxer movement logic
+def execute_boxer_move(boxer, signal):
+    if signal["price_change"] > 1:
+        boxer.execute("jab")
+    elif signal["price_change"] > 2:
+        boxer.execute("double_jab")
+    elif signal["bollinger_band"] > signal["upper"]:
+        boxer.execute("hook")
+    elif signal["RSI"] > 70:
+        boxer.execute("uppercut")
+    elif signal["MACD"]["cross_up"]:
+        boxer.execute_combo(["jab", "hook", "uppercut"])
+    elif signal["MACD"]["cross_down"]:
+        boxer.execute("stumble")
+```
+
+**Token-Specific Movesets:**
+| Token | Move | Market Trigger | Animation |
+|-------|------|----------------|-----------|
+| BTC   | Jab  | +1% price     | Miner boxer swing pickaxe |
+| WYO   | Lasso Combo | +2% price | Rancher lasso + punch |
+| LINK  | Oracle Hook | Chainlink oracle update | Guardian's beadwork glows |
+| SOL   | Quantum Charge | Network latency >1s | Cowboy stumbles |
+
+---
