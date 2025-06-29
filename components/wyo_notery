@@ -1,0 +1,9 @@
+// Component: WyomingSeal.jsx
+export default function WyomingSeal() {
+  return (
+    <div className="verification-badge">
+      <img src="/wyoming-state-seal.png" alt="Officially Verified" />
+      <span>Blockchain-Notarized • Wyoming State Archives</span>
+    </div>
+  )
+}
