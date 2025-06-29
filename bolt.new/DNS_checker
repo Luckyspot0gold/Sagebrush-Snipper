@@ -1,0 +1,13 @@
+`bash
+# Check DNS for cryptoclashers.games
+dig +short cryptoclashers.games | grep "supabase.app" || echo "❌ CNAME not set"
+# Expected: YOUR_PROJECT_ID.supabase.app
+
+# Check DNS for stoneyard.cash
+dig +short stoneyard.cash | grep "s3.amazonaws.com" || echo "❌ A record not set"
+# Expected: stoneyard.cash.s3.amazonaws.com
+
+# Test domain connectivity
+curl -I https://cryptoclashers.games 2>/dev/null | grep "200 OK" || echo "❌ Supabase down"
+curl -I https://stoneyard.cash 2>/dev/null | grep "200 OK" || echo "❌ S3 down"
+```
