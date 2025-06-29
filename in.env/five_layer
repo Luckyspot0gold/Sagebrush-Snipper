@@ -1,0 +1,22 @@
+5-Layer Encryption System
+def encrypt_sprite(sprite_data):
+    # Layer 1: Base64
+    layer1 = base64.b64encode(sprite_data)
+    
+    # Layer 2: Fernet
+    layer2 = Fernet(UND3AD_KEY).encrypt(layer1)
+    
+    # Layer 3: Quantum Shuffle
+    layer3 = quantum_shuffle(layer2)
+    
+    # Layer 4: Aleo Proof
+    layer4 = generate_zk_proof(layer3)
+    
+    # Layer 5: Wyoming Stamp
+    return apply_wyoming_signature(layer4)
+
+# Apply to all assets
+for sprite in os.listdir("sprites/"):
+    encrypted = encrypt_sprite(open(f"sprites/{sprite}", "rb").read())
+    open(f"sprites/{sprite}.enc", "wb").write(encrypted)
+```
