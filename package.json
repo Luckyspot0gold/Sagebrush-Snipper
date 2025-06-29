@@ -79,17 +79,7 @@ export default {
 }
 }
 {
-  "configurations": [
-    {
-      "type": "pwa-chrome",
-      "request": "launch",
-      "name": "Frontend: Vite",
-      "url": "https://crypto-clashers-<your-id>.stackblitz.io",
-      "webRoot": "${workspaceFolder}",
-      "sourceMaps": true,
-      "breakOnLoad": true
-    },
-    {
+
       "type": "node",
       "request": "attach",
       "name": "Backend: Node",
