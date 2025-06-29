@@ -1,0 +1,10 @@
+// vite.config.js
+server: {
+  proxy: {
+    '/api': {
+      target: 'https://your-api.com',
+      changeOrigin: true,
+      secure: false
+    }
+  }
+}
