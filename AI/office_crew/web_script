@@ -1,0 +1,10 @@
+# wyoverse-web/scripts/generate_content.py
+from langchain import LangChain
+
+def generate_edition(player_tips: list):
+    lc = LangChain(wyoming_archive_key)
+    return lc.generate_edition(
+        date="1885-06-23",
+        player_submissions=player_tips,
+        historical_accuracy=0.92
+    )
