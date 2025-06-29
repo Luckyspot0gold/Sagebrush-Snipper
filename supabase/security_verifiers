@@ -1,0 +1,16 @@
+bash
+# Test encryption layers
+for sprite in miner rancher cowboy guardian; do
+    ENCRYPTED="assets/sprites/${sprite}.final"
+    if [ ! -f "$ENCRYPTED" ]; then
+        echo "Missing encrypted sprite: $sprite"
+        exit 1
+    fi
+    
+    # Verify quantum signature
+    if ! quantum.verify "$ENCRYPTED"; then
+        echo "Quantum signature invalid for $sprite"
+        exit 1
+    fi
+done
+```
