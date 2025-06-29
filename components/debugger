@@ -1,8 +1,19 @@
 # Add to package.json
 "devDependencies": {
-  "vite-plugin-inspect": "^0.8.1",       # Component inspector
-  "vite-plugin-node": "^0.14.3",         # Node backend debugging
-  "stackblitz-debugger": "^1.4.0",       # StackBlitz-specific debug
-  "vitest": "^1.3.1",                    # Test runner with UI
-  "playwright": "^1.43.0"                # E2E testing
+  "vite-plugin-inspect": "^0.8.1",       
+  "vite-plugin-node": "^0.14.3",         
+  "stackblitz-debugger": "^1.4.0",       
+  "vitest": "^1.3.1",                    
+  "playwright": "^1.43.0"                
 }
+# Start debug mode
+npm run dev -- --debug
+
+# Run tests with debug UI
+npx vitest --ui
+
+# Generate debug report
+npx stackblitz-debugger capture
+
+# Trace blockchain calls
+DEBUG=avalanche*,web3* npm start
