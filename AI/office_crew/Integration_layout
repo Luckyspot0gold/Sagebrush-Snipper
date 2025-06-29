@@ -1,0 +1,21 @@
+graph TD
+    A[Justin] -->|Project Lead| B[Frontend Crew]
+    A -->|Blockchain Lead| C[Blockchain Crew]
+    A -->|Compliance Lead| D[Legal Crew]
+    A -->|Content Lead| E[Media Crew]
+    
+    B --> B1[Interactive Newspaper UI]
+    B --> B2[Player Submission System]
+    B --> B3[Blockchain Status Panel]
+    
+    C --> C1[NFT Minting Pipeline]
+    C --> C2[Algorand Verification]
+    C --> C3[Wyoming Node Setup]
+    
+    D --> D1[Age Gate Compliance]
+    D --> D2[Gaming License Docs]
+    D --> D3[Archive Partnership]
+    
+    E --> E1[Demo Video Production]
+    E --> E2[Devpost Submission]
+    E --> E3[Press Kit]
