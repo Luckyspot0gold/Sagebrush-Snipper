@@ -52,7 +52,6 @@
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
   }
-}# Add to package.json
 "devDependencies": {
   "vite-plugin-inspect": "^0.8.1",       
   "vite-plugin-node": "^0.14.3",         
