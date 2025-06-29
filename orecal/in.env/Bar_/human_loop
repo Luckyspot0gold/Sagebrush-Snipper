@@ -1,0 +1,8 @@
+`javascript
+// Add to existing Supabase setup
+supabase.channel('bar-keep-review')
+  .on('postgres_changes', { event: 'INSERT', schema: 'public' }, (payload) => {
+    if (payload.new.requires_approval) {
+      sendToHumanReviewQueue(payload);
+    }
+  })
