@@ -1,0 +1,2 @@
+# Send 500 ALGO to team wallet
+goal clerk send -a 500000000 -f FUNDS_WALLET -t TEAM_WALLET -d ~/algorand/testnet
