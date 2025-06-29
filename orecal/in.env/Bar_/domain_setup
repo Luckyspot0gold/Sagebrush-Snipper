@@ -1,0 +1,16 @@
+bash
+# Quantum-Secure DNS Setup
+dig TXT @8.8.8.8 wyoverse.com
+# Expected: "venice-ai/quantum-encrypted"
+# "undead-stackerS/v3"
+# "chainlink-oracle/active"
+
+# Deploy to all domains
+if [ "$DOMAIN" == "cryptoclashers.games" ]; then
+    npx supabase gen2 deploy -n wyoming_boxing
+elif [ "$DOMAIN" == "stoneyard.cash" ]; then
+    aws s3 sync assets/ s3://stoneyard.cash/boxers/
+elif [ "$DOMAIN" == "v0.dev" ]; then
+    v0 deploy --project=clash-rt1K4z5ldO7
+fi
+```
