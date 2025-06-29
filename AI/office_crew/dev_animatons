@@ -1,0 +1,6 @@
+#!/bin/bash
+# deploy_prod.sh
+git pull origin main
+npm run build
+vercel --prod -A now.prod.json
+aws s3 sync out/ s3://wyoverse-newspaper-prod
