@@ -1,0 +1,6 @@
+ ```bash
+   # COMMAND: Stabilize essential features
+   git checkout main
+   git reset --hard COMMIT_SHA # To stable version
+   git checkout -b submission-version
+   ```
