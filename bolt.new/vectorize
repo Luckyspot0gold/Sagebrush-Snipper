@@ -1,0 +1,12 @@
+curl https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/vectorize/v2/indexes \
+    -H 'Content-Type: application/json' \
+    -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
+    -H "X-Auth-Key: $CLOUDFLARE_API_KEY" \
+    -d '{
+      "config": {
+        "dimensions": 768,
+        "metric": "cosine"
+      },
+      "name": "example-index",
+      "description": "This is my example index."
+    }'
