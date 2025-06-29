@@ -1,0 +1,7 @@
+`python
+# Trigger events from blockchain activities
+AVALANCHE_EVENTS = {
+    "large_trade": "market_activity",
+    "new_player_mint": "welcome",
+    "nft_transfer": "gossip_event"
+}
