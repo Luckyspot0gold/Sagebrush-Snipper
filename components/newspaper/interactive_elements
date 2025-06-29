@@ -1,0 +1,15 @@
+`typescript
+// File: wyoverse-web/components/NewspaperSection.tsx
+const handlePlayerSubmission = async (playerTip: string) => {
+  // Verify tip on blockchain
+  const verificationTx = await verifyOnChain(playerTip);
+  
+  // Generate AI-expanded story
+  const fullStory = await langChain.expandStory(playerTip);
+  
+  // Add player byline to edition
+  currentEdition.addArticle(fullStory, playerWallet.address);
+  
+  // Reward player with $GOLD tokens
+  rewardPlayer(playerWallet, 50);
+}
