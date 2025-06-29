@@ -1,0 +1,2 @@
+const tx = await contract.mint(metadata);
+console.log('Minting TX:', tx); // <<< BREAKPOINT HERE
