@@ -1,0 +1,9 @@
+# TASKS:
+# 1. Finalize NFT contract: npx hardhat deploy --network algorand-testnet
+# 2. Set up Wyoming validator node: aws ec2 run-instances --image-id ami-wyoming-node
+# 3. Create verification API: flask run --port 5000
+
+# TOOLS: 
+# - Algorand Sandbox
+# - Thirdweb SDK
+# - AWS CLI
