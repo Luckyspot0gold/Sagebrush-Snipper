@@ -1,0 +1,2 @@
+# Run nightly at 2AM
+0 2 * * * /usr/bin/python3 /home/ubuntu/wyoverse/scripts/compliance_check.py --jurisdiction WY
