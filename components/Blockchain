@@ -1,0 +1,7 @@
+contract Molotov {
+   function burnBug(address _bug) public {
+       require(isCritical(_bug), "Not worth fuel");
+       emit BugIncinerated(_bug, msg.sender);
+       reward(msg.sender, 100 $GOLD);
+   }
+}
