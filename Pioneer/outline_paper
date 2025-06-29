@@ -1,0 +1,23 @@
+graph TD
+    A[Wyoverse 1880 Newspaper] --> B[Core Features]
+    A --> C[Blockchain Integration]
+    A --> D[Demo Preparation]
+    A --> E[Submission Requirements]
+    
+    B --> B1(Historical Market Simulation)
+    B --> B2(LangChain AI Content)
+    B --> B3(Wyoming Frontier UI)
+    B --> B4(Player Impact System)
+    
+    C --> C1(Algorand Transactions)
+    C --> C2(NFT Editions)
+    C --> C3(On-chain Verification)
+    C --> C4(Patent Generator)
+    
+    D --> D1(<3min Video)
+    D --> D2(Live Demo)
+    D --> D3(Player Journey Showcase)
+    
+    E --> E1(Built with Bot Badge)
+    E --> E2(Devpost Submission)
+    E --> E3(Bonus Claims)
