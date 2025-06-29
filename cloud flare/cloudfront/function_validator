@@ -1,0 +1,7 @@
+`solidity
+   function validateWyoming(address _user) public {
+       if (tx.origin != WyomingNode) revert NotAuthentic();
+       uint256 bounty = 0.1 ether;
+       _mintWyomingSeal(_user); // NFT Badge
+       payable(_user).transfer(bounty);
+   }
