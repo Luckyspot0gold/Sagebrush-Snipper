@@ -1,0 +1,11 @@
+bash
+# 5-layer sprite encryption
+function encrypt_sprite() {
+    local SPRITE="$1"
+    
+    # Layer 1: Base64
+    base64 "$SPRITE" > "$SPRITE.b64"
+    
+    # Layer 2: Quantum Shuffle
+    python3 -c "import quantum; quantum.shuffle('$SPRITE.b64', '$SPRITE.quantum')"
+    
