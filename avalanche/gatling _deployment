@@ -1,0 +1,6 @@
+# Rapid-fire deployment sequence
+for FEATURE in "nft-minting" "compliance-age-gate" "hologram-ai"; do
+  vercel deploy $FEATURE --prod --force &
+done
+wait
+echo "BARRAGE COMPLETE!"
