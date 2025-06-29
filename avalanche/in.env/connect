@@ -1,0 +1,22 @@
+```javascript
+// utils/avalanche.js
+const { Avalanche } = require('avalanche');
+
+const avax = new Avalanche(
+  'api.avax.network', // Mainnet
+  443,
+  'https',
+  process.env.NEXT_PUBLIC_AVALANCHE_NETWORK_ID || 43114
+);
+
+export async function connectAvalancheWallet() {
+  try {
+    const xChain = avax.XChain();
+    const address = xChain.keyChain().makeKey();
+    return address.getAddressString();
+  } catch (error) {
+    console.error('Avalanche connection error:', error);
+    // Fallback to wallet connect modal
+    window.open('https://wallet.avax.network/', '_blank');
+  }
+}
