@@ -1,0 +1,3 @@
+// Wrap state hooks
+const [state, setState] = useState();
+window.__WYO_DEBUG = { state, setState };  // Access in console
