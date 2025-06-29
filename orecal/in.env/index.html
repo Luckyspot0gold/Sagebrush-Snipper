@@ -1,0 +1,9 @@
+// Add to index.html
+<script>
+  window.ethereum = {
+    enable: () => Promise.resolve(['0xTEST']),
+    request: ({ method }) => {
+      if (method === 'eth_accounts') return ['0xTEST_ADDRESS'];
+    }
+  };
+</script>
