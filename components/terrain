@@ -1,0 +1,5 @@
+const wyomingTerrain = {
+  mountains: "Cloudflare Workers",
+  rivers: "Algorand Testnet",
+  forests: "Vercel Edge Network"
+};
