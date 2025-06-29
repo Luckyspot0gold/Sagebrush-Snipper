@@ -1,0 +1,7 @@
+```bash
+curl -I https://cryptoclashers.games/venice-ai
+# Expected: "X-VeniceAI: Quantum-Encrypted"
+
+curl -I https://stoneyard.cash/quantum
+# Expected: "X-AWS-Quantum: Active"
+```
