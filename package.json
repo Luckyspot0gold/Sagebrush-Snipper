@@ -1,0 +1,36 @@
+{
+  "name": "wyoverse-ecosystem",
+  "version": "1.0.0",
+  "description": "Wyoming-themed crypto gaming ecosystem with AI integration",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "deploy": "npm run build && surge ./out wyoverse.surge.sh"
+  },
+  "dependencies": {
+    "next": "^14.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "@supabase/supabase-js": "^2.38.0",
+    "@coinbase/onchainkit": "^0.10.0",
+    "web3": "^4.0.0",
+    "ethers": "^6.0.0",
+    "streamlit": "^1.28.0",
+    "yfinance": "^0.2.18",
+    "plotly": "^5.17.0",
+    "pandas": "^2.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^14.0.0",
+    "typescript": "^5.0.0",
+    "@types/react": "^18.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "keywords": ["wyoming", "crypto", "gaming", "ai", "blockchain"],
+  "author": "Justin McCrea",
+  "license": "MIT"
+}
