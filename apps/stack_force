@@ -1,0 +1,2 @@
+# Force install in StackBlitz
+node -e "require('child_process').execSync('npm install @thirdweb-dev/sdk', {stdio: 'inherit'})"
