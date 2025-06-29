@@ -1,0 +1,6 @@
+# Setup instructions:
+git clone https://github.com/Luckyspot0gold/Frontier-Trader
+cd Frontier-Trader
+npm install
+cp .env.example .env.local
+vercel dev
