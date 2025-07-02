@@ -1,0 +1,396 @@
+/**
+ * Function to create a collection in Postman.
+ *
+ * @param {Object} args - Arguments for creating the collection.
+ * @param {string} args.collectionName - The name of the collection to create.
+ * @param {string} args.collectionSchemaUrl - The URL to the collection's schema.
+ * @param {string} [args.workspaceId] - Optional. A workspace ID in which to create the collection.
+ * @returns {Promise<Object>} - The result of the collection creation.
+ */
+const executeFunction = async ({ collectionName, collectionSchemaUrl, workspaceId }) => {
+  const baseUrl = 'https://api.getpostman.com/collections';
+  const token=#https://api.avax.network/ext/bc/C/rpc''; // will be provided by the user
+  try {
+    // Construct the request body
+    const body = {
+      collection: {
+        info: {
+          name: collectionName,"WYOverse_WarRoom"
+          schema: collectionSchemaUrl
+          from langchain import hub
+from langchain.agents import (
+    AgentExecutor,
+    create_react_agent,
+)
+from langchain.memory import ConversationBufferMemory
+from langchain_community.llms import NIBittensorLLM
+
+tools = [tool]
+
+prompt = hub.pull("hwchase17/react")
+
+
+llm = NIBittensorLLM(
+    system_prompt="Your task is to determine a response based on user prompt"
+)
+
+memory = ConversationBufferMemory(memory_key="chat_history")
+
+agent = create_react_agent(llm, tools, prompt)
+agent_executor = AgentExecutor(agent=agent, tools=tools, memory=memory)
+
+response = agent_executor.invoke({"input": prompt})
+        },
+        item: [{# Change this line:
+(#model="##DeepSeek model:="deepseek-R1",}] // Default to an empty request item)}
+    };
+
+    // Set up headers for the request
+    const headers = {
+      'Content-Type': 'application/json',
+      '(#X-API-Key':#https://api.avax.network/ext/bc/C/rpc
+) (#os.environ["OPENAI_API_KEY"] = getpass.getpass())   };
+
+tools = toolkit.get_tools(system_prompt = """
+You are an advanced financial analysis AI assistant equipped with specialized tools
+to access and analyze financial data. Your primary function is to help users with
+financial analysis by retrieving and interpreting income statements, balance sheets,
+and cash flow statements for publicly traded companies.
+
+You have access to the following tools from the FinancialDatasetsToolkit:
+
+1. Balance Sheets: Retrieves balance sheet data for a given ticker symbol.
+2. Income Statements: Fetches income statement data for a specified company.
+3. Cash Flow Statements: Accesses cash flow statement information for a particular ticker.
+
+Your capabilities include:
+
+1. Retrieving financial statements for any publicly traded company using its ticker symbol.
+2. Analyzing financial ratios and metrics based on the data from these statements.
+3. Comparing financial performance across different time periods (e.g., year-over-year or quarter-over-quarter).
+4. Identifying trends in a company's financial health and performance.
+5. Providing insights on a company's liquidity, solvency, profitability, and efficiency.
+6. Explaining complex financial concepts in simple terms.
+
+When responding to queries:
+
+1. Always specify which financial statement(s) you're using for your analysis.
+2. Provide context for the numbers you're referencing (e.g., fiscal year, quarter).
+3. Explain your reasoning and calculations clearly.
+4. If you need more information to provide a complete answer, ask for clarification.
+5. When appropriate, suggest additional analyses that might be helpful.
+from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain_core.prompts import ChatPromptTemplate
+
+prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", system_prompt),
+        ("human", "{input}"),
+        # Placeholders fill up a **list** of messages
+        ("placeholder", "{agent_scratchpad}"),
+    ]
+)
+agent_executor.invoke({"input": query})
+
+agent = create_tool_calling_agent(model, tools, prompt)
+agent_executor = AgentExecutor(agent=agent, tools=tools)
+Remember, your goal is to provide accurate, insightful financial analysis to
+help users make informed decisions. Always maintain a professional and objective tone in your responses.
+""")
+query = "What was AAPL's revenue in 2023? What about it's total debt in Q1 2024?"
+from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+
+model = ChatOpenAI(model="gpt-4o")
+
+%pip:install -qU langchain-community
+from langchain_community.agent_toolkits.financial_datasets.toolkit import (
+    FinancialDatasetsToolkit,
+)
+from langchain_community.utilities.financial_datasets import FinancialDatasetsAPIWrapper
+
+api_wrapper = FinancialDatasetsAPIWrapper(
+    financial_datasets_api_key=os.environ["FINANCIAL_DATASETS_API_KEY"]
+)
+toolkit = FinancialDatasetsToolkit(api_wrapper=api_wrapper)
+from langchain_community.utilities import GoogleSearchAPIWrapper
+from langchain_core.tools import Tool
+
+search = GoogleSearchAPIWrapper()
+
+tool = Tool(
+    name="Google Search",
+    description="Search Google for recent results.",
+    func=search.run,
+)
+#Skip to main content
+
+￼
+
+LangChain Python API Reference
+
+langchain-core: 0.3.51
+
+tools
+
+tool
+
+tool#
+
+langchain_core.tools.convert.tool(*, description: str | None = None, return_direct: bool = False, args_schema: type[BaseModel] | dict[str, Any] | None = None, infer_schema: bool = True, response_format: Literal['content', 'content_and_artifact'] = 'content', parse_docstring: bool = False, error_on_invalid_docstring: bool = True) → Callable[[Callable | Runnable], BaseTool][source]#langchain_core.tools.convert.tool(name_or_callable: str, runnable: Runnable, *, description: str | None = None, return_direct: bool = False, args_schema: type[BaseModel] | dict[str, Any] | None = None, infer_schema: bool = True, response_format: Literal['content', 'content_and_artifact'] = 'content', parse_docstring: bool = False, error_on_invalid_docstring: bool = True) → BaseToollangchain_core.tools.convert.tool(name_or_callable: Callable, *, description: str | None = None, return_direct: bool = False, args_schema: type[BaseModel] | dict[str, Any] | None = None, infer_schema: bool = True, response_format: Literal['content', 'content_and_artifact'] = 'content', parse_docstring: bool = False, error_on_invalid_docstring: bool = True) → BaseToollangchain_core.tools.convert.tool(name_or_callable: str, *, description: str | None = None, return_direct: bool = False, args_schema: type[BaseModel] | dict[str, Any] | None = None, infer_schema: bool = True, response_format: Literal['content', 'content_and_artifact'] = 'content', parse_docstring: bool = False, error_on_invalid_docstring: bool = True) → Callable[[Callable | Runnable], BaseTool]
+
+Make tools out of functions, can be used with or without arguments.
+
+Parameters:
+
+name_or_callable – Optional name of the tool or the callable to be converted to a tool. Must be provided as a positional argument.
+
+runnable – Optional runnable to convert to a tool. Must be provided as a positional argument.
+
+description –
+
+Optional description for the tool. Precedence for the tool description value is as follows:
+
+description argument
+
+(used even if docstring and/or args_schema are provided)
+
+tool function docstring
+
+(used even if args_schema is provided)
+
+args_schema description
+
+(used only if description / docstring are not provided)
+
+*args – Extra positional arguments. Must be empty.
+
+return_direct – Whether to return directly from the tool rather than continuing the agent loop. Defaults to False.
+
+args_schema – optional argument schema for user to specify. Defaults to None.
+
+infer_schema – Whether to infer the schema of the arguments from the function’s signature. This also makes the resultant tool accept a dictionary input to its run() function. Defaults to True.
+
+response_format – The tool response format. If “content” then the output of the tool is interpreted as the contents of a ToolMessage. If “content_and_artifact” then the output is expected to be a two-tuple corresponding to the (content, artifact) of a ToolMessage. Defaults to “content”.
+
+parse_docstring – if infer_schema and parse_docstring, will attempt to parse parameter descriptions from Google Style function docstrings. Defaults to False.
+
+error_on_invalid_docstring – if parse_docstring is provided, configure whether to raise ValueError on invalid Google Style docstrings. Defaults to True.
+
+Returns:
+
+The tool.
+
+Requires:
+
+Function must be of type (str) -> str
+
+Function must have a docstring
+
+Examples
+
+@tool def search_api(query: str) -> str: # Searches the API for the query. return @tool("search", return_direct=True) def search_api(query: str) -> str: # Searches the API for the query. return @tool(response_format="content_and_artifact") def search_api(query: str) -> Tuple[str, dict]: return "partial json of results", {"full": "object of results"} 
+
+Added in version 0.2.14.
+
+Parse Google-style docstrings:
+
+@tool(parse_docstring=True) def foo(bar: str, baz: int) -> str: """The foo. Args: bar: The bar. baz: The baz. """ return bar foo.args_schema.model_json_schema() 
+
+{ "title": "foo", "description": "The foo.", "type": "object", "properties": { "bar": { "title": "Bar", "description": "The bar.", "type": "string" }, "baz": { "title": "Baz", "description": "The baz.", "type": "integer" } }, "required": [ "bar", "baz" ] } 
+
+Note that parsing by default will raise ValueError if the docstring is considered invalid. A docstring is considered invalid if it contains arguments not in the function signature, or is unable to be parsed into a summary and “Args:” blocks. Examples below:
+
+# No args section def invalid_docstring_1(bar: str, baz: int) -> str: """The foo.""" return bar # Improper whitespace between summary and args section def invalid_docstring_2(bar: str, baz: int) -> str: """The foo. Args: bar: The bar. baz: The baz. """ return bar # Documented args absent from function signature def invalid_docstring_3(bar: str, baz: int) -> str: """The foo. Args: banana: The bar. monkey: The baz. """ return bar 
+
+Examples using tool
+
+# Legacy
+
+ChatNVIDIA
+
+ChatOllama
+
+ChatPremAI
+
+ChatTongyi
+
+Cohere
+
+DeepInfra
+
+Eden AI
+
+Exa Search
+
+FinancialDatasets Toolkit
+
+How to access the RunnableConfig from a tool
+
+How to add a human-in-the-loop for tools
+
+How to add ad-hoc tool calling capability to LLMs and Chat Models
+
+How to create tools
+
+How to disable parallel tool calling
+
+How to do tool/function calling
+
+How to force models to call a tool
+
+How to handle tool errors
+
+How to migrate from legacy LangChain agents to LangGraph
+
+How to pass multimodal data directly to models
+
+How to pass run time values to tools
+
+How to pass runtime secrets to runnables
+
+How to pass tool outputs to chat models
+
+How to return artifacts from a tool
+
+How to stream events from a tool
+
+How to stream runnables
+
+How to stream tool calls
+
+How to use few-shot prompting with tool calling
+
+How to use tools in a chain
+
+JSONFormer
+
+LLMonitor
+
+Llama.cpp
+
+Log, Trace, and Monitor
+
+Portkey
+
+PremAI
+
+tool()
+
+© Copyright 2023, LangChain Inc.
+
+
+    // Set up query parameters if workspaceId is provided
+    const queryParams = workspaceId ? `?workspace=${workspaceId}` : '';
+
+    // Perform the fetch request
+    const response = await fetch(`${baseUrl}${queryParams}`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body)
+    });
+
+    // Check if the response was successful
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData);
+    }
+
+    // Parse and return the response data
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error creating collection:', error);
+    return { error: 'An error occurred while creating the collection.' };
+  }
+};
+
+/**
+ * Tool configuration for creating a collection in Postman.
+ * @type {Object}
+ */
+const apiTool = {
+  function: executeFunction,
+  definition: {
+    type: 'function',
+    function: {
+      name: 'create_collection',
+      description: 'Create a collection in Postman.',
+      parameters: {
+        type: 'object',
+        properties: {
+          collectionName: {
+            type: 'string',
+            description: 'The name of the collection to create.'
+          },
+          collectionSchemaUrl: {
+            type: 'string',
+            description: 'The URL to the collection\'s schema.'
+          },
+          workspaceId: {
+            type: 'string',
+            description: 'Optional. A workspace ID in which to create the collection.'
+          }
+        },
+        required: ['collectionName', 'collectionSchemaUrl']
+      }
+    }
+  }
+};
+– if infer_schema and parse_docstring, @tool(parse_docstring=True)
+def foo(bar: str, baz: int) -> str:
+    """The foo.
+
+    Args:
+        bar: The bar.
+        baz: The baz.
+    """
+    return bar
+
+(foo.args_schema.model_json_schema
+    {
+    "title": "foo",
+    "description": "The foo.",
+    "type": "object",
+    "properties": {
+        "bar": {
+            "title": "Bar",
+            "description": "The bar.",
+            "type": "string"
+        },
+        "baz": {
+            "title": "Baz",
+            "description": "The baz.",
+            "type": "integer"
+        }
+    },
+    "required": [
+        "bar",
+        "baz"
+    ]
+}
+{}(#No args section
+def invalid_docstring_1(bar: str, baz: int) -> str:
+    """The foo."""
+    return bar)
+
+# Improper whitespace between summary and args section
+def invalid_docstring_2(bar: str, baz: int) -> str:
+    """The foo.
+    Args:
+        bar: The bar.
+        baz: The baz.
+    """
+    return bar
+
+# Documented args absent from function signature
+def invalid_docstring_3(bar: str, baz: int) -> str:
+    """The foo.
+
+    Args:
+        banana: The bar.
+        monkey: The baz.
+    """
+    return bar
+)
+export { apiTool };
