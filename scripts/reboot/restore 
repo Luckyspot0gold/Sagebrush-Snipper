@@ -1,0 +1,16 @@
+cd bullvsbear
+git add .
+git commit -m "Emergency save point - July 1"
+git push 
+# Delete redundant workflow files
+git rm .github/workflows/docker-publish.yaml
+git rm .github/workflows/docker-publish.yml
+git rm .github/workflows/google-cloudrun-source.yml
+git rm .github/workflows/google.sce.yaml
+git rm .github/workflows/google.sce.yml
+git rm .github/workflows/python-publish.yaml
+git rm .github/workflows/python-publish.yml
+
+# Create a new Vercel deployment workflow
+mkdir -p .github/workflows
+touch .github/workflows/vercel-deploy.yml
